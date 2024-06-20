@@ -3,6 +3,7 @@ plugins {
     alias(libs.plugins.jetbrainsKotlinAndroid)
     id("kotlin-kapt")
     id("com.google.dagger.hilt.android")
+    kotlin("plugin.serialization")
 }
 
 android {
@@ -87,11 +88,21 @@ dependencies {
     // KotlinX Serialization
     implementation (libs.kotlinx.serialization.json)
 
+    // Room components
+    implementation (libs.androidx.room.runtime)
+    kapt (libs.androidx.room.compiler)
+    implementation (libs.androidx.room.ktx)
+    implementation (libs.androidx.room.paging)
+
+    // Paging 3.0
+    implementation (libs.androidx.paging.compose)
+
     // Dagger - Hilt
-    implementation (libs.hilt.android.v2381)
-    kapt (libs.hilt.android.compiler.v2381)
+    implementation (libs.hilt.android)
+    kapt (libs.hilt.android.compiler)
     kapt (libs.androidx.hilt.compiler)
     implementation (libs.androidx.hilt.navigation.compose)
+
 
     // Coil
     implementation(libs.coil.compose)
