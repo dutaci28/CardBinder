@@ -3,13 +3,13 @@ package com.example.cardbinder.screens.common
 import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -28,13 +28,9 @@ import com.example.cardbinder.model.MTGCard
 
 @Composable
 fun CardsListContent(items: LazyPagingItems<MTGCard>) {
-    Log.d("Error", items.loadState.toString())
-    LazyColumn(
-        modifier = Modifier.fillMaxSize(),
-        contentPadding = PaddingValues(all = 12.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp)
+    LazyVerticalGrid(
+        columns = GridCells.Adaptive(minSize = 165.dp)
     ) {
-
         items(
             count = items.itemCount,
             key = items.itemKey(),
@@ -55,7 +51,7 @@ fun CardsListContent(items: LazyPagingItems<MTGCard>) {
 fun MTGCardItem(mtgCard: MTGCard) {
     //TODO DE MODIFICAT INCAT SA AFISEZE SI CARTI CU DOUA FETE
     val painter = rememberImagePainter(data = mtgCard.image_uris.png) {
-        crossfade(durationMillis = 1000)
+        crossfade(durationMillis = 100)
         error(R.drawable.image_card_blurred)
         placeholder(R.drawable.image_card_blurred)
     }
@@ -65,8 +61,9 @@ fun MTGCardItem(mtgCard: MTGCard) {
                 Log.d("CARD", "Card clicked")
                 //TODO redirect to individual card page
             }
-            .height(300.dp)
-            .width(215.dp),
+            .padding(5.dp)
+            .height(280.dp)
+            .width(200.dp),
         contentAlignment = Alignment.BottomCenter
     ) {
         Image(
