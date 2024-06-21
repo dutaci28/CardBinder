@@ -53,6 +53,7 @@ fun CardsListContent(items: LazyPagingItems<MTGCard>) {
 @OptIn(ExperimentalCoilApi::class)
 @Composable
 fun MTGCardItem(mtgCard: MTGCard) {
+    //TODO DE MODIFICAT INCAT SA AFISEZE SI CARTI CU DOUA FETE
     val painter = rememberImagePainter(data = mtgCard.image_uris.png) {
         crossfade(durationMillis = 1000)
         error(R.drawable.image_card_blurred)

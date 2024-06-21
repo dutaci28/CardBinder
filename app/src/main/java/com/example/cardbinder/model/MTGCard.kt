@@ -11,14 +11,15 @@ import kotlinx.serialization.Serializable
 data class MTGCard(
     @PrimaryKey(autoGenerate = false)
     val id: String,
-    val name:String,
-    val mana_cost: String,
+    val name: String,
+    val mana_cost: String = "",
     val cmc: Double,
     val type_line: String,
     val rulings_uri: String,
     @Embedded
-    val image_uris: ImageURIs,
+    val image_uris: ImageURIs = ImageURIs("", "", ""),
     @Embedded
     val legalities: Legalities,
-    val artist:String
+    val artist: String
 )
+//TODO DE MODIFICAT CLASA CAT SAPERMITA INFORAMTIILE CARTILOR CU DOUA FETE
