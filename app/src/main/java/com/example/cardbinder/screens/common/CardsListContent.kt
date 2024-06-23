@@ -40,7 +40,7 @@ fun CardsListContent(items: LazyPagingItems<MTGCard>) {
             if (card != null) {
                 MTGCardItem(mtgCard = card)
             } else {
-                Log.d("CARDS","Found null card")
+                Log.d("CARDS", "Found null card")
             }
         }
     }
@@ -49,8 +49,10 @@ fun CardsListContent(items: LazyPagingItems<MTGCard>) {
 @OptIn(ExperimentalCoilApi::class)
 @Composable
 fun MTGCardItem(mtgCard: MTGCard) {
-    //TODO DE MODIFICAT INCAT SA AFISEZE SI CARTI CU DOUA FETE
-    val painter = rememberImagePainter(data = mtgCard.image_uris.png) {
+    //TODO DE MODIFICAT INCAT SA AFISEZE SI SPATELE CARTILOR CU DOUA FETE
+    val imageSource =
+        if (mtgCard.layout == "normal") mtgCard.image_uris.png else mtgCard.faces[0].image_uris.png
+    val painter = rememberImagePainter(data = imageSource) {
         crossfade(durationMillis = 100)
         error(R.drawable.image_card_blurred)
         placeholder(R.drawable.image_card_blurred)
