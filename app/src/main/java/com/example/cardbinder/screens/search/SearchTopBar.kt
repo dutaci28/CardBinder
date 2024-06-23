@@ -21,6 +21,7 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.platform.LocalFocusManager
 
 @Composable
 fun SearchWidget(
@@ -38,6 +39,8 @@ fun SearchWidget(
             }
     ) {
         val keyboardController = LocalSoftwareKeyboardController.current
+        val focusManager = LocalFocusManager.current
+
         TextField(
             modifier = Modifier
                 .fillMaxWidth()
@@ -70,17 +73,16 @@ fun SearchWidget(
                             contentDescription = "CloseButton"
                         },
                     onClick = {
-                        if (text.isNotEmpty()) {
-                            onTextChange("")
-                        } else {
-                            onCloseClicked()
-                        }
+                        keyboardController?.hide()
+                        focusManager.clearFocus()
+                        onTextChange("")
                     }
                 ) {
-                    Icon(
-                        imageVector = Icons.Default.Close,
-                        contentDescription = "Close Icon"
-                    )
+                    if (text.isNotEmpty())
+                        Icon(
+                            imageVector = Icons.Default.Close,
+                            contentDescription = "Empty Text Icon"
+                        )
                 }
             },
             keyboardOptions = KeyboardOptions(
@@ -90,6 +92,7 @@ fun SearchWidget(
                 onSearch = {
                     onSearchClicked(text)
                     keyboardController?.hide()
+                    focusManager.clearFocus()
                 }
             )
         )

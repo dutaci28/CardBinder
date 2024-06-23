@@ -35,17 +35,17 @@ fun SearchScreen(
                 onSearchClicked = {
                     searchViewModel.searchCardsByName(name = it)
                 },
-                onCloseClicked = {
-                    navController.popBackStack()
-                }
+                onCloseClicked = {}
             )
         },
-        content = {innerPadding ->
+        content = { innerPadding ->
             Column {
-                Box(modifier = Modifier
-                    .width(500.dp)
-                    .padding(top =  innerPadding.calculateTopPadding()))
-                CardsListContent(items = if(searchedCards.itemCount == 0) getAllCards else searchedCards)
+                Box(
+                    modifier = Modifier
+                        .width(500.dp)
+                        .padding(top = innerPadding.calculateTopPadding())
+                )
+                CardsListContent(items = if (searchedCards.itemCount == 0) getAllCards else searchedCards)
             }
         }
     )

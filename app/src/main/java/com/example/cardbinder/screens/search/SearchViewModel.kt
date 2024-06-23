@@ -15,7 +15,7 @@ import javax.inject.Inject
 @HiltViewModel
 class SearchViewModel @Inject constructor(
     repository: Repository
-): ViewModel() {
+) : ViewModel() {
     val getAllCards = repository.getAllCards()
     private val repo = repository
     private val _searchQuery = mutableStateOf("")
@@ -25,6 +25,7 @@ class SearchViewModel @Inject constructor(
 
     fun updateSearchQuery(query: String) {
         _searchQuery.value = query
+        if (query.isEmpty()) searchCardsByName("")
     }
 
     fun searchCardsByName(name: String) {
