@@ -6,6 +6,7 @@ import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import com.example.cardbinder.data.local.MTGCardDatabase
 import com.example.cardbinder.data.paging.ScryfallRemoteMediator
+import com.example.cardbinder.data.paging.SearchByNamePagingSource
 import com.example.cardbinder.data.remote.ScryfallAPI
 import com.example.cardbinder.model.MTGCard
 import com.example.cardbinder.util.Constants.Companion.ITEMS_PER_PAGE
@@ -27,6 +28,15 @@ class Repository @Inject constructor(
                 mtgCardDatabase = mtgCardDatabase
             ),
             pagingSourceFactory = pagingSourceFactory
+        ).flow
+    }
+
+    fun searchCardsByName(name: String): Flow<PagingData<MTGCard>> {
+        return Pager(
+            config = PagingConfig(pageSize = ITEMS_PER_PAGE),
+            pagingSourceFactory = {
+                SearchByNamePagingSource(scryfallAPI = scryfallApi, name = name)
+            }
         ).flow
     }
 }

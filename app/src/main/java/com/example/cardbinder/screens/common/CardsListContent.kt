@@ -40,7 +40,7 @@ fun CardsListContent(items: LazyPagingItems<MTGCard>) {
             if (card != null) {
                 MTGCardItem(mtgCard = card)
             } else {
-                Log.d("ERROR","Found null card")
+                Log.d("CARDS","Found null card")
             }
         }
     }
@@ -58,7 +58,7 @@ fun MTGCardItem(mtgCard: MTGCard) {
     Box(
         modifier = Modifier
             .clickable {
-                Log.d("CARD", "Card clicked")
+                Log.d("CARDS", "Card clicked")
                 //TODO redirect to individual card page
             }
             .padding(5.dp)
