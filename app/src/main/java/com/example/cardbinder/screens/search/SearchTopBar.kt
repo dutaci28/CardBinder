@@ -15,6 +15,7 @@ import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.input.ImeAction
@@ -36,6 +37,7 @@ fun SearchWidget(
                 contentDescription = "SearchWidget"
             }
     ) {
+        val keyboardController = LocalSoftwareKeyboardController.current
         TextField(
             modifier = Modifier
                 .fillMaxWidth()
@@ -87,6 +89,7 @@ fun SearchWidget(
             keyboardActions = KeyboardActions(
                 onSearch = {
                     onSearchClicked(text)
+                    keyboardController?.hide()
                 }
             )
         )
