@@ -50,7 +50,7 @@ class ScryfallRemoteMediator(
             }
 
             val response = scryfallAPI.getAllCards(page = currentPage)
-            val endOfPaginationReached = response.isEmpty()
+            val endOfPaginationReached = response.cards.isEmpty()
 
             val prevPage = if (currentPage == 1) null else currentPage - 1
             val nextPage = if (endOfPaginationReached) null else currentPage + 1
@@ -60,7 +60,7 @@ class ScryfallRemoteMediator(
                     mtgCardDao.deleteAllCards()
                     mtgCardRemoteKeysDao.deleteAllRemoteKeys()
                 }
-                val keys = response.map { card ->
+                val keys = response.cards.map { card ->
                     MTGCardRemoteKeys(
                         id = card.id,
                         prevPage = prevPage,
@@ -68,7 +68,7 @@ class ScryfallRemoteMediator(
                     )
                 }
                 mtgCardRemoteKeysDao.addAllRemoteKeys(remoteKeys = keys)
-                mtgCardDao.addCards(cards = response)
+                mtgCardDao.addCards(cards = response.cards)
             }
             MediatorResult.Success(endOfPaginationReached = endOfPaginationReached)
         } catch (e: Exception) {

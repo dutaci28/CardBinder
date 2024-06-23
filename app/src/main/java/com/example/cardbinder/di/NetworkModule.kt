@@ -1,6 +1,5 @@
 package com.example.cardbinder.di
 
-import com.example.cardbinder.data.remote.ResponseInterceptor
 import com.example.cardbinder.data.remote.ScryfallAPI
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import dagger.Module
@@ -26,7 +25,6 @@ object NetworkModule {
         return OkHttpClient.Builder()
             .readTimeout(15, TimeUnit.SECONDS)
             .connectTimeout(15, TimeUnit.SECONDS)
-            .addInterceptor(ResponseInterceptor())
             .build()
     }
 
