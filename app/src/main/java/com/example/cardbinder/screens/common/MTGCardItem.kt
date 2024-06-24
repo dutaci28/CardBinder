@@ -17,6 +17,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -68,7 +69,10 @@ fun MTGCardItem(mtgCard: MTGCard, paddingModifier: Modifier) {
                 Image(
                     painter = painter,
                     contentDescription = "Card Image",
-                    contentScale = ContentScale.Fit
+                    contentScale = ContentScale.Fit,
+                    modifier = Modifier
+                        .shadow(elevation = 4.dp, shape = RoundedCornerShape(10.dp))
+                        .padding(5.dp)
                 )
             },
             modifier = Modifier

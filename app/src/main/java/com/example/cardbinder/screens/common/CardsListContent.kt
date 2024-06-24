@@ -28,7 +28,7 @@ fun CardsListContent(
         items(
             count = items.itemCount,
             key = items.itemKey(),
-            contentType = items.itemContentType()
+            contentType = items.itemContentType(),
         ) { index ->
             val card = items[index]
 
