@@ -1,4 +1,4 @@
-package com.example.cardbinder.screens.common
+package com.example.cardbinder.screens.navigation
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -7,8 +7,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.rememberNavController
-import com.example.cardbinder.screens.navigation.BottomBar
-import com.example.cardbinder.screens.navigation.NavigationContainer
 
 @Composable
 fun MainScreen() {
