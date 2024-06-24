@@ -57,7 +57,7 @@ fun CardsListContent(items: LazyPagingItems<MTGCard>) {
 fun MTGCardItem(mtgCard: MTGCard) {
     //TODO DE MODIFICAT INCAT SA AFISEZE SI SPATELE CARTILOR CU DOUA FETE
     val imageSource =
-        if (mtgCard.layout == "normal") mtgCard.image_uris.png else mtgCard.faces[0].image_uris.png
+        if (mtgCard.layout == "transform" || mtgCard.layout == "modal_dfc") mtgCard.faces[0].image_uris.png else mtgCard.image_uris.png
     val painter = rememberImagePainter(data = imageSource) {
         crossfade(durationMillis = 100)
     }
