@@ -1,12 +1,14 @@
 package com.example.cardbinder.screens.search
 
 import android.annotation.SuppressLint
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
@@ -38,7 +40,7 @@ fun SearchScreen(
             )
         },
         content = { innerPadding ->
-            Column {
+            Column(modifier = Modifier.background(Color.White)) {
                 if (searchedCards.itemCount == 0) {
                     SingleRandomCard(card = getRandomCard)
                 } else {
