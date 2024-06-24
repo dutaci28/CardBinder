@@ -49,13 +49,14 @@ fun RowScope.AddItem(
     currentDestination: NavDestination?,
     navController: NavHostController
 ) {
-    val navBackStackEntry by navController.currentBackStackEntryAsState()
-    val currentRoute = navBackStackEntry?.destination?.route
-
-    val selected = currentRoute == screen.route
+    val selected = currentDestination?.hierarchy?.any { it.route == screen.route } == true
 
     NavigationBarItem(
-        label = { if (selected) {Text(text = screen.title)} },
+        label = {
+            if (selected) {
+                Text(text = screen.title)
+            }
+        },
         icon = {
             when (screen.route) {
                 NavigationRoutes.Collection.route -> {
