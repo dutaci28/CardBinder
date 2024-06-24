@@ -16,11 +16,12 @@ import javax.inject.Inject
 class SearchViewModel @Inject constructor(
     repository: Repository
 ) : ViewModel() {
-    val getAllCards = repository.getAllCards()
     private val repo = repository
     private val _searchQuery = mutableStateOf("")
     val searchQuery = _searchQuery
     private val _searchedCards = MutableStateFlow<PagingData<MTGCard>>(PagingData.empty())
+    val getAllCards = repo.getAllCards()
+    val getRandomCard = repo.getRandomCard()
     val searchedCards = _searchedCards
 
     fun updateSearchQuery(query: String) {
@@ -31,6 +32,14 @@ class SearchViewModel @Inject constructor(
     fun searchCardsByName(name: String) {
         viewModelScope.launch {
             repo.searchCardsByName(name = name).cachedIn(viewModelScope).collect {
+                _searchedCards.value = it
+            }
+        }
+    }
+
+    fun getRandomCard() {
+        viewModelScope.launch {
+            repo.getRandomCard().cachedIn(viewModelScope).collect {
                 _searchedCards.value = it
             }
         }

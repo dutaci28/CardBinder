@@ -22,6 +22,7 @@ fun SearchScreen(
     searchViewModel: SearchViewModel = hiltViewModel()
 ) {
     val getAllCards = searchViewModel.getAllCards.collectAsLazyPagingItems()
+    val getRandomCard = searchViewModel.getRandomCard.collectAsLazyPagingItems()
     val searchQuery by searchViewModel.searchQuery
     val searchedCards = searchViewModel.searchedCards.collectAsLazyPagingItems()
 
@@ -45,7 +46,14 @@ fun SearchScreen(
                         .width(500.dp)
                         .padding(top = innerPadding.calculateTopPadding())
                 )
-                CardsListContent(items = if (searchedCards.itemCount == 0) getAllCards else searchedCards)
+                if (searchedCards.itemCount == 0) {
+                    SingleRandomCard(card = getRandomCard)
+                } else {
+                    CardsListContent(
+                        items = searchedCards,
+                        modifier = Modifier.padding(horizontal = 5.dp)
+                    )
+                }
             }
         }
     )

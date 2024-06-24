@@ -52,7 +52,7 @@ fun SearchWidget(
             placeholder = {
                 Text(
                     text = "Search here...",
-                    color = Color.White
+                    color = Color.Black
                 )
             },
             singleLine = true,

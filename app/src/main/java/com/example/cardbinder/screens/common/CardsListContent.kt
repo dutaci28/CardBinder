@@ -33,8 +33,9 @@ import com.example.cardbinder.model.Legalities
 import com.example.cardbinder.model.MTGCard
 
 @Composable
-fun CardsListContent(items: LazyPagingItems<MTGCard>) {
+fun CardsListContent(items: LazyPagingItems<MTGCard>, modifier: Modifier) {
     LazyVerticalGrid(
+        modifier = modifier,
         columns = GridCells.Adaptive(minSize = 165.dp)
     ) {
         items(
@@ -81,7 +82,7 @@ fun MTGCardItem(mtgCard: MTGCard) {
                 Log.d("CARDS", "Card clicked")
                 //TODO redirect to individual card page
             }
-            .padding(5.dp)
+            .padding(vertical = 5.dp)
             .height(280.dp)
             .width(200.dp),
         contentAlignment = Alignment.Center
@@ -90,14 +91,9 @@ fun MTGCardItem(mtgCard: MTGCard) {
             isLoading = isLoading,
             contentAfterLoading = {
                 Image(
-                    modifier = Modifier
-                        .padding(5.dp)
-                        .height(280.dp)
-                        .width(200.dp),
                     painter = painter,
                     contentDescription = "Card Image",
                     contentScale = ContentScale.Fit
-
                 )
             },
             modifier = Modifier
