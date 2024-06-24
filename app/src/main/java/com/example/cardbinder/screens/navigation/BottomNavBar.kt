@@ -10,12 +10,15 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavDestination
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
+import com.example.cardbinder.R
 
 @Composable
 fun BottomNavBar(navController: NavHostController) {
@@ -46,9 +49,38 @@ fun RowScope.AddItem(
     currentDestination: NavDestination?,
     navController: NavHostController
 ) {
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val currentRoute = navBackStackEntry?.destination?.route
+
+    val selected = currentRoute == screen.route
+
     NavigationBarItem(
-        label = { Text(text = screen.title) },
-        icon = { Icon(imageVector = screen.icon, contentDescription = "Navigation Icon") },
+        label = { if (selected) {Text(text = screen.title)} },
+        icon = {
+            when (screen.route) {
+                NavigationRoutes.Collection.route -> {
+                    Icon(
+                        imageVector = ImageVector.vectorResource(R.drawable.collection),
+                        contentDescription = "Navigation Icon"
+                    )
+                }
+
+                NavigationRoutes.Search.route -> {
+                    Icon(
+                        imageVector = ImageVector.vectorResource(R.drawable.search),
+                        contentDescription = "Navigation Icon"
+                    )
+                }
+
+                NavigationRoutes.Decks.route -> {
+                    Icon(
+                        imageVector = ImageVector.vectorResource(R.drawable.decks),
+                        contentDescription = "Navigation Icon"
+                    )
+                }
+            }
+
+        },
         selected = currentDestination?.hierarchy?.any { it.route == screen.route } == true,
         onClick = {
             navController.navigate(screen.route) {
