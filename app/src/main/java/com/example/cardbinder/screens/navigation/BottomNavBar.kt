@@ -50,7 +50,7 @@ fun RowScope.AddItem(
     navController: NavHostController
 ) {
     val selected = currentDestination?.hierarchy?.any { it.route == screen.route } == true
-
+    val iconTint = if (!selected) Color.Gray else Color.Black
     NavigationBarItem(
         label = {
             if (selected) {
@@ -62,21 +62,24 @@ fun RowScope.AddItem(
                 NavigationRoutes.Collection.route -> {
                     Icon(
                         imageVector = ImageVector.vectorResource(R.drawable.collection),
-                        contentDescription = "Navigation Icon"
+                        contentDescription = "Navigation Icon",
+                        tint = iconTint
                     )
                 }
 
                 NavigationRoutes.Search.route -> {
                     Icon(
                         imageVector = ImageVector.vectorResource(R.drawable.search),
-                        contentDescription = "Navigation Icon"
+                        contentDescription = "Navigation Icon",
+                        tint = iconTint
                     )
                 }
 
                 NavigationRoutes.Decks.route -> {
                     Icon(
                         imageVector = ImageVector.vectorResource(R.drawable.decks),
-                        contentDescription = "Navigation Icon"
+                        contentDescription = "Navigation Icon",
+                        tint = iconTint
                     )
                 }
             }
