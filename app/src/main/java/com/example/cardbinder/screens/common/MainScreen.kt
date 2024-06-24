@@ -7,8 +7,8 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.rememberNavController
-import com.example.cardbinder.navigation.BottomBar
-import com.example.cardbinder.navigation.NavigationContainer
+import com.example.cardbinder.screens.navigation.BottomBar
+import com.example.cardbinder.screens.navigation.NavigationContainer
 
 @Composable
 fun MainScreen() {

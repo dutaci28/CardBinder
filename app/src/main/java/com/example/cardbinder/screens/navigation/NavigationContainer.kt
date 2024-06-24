@@ -1,4 +1,4 @@
-package com.example.cardbinder.navigation
+package com.example.cardbinder.screens.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
