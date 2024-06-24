@@ -11,14 +11,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavHostController
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.example.cardbinder.screens.common.CardsListContent
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun SearchScreen(
-    navController: NavHostController,
     searchViewModel: SearchViewModel = hiltViewModel()
 ) {
     val getAllCards = searchViewModel.getAllCards.collectAsLazyPagingItems()
