@@ -11,19 +11,36 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class MTGCard(
     @PrimaryKey(autoGenerate = false)
-    val id: String,
-    val name: String,
+    val id: String = "",
+    val name: String = "",
     val mana_cost: String = "",
-    val cmc: Double,
-    val type_line: String,
+    val cmc: Double = 0.0,
+    val type_line: String = "",
     val layout: String = "",
     @SerialName("card_faces")
-    val faces: List<CardFace> = listOf(),
-    val rulings_uri: String,
+    val faces: List<CardFace> = listOf(
+        CardFace("", "", "", ImageURIs("", "", "")),
+        CardFace("", "", "", ImageURIs("", "", ""))
+    ),
+    val rulings_uri: String = "",
     @Embedded
     val image_uris: ImageURIs = ImageURIs("", "", ""),
     @Embedded
-    val legalities: Legalities,
-    val artist: String
+    val legalities: Legalities = Legalities(
+        "not_legal",
+        "not_legal",
+        "not_legal",
+        "not_legal",
+        "not_legal",
+        "not_legal",
+        "not_legal",
+        "not_legal",
+        "not_legal",
+        "not_legal",
+        "not_legal",
+        "not_legal",
+        "not_legal",
+        "not_legal"
+    ),
+    val artist: String = ""
 )
-//TODO DE MODIFICAT CLASA CAT SAPERMITA INFORAMTIILE CARTILOR CU DOUA FETE

@@ -14,7 +14,7 @@ class SearchByNamePagingSource(
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, MTGCard> {
         val currentPage = params.key ?: 1
         return try {
-            val response = scryfallAPI.searchCardsByName(name = "o:$name")
+            val response = scryfallAPI.searchCardsByName(name = name)
             if (response.cards.isNotEmpty()) {
                 LoadResult.Page(
                     data = response.cards,
@@ -30,7 +30,7 @@ class SearchByNamePagingSource(
                 )
             }
         } catch (e: Exception) {
-            Log.d("CARDS","Exception loading cards" + e.message )
+            Log.d("CARDS", "Exception loading cards" + e.message)
             LoadResult.Error(e)
         }
     }
