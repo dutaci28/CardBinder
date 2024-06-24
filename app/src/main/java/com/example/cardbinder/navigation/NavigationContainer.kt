@@ -9,18 +9,18 @@ import com.example.cardbinder.screens.decks.DecksScreen
 import com.example.cardbinder.screens.search.SearchScreen
 
 @Composable
-fun BottomNavGraph(navController: NavHostController) {
+fun NavigationContainer(navController: NavHostController) {
     NavHost(
         navController = navController,
-        startDestination = BottomBarScreen.Search.route
+        startDestination = NavigationRoute.Search.route
     ) {
-        composable(route = BottomBarScreen.Collection.route) {
+        composable(route = NavigationRoute.Collection.route) {
             CollectionScreen()
         }
-        composable(route = BottomBarScreen.Search.route) {
+        composable(route = NavigationRoute.Search.route) {
             SearchScreen()
         }
-        composable(route = BottomBarScreen.Decks.route) {
+        composable(route = NavigationRoute.Decks.route) {
             DecksScreen()
         }
     }

@@ -6,24 +6,24 @@ import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.ui.graphics.vector.ImageVector
 
-sealed class BottomBarScreen(
+sealed class NavigationRoute(
     val route: String,
     val title: String,
     val icon: ImageVector
 ) {
-    data object Collection : BottomBarScreen(
+    data object Collection : NavigationRoute(
         route = "collection",
         title = "Collection",
         icon = Icons.Default.Home
     )
 
-    data object Search : BottomBarScreen(
+    data object Search : NavigationRoute(
         route = "search",
         title = "Search",
         icon = Icons.Default.Search
     )
 
-    data object Decks : BottomBarScreen(
+    data object Decks : NavigationRoute(
         route = "decks",
         title = "Decks",
         icon = Icons.Default.Add
