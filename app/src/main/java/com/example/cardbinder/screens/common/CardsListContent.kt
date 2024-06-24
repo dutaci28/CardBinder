@@ -20,7 +20,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.itemContentType
@@ -33,7 +36,7 @@ import com.example.cardbinder.model.Legalities
 import com.example.cardbinder.model.MTGCard
 
 @Composable
-fun CardsListContent(items: LazyPagingItems<MTGCard>, modifier: Modifier) {
+fun CardsListContent(items: LazyPagingItems<MTGCard>, modifier: Modifier, topPaddingModifier:Modifier) {
     LazyVerticalGrid(
         modifier = modifier,
         columns = GridCells.Adaptive(minSize = 165.dp)
@@ -44,18 +47,39 @@ fun CardsListContent(items: LazyPagingItems<MTGCard>, modifier: Modifier) {
             contentType = items.itemContentType()
         ) { index ->
             val card = items[index]
+
+            @Composable
+            fun screenWidthDp(): Dp {
+                val configuration = LocalConfiguration.current
+                return with(LocalDensity.current) { configuration.screenWidthDp.dp }
+            }
+
+            @Composable
+            fun columnsInFirstRow(itemCount: Int, minWidth: Dp): Int {
+                val density = LocalDensity.current
+                val screenWidth = with(density) { screenWidthDp().toPx() }
+                val itemWidth = with(density) { minWidth.toPx() }
+                return (screenWidth / itemWidth).toInt().coerceAtMost(itemCount)
+            }
+
+            val paddingModifier = if (index < columnsInFirstRow(items.itemCount, 165.dp)) {
+                topPaddingModifier
+            } else {
+                Modifier.padding(top = 0.dp)
+            }
             if (card != null) {
-                MTGCardItem(mtgCard = card)
+                MTGCardItem(mtgCard = card,paddingModifier)
             } else {
                 Log.d("CARDS", "Found null card")
             }
+
         }
     }
 }
 
 @OptIn(ExperimentalCoilApi::class)
 @Composable
-fun MTGCardItem(mtgCard: MTGCard) {
+fun MTGCardItem(mtgCard: MTGCard, paddingModifier:Modifier) {
     //TODO DE MODIFICAT INCAT SA AFISEZE SI SPATELE CARTILOR CU DOUA FETE
     val imageSource =
         if (mtgCard.layout == "transform" || mtgCard.layout == "modal_dfc") mtgCard.faces[0].image_uris.png else mtgCard.image_uris.png
@@ -77,7 +101,7 @@ fun MTGCardItem(mtgCard: MTGCard) {
         }
     }
     Box(
-        modifier = Modifier
+        modifier = paddingModifier
             .clickable {
                 Log.d("CARDS", "Card clicked")
                 //TODO redirect to individual card page
@@ -136,6 +160,6 @@ fun MTGCardPreview() {
                 alchemy = "not_legal"
             ),
             artist = "Jason Chan"
-        )
+        ),Modifier.padding(top = 0.dp)
     )
 }

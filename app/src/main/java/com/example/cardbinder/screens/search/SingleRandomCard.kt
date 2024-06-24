@@ -24,7 +24,8 @@ fun SingleRandomCard(card: LazyPagingItems<MTGCard>) {
             items = card,
             modifier = Modifier
                 .padding(horizontal = 5.dp)
-                .width(200.dp)
+                .width(200.dp),
+            topPaddingModifier = Modifier.padding(0.dp)
         )
     }
 }
