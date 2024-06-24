@@ -7,6 +7,10 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
 import androidx.navigation.NavDestination
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
@@ -14,15 +18,18 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 
 @Composable
-fun BottomBar(navController: NavHostController) {
+fun BottomNavBar(navController: NavHostController) {
     val screens = listOf(
-        NavigationRoute.Collection,
-        NavigationRoute.Search,
-        NavigationRoute.Decks,
+        NavigationRoutes.Collection,
+        NavigationRoutes.Search,
+        NavigationRoutes.Decks,
     )
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry?.destination
-    NavigationBar {
+    NavigationBar(
+        modifier = Modifier.shadow(elevation = 10.dp),
+        containerColor = Color.White.copy(alpha = 0.9f)
+    ) {
         screens.forEach { screen ->
             AddItem(
                 screen = screen,
@@ -35,7 +42,7 @@ fun BottomBar(navController: NavHostController) {
 
 @Composable
 fun RowScope.AddItem(
-    screen: NavigationRoute,
+    screen: NavigationRoutes,
     currentDestination: NavDestination?,
     navController: NavHostController
 ) {

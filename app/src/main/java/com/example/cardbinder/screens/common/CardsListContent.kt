@@ -16,7 +16,11 @@ import androidx.paging.compose.itemKey
 import com.example.cardbinder.model.MTGCard
 
 @Composable
-fun CardsListContent(items: LazyPagingItems<MTGCard>, modifier: Modifier, topPaddingModifier:Modifier) {
+fun CardsListContent(
+    items: LazyPagingItems<MTGCard>,
+    modifier: Modifier,
+    topPaddingModifier: Modifier
+) {
     LazyVerticalGrid(
         modifier = modifier,
         columns = GridCells.Adaptive(minSize = 165.dp)
@@ -44,11 +48,14 @@ fun CardsListContent(items: LazyPagingItems<MTGCard>, modifier: Modifier, topPad
 
             val paddingModifier = if (index < columnsInFirstRow(items.itemCount, 165.dp)) {
                 topPaddingModifier
+            } else if (index == items.itemCount - 1) {
+                Modifier.padding(bottom = 80.dp)
             } else {
                 Modifier.padding(top = 0.dp)
             }
+
             if (card != null) {
-                MTGCardItem(mtgCard = card,paddingModifier)
+                MTGCardItem(mtgCard = card, paddingModifier)
             } else {
                 Log.d("CARDS", "Found null card")
             }
