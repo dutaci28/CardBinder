@@ -16,14 +16,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalView
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.example.cardbinder.screens.collection.CollectionScreen
 import com.example.cardbinder.screens.decks.DecksScreen
 import com.example.cardbinder.screens.individualCard.IndividualCardScreen
 import com.example.cardbinder.screens.search.SearchScreen
+import com.example.cardbinder.util.Constants.Companion.NAV_ARGUMENT_CARD_ID
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
@@ -38,7 +41,7 @@ fun MainScreen(window: Window) {
     }
 
     UpdateStatusBarColor(color = Color.Black, window = window)
-    Scaffold(bottomBar = {if (showBottomBar) BottomNavBar(navController = navController) }) {
+    Scaffold(bottomBar = { if (showBottomBar) BottomNavBar(navController = navController) }) {
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -57,8 +60,12 @@ fun MainScreen(window: Window) {
                 composable(route = NavigationRoutes.Decks.route) {
                     DecksScreen()
                 }
-                composable(route = NavigationRoutes.IndividualCard.route) {
-                    IndividualCardScreen()
+                composable(route = NavigationRoutes.IndividualCard.route, arguments = listOf(
+                    navArgument(name = NAV_ARGUMENT_CARD_ID) {
+                        type = NavType.StringType
+                    }
+                )) {
+                    IndividualCardScreen(it.arguments?.getString(NAV_ARGUMENT_CARD_ID).toString())
                 }
             }
         }

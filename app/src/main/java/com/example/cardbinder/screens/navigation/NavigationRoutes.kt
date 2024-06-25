@@ -1,5 +1,7 @@
 package com.example.cardbinder.screens.navigation
 
+import com.example.cardbinder.util.Constants.Companion.NAV_ARGUMENT_CARD_ID
+
 sealed class NavigationRoutes(
     val route: String,
     val title: String
@@ -21,7 +23,7 @@ sealed class NavigationRoutes(
     )
 
     data object IndividualCard : NavigationRoutes(
-        route = "individualCard",
+        route = "individualCard/{$NAV_ARGUMENT_CARD_ID}",
         title = "IndividualCard"
     )
 }

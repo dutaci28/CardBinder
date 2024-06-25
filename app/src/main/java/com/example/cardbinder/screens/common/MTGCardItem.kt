@@ -28,7 +28,6 @@ import coil.compose.rememberImagePainter
 import com.example.cardbinder.model.ImageURIs
 import com.example.cardbinder.model.Legalities
 import com.example.cardbinder.model.MTGCard
-import com.example.cardbinder.screens.navigation.NavigationRoutes
 
 
 @OptIn(ExperimentalCoilApi::class)
@@ -57,7 +56,7 @@ fun MTGCardItem(navController: NavController, mtgCard: MTGCard, paddingModifier:
     Box(
         modifier = paddingModifier
             .clickable {
-                navController.navigate(NavigationRoutes.IndividualCard.route)
+                navController.navigate(route = "individualCard/" + mtgCard.id)
                 //TODO add current card data to nav arguments
             }
             .padding(vertical = 5.dp)
