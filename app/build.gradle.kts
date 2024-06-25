@@ -74,16 +74,17 @@ dependencies {
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
 
-    implementation(libs.hilt.android)
+    implementation (libs.hilt.android)
     kapt(libs.hilt.android.compiler)
 
     // Compose Navigation
-    implementation(libs.androidx.navigation.compose)
+    implementation (libs.androidx.navigation.compose)
 
     // Retrofit
     implementation (libs.retrofit)
-    implementation(libs.converter.gson)
-    implementation(libs.retrofit2.kotlinx.serialization.converter)
+    implementation (libs.converter.gson)
+    implementation (libs.retrofit2.kotlinx.serialization.converter)
+    implementation(libs.okhttp3.logging.interceptor)
 
     // KotlinX Serialization
     implementation (libs.kotlinx.serialization.json)
@@ -103,8 +104,6 @@ dependencies {
     kapt (libs.androidx.hilt.compiler)
     implementation (libs.androidx.hilt.navigation.compose)
 
-
     // Coil
-    implementation(libs.coil.compose)
-
+    implementation (libs.coil.compose)
 }
