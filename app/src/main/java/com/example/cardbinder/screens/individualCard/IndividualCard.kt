@@ -34,8 +34,10 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.paging.compose.collectAsLazyPagingItems
@@ -85,11 +87,26 @@ fun IndividualCardScreen(
                             bottom = innerPadding.calculateBottomPadding()
                         )
                         .verticalScroll(scrollState)
+                        .background(Color.White)
                 ) {
                     MTGCardBigImage(card = card, cardWidthDp = calculateMaxWidth())
-                    Text(text = "Illustrated by ${card.artist}")
-                    Text(text = card.name)
-                    Text(text = card.set_name + " #" + card.collector_number)
+                    Text(
+                        text = "Illustrated by ${card.artist}",
+                        fontSize = 10.sp,
+                        color = Color.Gray.copy(alpha = 0.8f),
+                        modifier = Modifier.padding(horizontal = 10.dp)
+                    )
+                    Text(
+                        text = card.name,
+                        fontSize = 32.sp,
+                        fontWeight = FontWeight.SemiBold,
+                        modifier = Modifier.padding(horizontal = 20.dp)
+                    )
+                    Text(
+                        text = card.set_name + " #" + card.collector_number,
+                        fontSize = 16.sp,
+                        color = Color.Gray, modifier = Modifier.padding(horizontal = 20.dp)
+                    )
                     LegalitiesBox(card = card)
                     CardPrintingsBox(navController, printingsList = cardPrintingsList)
                     RulingsBox(rulingsList = rulingsList)
@@ -101,16 +118,27 @@ fun IndividualCardScreen(
 
 @Composable
 fun RulingsBox(rulingsList: List<Ruling>) {
-    Column {
-        rulingsList.forEach {
-            RulingItem(ruling = it)
+    if (rulingsList.isNotEmpty())
+        Column(modifier = Modifier.padding(20.dp)) {
+            Text(
+                text = "Rulings",
+                fontSize = 18.sp,
+                fontWeight = FontWeight.SemiBold,
+                modifier = Modifier.padding(bottom = 5.dp)
+            )
+            rulingsList.forEach {
+                RulingItem(ruling = it)
+            }
         }
-    }
 }
 
 @Composable
 fun RulingItem(ruling: Ruling) {
-    Column(modifier = Modifier.fillMaxWidth()) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 5.dp)
+    ) {
         Text(text = ruling.comment)
         Text(text = ruling.published_at, color = Color.Gray.copy(alpha = 0.8f))
     }
@@ -118,7 +146,13 @@ fun RulingItem(ruling: Ruling) {
 
 @Composable
 fun CardPrintingsBox(navController: NavController, printingsList: List<MTGCard>) {
-    Column {
+    Column(modifier = Modifier.padding(20.dp)) {
+        Text(
+            text = "Prints",
+            fontSize = 18.sp,
+            fontWeight = FontWeight.SemiBold,
+            modifier = Modifier.padding(bottom = 5.dp)
+        )
         printingsList.forEach {
             CardPrintingItem(navController, card = it)
         }
@@ -138,7 +172,7 @@ fun CardPrintingItem(navController: NavController, card: MTGCard) {
 
 @Composable
 fun LegalitiesBox(card: MTGCard) {
-    Column {
+    Column(modifier = Modifier.padding(20.dp)) {
         LegalityItem(format = "Standard", cardLegality = card.legalities.standard)
         LegalityItem(format = "Historic", cardLegality = card.legalities.historic)
         LegalityItem(format = "Timeless", cardLegality = card.legalities.timeless)
@@ -161,15 +195,16 @@ fun LegalitiesBox(card: MTGCard) {
 fun LegalityItem(format: String, cardLegality: String) {
     val boxColor = if (cardLegality == "legal") Color.Green else Color.Gray
     val boxText = if (cardLegality == "legal") "LEGAL" else "NOT LEGAL"
-    Row {
+    Row(modifier = Modifier.padding(vertical = 2.dp)) {
         Box(
             modifier = Modifier
                 .width(100.dp)
-                .background(boxColor)
+                .background(boxColor),
+            contentAlignment = Alignment.Center
         ) {
-            Text(text = boxText)
+            Text(text = boxText, fontWeight = FontWeight.SemiBold, color = Color.White)
         }
-        Text(text = format)
+        Text(text = format, modifier = Modifier.padding(start = 5.dp))
     }
 }
 
@@ -188,6 +223,7 @@ fun TopBarWithBackButton() {
         modifier = Modifier
             .fillMaxWidth()
             .height(56.dp)
+            .background(Color.White)
     ) {
         IconButton(
             onClick = {
