@@ -15,12 +15,13 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import androidx.paging.compose.LazyPagingItems
 import com.example.cardbinder.model.MTGCard
 import com.example.cardbinder.screens.common.CardsListContent
 
 @Composable
-fun SingleRandomCard(card: LazyPagingItems<MTGCard>) {
+fun SingleRandomCard(navController: NavController, card: LazyPagingItems<MTGCard>) {
     Column(
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Center,
@@ -39,6 +40,7 @@ fun SingleRandomCard(card: LazyPagingItems<MTGCard>) {
             modifier = Modifier.padding(bottom = 6.dp)
         )
         CardsListContent(
+            navController = navController,
             items = card,
             modifier = Modifier
                 .padding(horizontal = 5.dp)

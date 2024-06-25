@@ -1,6 +1,5 @@
 package com.example.cardbinder.screens.common
 
-import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -19,19 +18,22 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import coil.annotation.ExperimentalCoilApi
 import coil.compose.ImagePainter
 import coil.compose.rememberImagePainter
 import com.example.cardbinder.model.ImageURIs
 import com.example.cardbinder.model.Legalities
 import com.example.cardbinder.model.MTGCard
+import com.example.cardbinder.screens.navigation.NavigationRoutes
 
 
 @OptIn(ExperimentalCoilApi::class)
 @Composable
-fun MTGCardItem(mtgCard: MTGCard, paddingModifier: Modifier) {
+fun MTGCardItem(navController: NavController, mtgCard: MTGCard, paddingModifier: Modifier) {
     //TODO DE MODIFICAT INCAT SA AFISEZE SI SPATELE CARTILOR CU DOUA FETE
     val imageSource =
         if (mtgCard.layout == "transform" || mtgCard.layout == "modal_dfc") mtgCard.faces[0].image_uris.png else mtgCard.image_uris.png
@@ -55,8 +57,8 @@ fun MTGCardItem(mtgCard: MTGCard, paddingModifier: Modifier) {
     Box(
         modifier = paddingModifier
             .clickable {
-                Log.d("CARDS", "Card clicked")
-                //TODO redirect to individual card page
+                navController.navigate(NavigationRoutes.IndividualCard.route)
+                //TODO add current card data to nav arguments
             }
             .padding(vertical = 5.dp)
             .height(280.dp)
@@ -86,6 +88,7 @@ fun MTGCardItem(mtgCard: MTGCard, paddingModifier: Modifier) {
 @Preview
 fun MTGCardPreview() {
     MTGCardItem(
+        NavController(LocalContext.current),
         mtgCard = MTGCard(
             id = "1",
             name = "Butcher of Malakir",

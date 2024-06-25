@@ -20,4 +20,8 @@ sealed class NavigationRoutes(
         title = "Decks"
     )
 
+    data object IndividualCard : NavigationRoutes(
+        route = "individualCard",
+        title = "IndividualCard"
+    )
 }

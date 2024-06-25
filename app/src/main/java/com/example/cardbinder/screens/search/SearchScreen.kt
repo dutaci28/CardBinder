@@ -11,12 +11,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.example.cardbinder.screens.common.CardsListContent
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun SearchScreen(
+    navController :NavController,
     searchViewModel: SearchViewModel = hiltViewModel()
 ) {
     val getAllCards = searchViewModel.getAllCards.collectAsLazyPagingItems()
@@ -39,9 +41,10 @@ fun SearchScreen(
         content = { innerPadding ->
             Column(modifier = Modifier.background(Color.White)) {
                 if (searchedCards.itemCount == 0) {
-                    SingleRandomCard(card = getRandomCard)
+                    SingleRandomCard(navController = navController, card = getRandomCard)
                 } else {
                     CardsListContent(
+                        navController = navController,
                         items = searchedCards,
                         modifier = Modifier.padding(horizontal = 5.dp),
                         topPaddingModifier = Modifier.padding(top = innerPadding.calculateTopPadding())

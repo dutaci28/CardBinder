@@ -10,6 +10,7 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.itemContentType
 import androidx.paging.compose.itemKey
@@ -17,6 +18,7 @@ import com.example.cardbinder.model.MTGCard
 
 @Composable
 fun CardsListContent(
+    navController: NavController,
     items: LazyPagingItems<MTGCard>,
     modifier: Modifier,
     topPaddingModifier: Modifier
@@ -55,7 +57,11 @@ fun CardsListContent(
             }
 
             if (card != null) {
-                MTGCardItem(mtgCard = card, paddingModifier)
+                MTGCardItem(
+                    navController = navController,
+                    mtgCard = card,
+                    paddingModifier = paddingModifier
+                )
             } else {
                 Log.d("CARDS", "Found null card")
             }
