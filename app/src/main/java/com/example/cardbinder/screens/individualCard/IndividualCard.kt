@@ -119,7 +119,7 @@ fun IndividualCardScreen(
 @Composable
 fun RulingsBox(rulingsList: List<Ruling>) {
     if (rulingsList.isNotEmpty())
-        Column(modifier = Modifier.padding(20.dp)) {
+        Column(modifier = Modifier.padding(horizontal = 20.dp, vertical = 10.dp)) {
             Text(
                 text = "Rulings",
                 fontSize = 18.sp,
@@ -146,7 +146,7 @@ fun RulingItem(ruling: Ruling) {
 
 @Composable
 fun CardPrintingsBox(navController: NavController, printingsList: List<MTGCard>) {
-    Column(modifier = Modifier.padding(20.dp)) {
+    Column(modifier = Modifier.padding(horizontal = 20.dp, vertical = 10.dp)) {
         Text(
             text = "Prints",
             fontSize = 18.sp,
@@ -165,30 +165,35 @@ fun CardPrintingItem(navController: NavController, card: MTGCard) {
         navController.navigate(route = "individualCard/" + card.id)
     })
     {
-        Text(text = card.set_name + " #" + card.collector_number)
+        Text(text = card.set_name)
+        Text(" #" + card.collector_number, color = Color.Gray.copy(alpha = 0.8f))
     }
 }
 
 
 @Composable
 fun LegalitiesBox(card: MTGCard) {
-    Column(modifier = Modifier.padding(20.dp)) {
-        LegalityItem(format = "Standard", cardLegality = card.legalities.standard)
-        LegalityItem(format = "Historic", cardLegality = card.legalities.historic)
-        LegalityItem(format = "Timeless", cardLegality = card.legalities.timeless)
-        LegalityItem(format = "Pioneer", cardLegality = card.legalities.pioneer)
-        LegalityItem(format = "Explorer", cardLegality = card.legalities.explorer)
-        LegalityItem(format = "Modern", cardLegality = card.legalities.modern)
-        LegalityItem(format = "Legacy", cardLegality = card.legalities.legacy)
-        LegalityItem(format = "Pauper", cardLegality = card.legalities.pauper)
-        LegalityItem(format = "Vintage", cardLegality = card.legalities.vintage)
-        LegalityItem(format = "Penny", cardLegality = card.legalities.penny)
-        LegalityItem(format = "Commander", cardLegality = card.legalities.commander)
-        LegalityItem(format = "Oathbreaker", cardLegality = card.legalities.oathbreaker)
-        LegalityItem(format = "Brawl", cardLegality = card.legalities.brawl)
-        LegalityItem(format = "Alchemy", cardLegality = card.legalities.alchemy)
-
+    Row(modifier = Modifier.padding(20.dp)) {
+        Column(modifier = Modifier.padding(horizontal = 5.dp)) {
+            LegalityItem(format = "Standard", cardLegality = card.legalities.standard)
+            LegalityItem(format = "Historic", cardLegality = card.legalities.historic)
+            LegalityItem(format = "Timeless", cardLegality = card.legalities.timeless)
+            LegalityItem(format = "Pioneer", cardLegality = card.legalities.pioneer)
+            LegalityItem(format = "Explorer", cardLegality = card.legalities.explorer)
+            LegalityItem(format = "Modern", cardLegality = card.legalities.modern)
+            LegalityItem(format = "Legacy", cardLegality = card.legalities.legacy)
+        }
+        Column(modifier = Modifier.padding(horizontal = 5.dp)) {
+            LegalityItem(format = "Standard", cardLegality = card.legalities.standard)
+            LegalityItem(format = "Historic", cardLegality = card.legalities.historic)
+            LegalityItem(format = "Timeless", cardLegality = card.legalities.timeless)
+            LegalityItem(format = "Pioneer", cardLegality = card.legalities.pioneer)
+            LegalityItem(format = "Explorer", cardLegality = card.legalities.explorer)
+            LegalityItem(format = "Modern", cardLegality = card.legalities.modern)
+            LegalityItem(format = "Legacy", cardLegality = card.legalities.legacy)
+        }
     }
+
 }
 
 @Composable
