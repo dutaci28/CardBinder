@@ -6,6 +6,7 @@ import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import com.example.cardbinder.data.local.MTGCardDatabase
 import com.example.cardbinder.data.paging.GetCardByIdPagingSource
+import com.example.cardbinder.data.paging.GetCardPrintingsPagingSource
 import com.example.cardbinder.data.paging.RandomCardPagingSource
 import com.example.cardbinder.data.paging.ScryfallRemoteMediator
 import com.example.cardbinder.data.paging.SearchByNamePagingSource
@@ -56,6 +57,18 @@ class Repository @Inject constructor(
             config = PagingConfig(pageSize = ITEMS_PER_PAGE),
             pagingSourceFactory = {
                 GetCardByIdPagingSource(scryfallAPI = scryfallApi, id)
+            }
+        ).flow
+    }
+
+    fun getCardPrintings(q: String): Flow<PagingData<MTGCard>> {
+        return Pager(
+            config = PagingConfig(pageSize = ITEMS_PER_PAGE),
+            pagingSourceFactory = {
+                GetCardPrintingsPagingSource(
+                    scryfallAPI = scryfallApi,
+                    q = q
+                )
             }
         ).flow
     }

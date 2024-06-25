@@ -53,7 +53,15 @@ fun IndividualCardScreen(
     val searchedCards = individualCardViewModel.searchedCards.collectAsLazyPagingItems()
     if (searchedCards.itemSnapshotList.isNotEmpty()) {
         val card: MTGCard? = searchedCards.itemSnapshotList[0]
+        var cardPrintingsList: List<MTGCard> = listOf()
         if (card != null) {
+            individualCardViewModel.getCardPrintings(
+                q = card.oracle_id
+            )
+            val cardPrintings = individualCardViewModel.cardPrintings.collectAsLazyPagingItems()
+            if (cardPrintings.itemSnapshotList.isNotEmpty()) {
+                cardPrintingsList = cardPrintings.itemSnapshotList.items
+            }
             Scaffold(topBar = {
                 TopBarWithBackButton()
             }, content = { innerPadding ->
@@ -68,9 +76,26 @@ fun IndividualCardScreen(
                     Text(text = card.name)
                     Text(text = card.set_name + " #" + card.collector_number)
                     LegalitiesBox(card = card)
+                    CardPrintingsBox(printingsList = cardPrintingsList)
                 }
             })
         }
+    }
+}
+
+@Composable
+fun CardPrintingsBox(printingsList: List<MTGCard>) {
+    Column {
+        printingsList.forEach {
+            CardPrinting(card = it)
+        }
+    }
+}
+
+@Composable
+fun CardPrinting(card: MTGCard) {
+    Row {
+        Text(text = card.set_name + " #" + card.collector_number)
     }
 }
 

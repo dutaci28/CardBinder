@@ -18,4 +18,11 @@ interface ScryfallAPI {
 
     @GET("/cards/{Id}")
     suspend fun getCardById(@Path("Id") id: String): MTGCard
+
+    @GET("/cards/search")
+    suspend fun getCardPrintings(
+        @Query("order") order: String = "released",
+        @Query("q") q: String,
+        @Query("unique") unique: String = "prints"
+    ): SearchResult
 }

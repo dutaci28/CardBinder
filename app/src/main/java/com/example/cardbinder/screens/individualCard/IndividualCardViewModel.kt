@@ -23,5 +23,14 @@ class IndividualCardViewModel @Inject constructor(repository: Repository) : View
             }
         }
     }
+    private val _cardPrintings = MutableStateFlow<PagingData<MTGCard>>(PagingData.empty())
+    val cardPrintings = _cardPrintings
+    fun getCardPrintings(q: String) {
+        viewModelScope.launch {
+            repo.getCardPrintings(q).cachedIn(viewModelScope).collect {
+                _cardPrintings.value = it
+            }
+        }
+    }
 
 }

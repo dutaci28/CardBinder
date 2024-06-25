@@ -12,6 +12,7 @@ import kotlinx.serialization.Serializable
 data class MTGCard(
     @PrimaryKey(autoGenerate = false)
     val id: String = "",
+    val oracle_id: String = "",
     val name: String = "",
     val mana_cost: String = "",
     val cmc: Double = 0.0,
