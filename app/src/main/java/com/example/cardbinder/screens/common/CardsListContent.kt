@@ -49,7 +49,7 @@ fun CardsListContent(
             val paddingModifier = if (index < columnsInFirstRow(items.itemCount, 165.dp)) {
                 topPaddingModifier
             } else if (index == items.itemCount - 1) {
-                Modifier.padding(bottom = 80.dp)
+                Modifier.padding(bottom = 140.dp)
             } else {
                 Modifier.padding(top = 0.dp)
             }
