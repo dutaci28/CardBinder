@@ -4,7 +4,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class SearchResult(
+data class CardSearchResult(
     @SerialName("data")
     val cards: List<MTGCard>
 )

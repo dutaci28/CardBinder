@@ -7,11 +7,13 @@ import androidx.paging.PagingData
 import com.example.cardbinder.data.local.MTGCardDatabase
 import com.example.cardbinder.data.paging.GetCardByIdPagingSource
 import com.example.cardbinder.data.paging.GetCardPrintingsPagingSource
+import com.example.cardbinder.data.paging.GetRulingsByCardIdPagingSource
 import com.example.cardbinder.data.paging.RandomCardPagingSource
 import com.example.cardbinder.data.paging.ScryfallRemoteMediator
 import com.example.cardbinder.data.paging.SearchByNamePagingSource
 import com.example.cardbinder.data.remote.ScryfallAPI
 import com.example.cardbinder.model.MTGCard
+import com.example.cardbinder.model.Ruling
 import com.example.cardbinder.util.Constants.Companion.ITEMS_PER_PAGE
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
@@ -69,6 +71,15 @@ class Repository @Inject constructor(
                     scryfallAPI = scryfallApi,
                     q = q
                 )
+            }
+        ).flow
+    }
+
+    fun getRulingsByCardId(id: String): Flow<PagingData<Ruling>> {
+        return Pager(
+            config = PagingConfig(pageSize = ITEMS_PER_PAGE),
+            pagingSourceFactory = {
+                GetRulingsByCardIdPagingSource(scryfallAPI = scryfallApi, id = id)
             }
         ).flow
     }

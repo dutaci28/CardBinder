@@ -42,6 +42,7 @@ import coil.compose.ImagePainter
 import coil.compose.rememberImagePainter
 import com.example.cardbinder.R
 import com.example.cardbinder.model.MTGCard
+import com.example.cardbinder.model.Ruling
 import com.example.cardbinder.screens.common.ShimmerEffectImage
 
 @Composable
@@ -54,6 +55,7 @@ fun IndividualCardScreen(
     if (searchedCards.itemSnapshotList.isNotEmpty()) {
         val card: MTGCard? = searchedCards.itemSnapshotList[0]
         var cardPrintingsList: List<MTGCard> = listOf()
+        var rulingsList: List<Ruling> = listOf()
         if (card != null) {
             individualCardViewModel.getCardPrintings(
                 q = card.oracle_id
@@ -62,13 +64,20 @@ fun IndividualCardScreen(
             if (cardPrintings.itemSnapshotList.isNotEmpty()) {
                 cardPrintingsList = cardPrintings.itemSnapshotList.items
             }
+            individualCardViewModel.getRulingsByCardId(
+                id = card.id
+            )
+            val rulings = individualCardViewModel.rulings.collectAsLazyPagingItems()
+            if (rulings.itemSnapshotList.isNotEmpty()) {
+                rulingsList = rulings.itemSnapshotList.items
+            }
             Scaffold(topBar = {
                 TopBarWithBackButton()
             }, content = { innerPadding ->
                 val scrollState = rememberScrollState()
                 Column(
                     modifier = Modifier
-                        .padding(top = innerPadding.calculateTopPadding())
+                        .padding(top = innerPadding.calculateTopPadding(), bottom = innerPadding.calculateBottomPadding())
                         .verticalScroll(scrollState)
                 ) {
                     MTGCardBigImage(card = card, cardWidthDp = calculateMaxWidth())
@@ -77,6 +86,7 @@ fun IndividualCardScreen(
                     Text(text = card.set_name + " #" + card.collector_number)
                     LegalitiesBox(card = card)
                     CardPrintingsBox(printingsList = cardPrintingsList)
+                    RulingsBox(rulingsList = rulingsList)
                 }
             })
         }
@@ -84,16 +94,33 @@ fun IndividualCardScreen(
 }
 
 @Composable
-fun CardPrintingsBox(printingsList: List<MTGCard>) {
+fun RulingsBox(rulingsList: List<Ruling>) {
     Column {
-        printingsList.forEach {
-            CardPrinting(card = it)
+        rulingsList.forEach {
+            RulingItem(ruling = it)
         }
     }
 }
 
 @Composable
-fun CardPrinting(card: MTGCard) {
+fun RulingItem(ruling: Ruling) {
+    Column (modifier = Modifier.fillMaxWidth()){
+        Text(text = ruling.comment)
+        Text(text = ruling.published_at)
+    }
+}
+
+@Composable
+fun CardPrintingsBox(printingsList: List<MTGCard>) {
+    Column {
+        printingsList.forEach {
+            CardPrintingItem(card = it)
+        }
+    }
+}
+
+@Composable
+fun CardPrintingItem(card: MTGCard) {
     Row {
         Text(text = card.set_name + " #" + card.collector_number)
     }
