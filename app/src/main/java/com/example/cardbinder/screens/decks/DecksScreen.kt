@@ -18,8 +18,7 @@ fun DecksScreen(
             SearchWidget(
                 text = "Text",
                 onTextChange = {},
-                onSearchClicked = {},
-                onCloseClicked = {}
+                onSearchClicked = {}
             )
         },
         content = { innerPadding ->

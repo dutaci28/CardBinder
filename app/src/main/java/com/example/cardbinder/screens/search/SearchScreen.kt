@@ -33,8 +33,7 @@ fun SearchScreen(
                 },
                 onSearchClicked = {
                     searchViewModel.searchCardsByName(name = it)
-                },
-                onCloseClicked = {}
+                }
             )
         },
         content = { innerPadding ->

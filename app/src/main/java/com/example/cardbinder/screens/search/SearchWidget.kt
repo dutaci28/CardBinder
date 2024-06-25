@@ -32,8 +32,7 @@ import androidx.compose.ui.unit.sp
 fun SearchWidget(
     text: String,
     onTextChange: (String) -> Unit,
-    onSearchClicked: (String) -> Unit,
-    onCloseClicked: () -> Unit
+    onSearchClicked: (String) -> Unit
 ) {
     Box(
         contentAlignment = Alignment.TopCenter,
@@ -113,7 +112,6 @@ fun SearchWidgetPreview() {
     SearchWidget(
         text = "Search",
         onTextChange = {},
-        onSearchClicked = {},
-        onCloseClicked = {}
+        onSearchClicked = {}
     )
 }
