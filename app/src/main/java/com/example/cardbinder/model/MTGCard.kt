@@ -16,6 +16,7 @@ data class MTGCard(
     val mana_cost: String = "",
     val cmc: Double = 0.0,
     val type_line: String = "",
+    val set_name: String = "",
     val layout: String = "",
     @SerialName("card_faces")
     val faces: List<CardFace> = listOf(
