@@ -1,6 +1,7 @@
 package com.example.cardbinder.screens.navigation
 
 import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
@@ -8,8 +9,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
@@ -30,7 +31,9 @@ fun BottomNavBar(navController: NavHostController) {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry?.destination
     NavigationBar(
-        modifier = Modifier.shadow(elevation = 10.dp),
+        modifier = Modifier.graphicsLayer {
+            shadowElevation = 50.dp.toPx()
+        }.padding(top = 10.dp),
         containerColor = Color.White.copy(alpha = 0.9f)
     ) {
         screens.forEach { screen ->
