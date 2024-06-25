@@ -5,10 +5,16 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shadow
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.paging.compose.LazyPagingItems
 import com.example.cardbinder.model.MTGCard
 import com.example.cardbinder.screens.common.CardsListContent
@@ -20,6 +26,18 @@ fun SingleRandomCard(card: LazyPagingItems<MTGCard>) {
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+        Text(
+            text = "Here's a random card!",
+            color = Color.Gray.copy(alpha = 0.8f),
+            fontSize = 24.sp,
+            fontStyle = FontStyle.Italic,
+            style = TextStyle(
+                shadow = Shadow(
+                    color = Color.Gray, blurRadius = 4f
+                ),
+            ),
+            modifier = Modifier.padding(bottom = 6.dp)
+        )
         CardsListContent(
             items = card,
             modifier = Modifier
