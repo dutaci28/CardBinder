@@ -1,4 +1,4 @@
-package com.example.cardbinder.screens.common.search
+package com.example.cardbinder.screens.search
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box

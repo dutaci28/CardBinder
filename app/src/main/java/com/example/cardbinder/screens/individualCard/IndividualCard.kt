@@ -112,7 +112,7 @@ fun RulingsBox(rulingsList: List<Ruling>) {
 fun RulingItem(ruling: Ruling) {
     Column(modifier = Modifier.fillMaxWidth()) {
         Text(text = ruling.comment)
-        Text(text = ruling.published_at)
+        Text(text = ruling.published_at, color = Color.Gray.copy(alpha = 0.8f))
     }
 }
 
