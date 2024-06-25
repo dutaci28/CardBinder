@@ -65,8 +65,8 @@ fun IndividualCardScreen(
                 ) {
                     MTGCardBigImage(card = card, cardWidthDp = calculateMaxWidth())
                     Text(text = "Illustrated by ${card.artist}")
-                    Text(text = card.set_name)
                     Text(text = card.name)
+                    Text(text = card.set_name + " #" + card.collector_number)
                     LegalitiesBox(card = card)
                 }
             })

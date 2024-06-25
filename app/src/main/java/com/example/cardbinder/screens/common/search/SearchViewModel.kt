@@ -1,4 +1,4 @@
-package com.example.cardbinder.screens.search
+package com.example.cardbinder.screens.common.search
 
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel

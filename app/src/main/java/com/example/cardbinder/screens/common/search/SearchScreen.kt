@@ -1,4 +1,4 @@
-package com.example.cardbinder.screens.search
+package com.example.cardbinder.screens.common.search
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.background

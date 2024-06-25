@@ -17,12 +17,14 @@ data class MTGCard(
     val cmc: Double = 0.0,
     val type_line: String = "",
     val set_name: String = "",
+    val collector_number: String = "",
     val layout: String = "",
     @SerialName("card_faces")
     val faces: List<CardFace> = listOf(
         CardFace("", "", "", ImageURIs("", "", "")),
         CardFace("", "", "", ImageURIs("", "", ""))
     ),
+    val prints_search_uri: String = "",
     val rulings_uri: String = "",
     @Embedded
     val image_uris: ImageURIs = ImageURIs("", "", ""),
