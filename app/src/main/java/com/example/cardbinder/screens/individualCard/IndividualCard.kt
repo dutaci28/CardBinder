@@ -3,6 +3,7 @@ package com.example.cardbinder.screens.individualCard
 import androidx.activity.ComponentActivity
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
@@ -36,6 +37,7 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
 import androidx.paging.compose.collectAsLazyPagingItems
 import coil.annotation.ExperimentalCoilApi
 import coil.compose.ImagePainter
@@ -47,6 +49,7 @@ import com.example.cardbinder.screens.common.ShimmerEffectImage
 
 @Composable
 fun IndividualCardScreen(
+    navController: NavController,
     cardId: String,
     individualCardViewModel: IndividualCardViewModel = hiltViewModel()
 ) {
@@ -77,7 +80,10 @@ fun IndividualCardScreen(
                 val scrollState = rememberScrollState()
                 Column(
                     modifier = Modifier
-                        .padding(top = innerPadding.calculateTopPadding(), bottom = innerPadding.calculateBottomPadding())
+                        .padding(
+                            top = innerPadding.calculateTopPadding(),
+                            bottom = innerPadding.calculateBottomPadding()
+                        )
                         .verticalScroll(scrollState)
                 ) {
                     MTGCardBigImage(card = card, cardWidthDp = calculateMaxWidth())
@@ -85,7 +91,7 @@ fun IndividualCardScreen(
                     Text(text = card.name)
                     Text(text = card.set_name + " #" + card.collector_number)
                     LegalitiesBox(card = card)
-                    CardPrintingsBox(printingsList = cardPrintingsList)
+                    CardPrintingsBox(navController, printingsList = cardPrintingsList)
                     RulingsBox(rulingsList = rulingsList)
                 }
             })
@@ -104,27 +110,31 @@ fun RulingsBox(rulingsList: List<Ruling>) {
 
 @Composable
 fun RulingItem(ruling: Ruling) {
-    Column (modifier = Modifier.fillMaxWidth()){
+    Column(modifier = Modifier.fillMaxWidth()) {
         Text(text = ruling.comment)
         Text(text = ruling.published_at)
     }
 }
 
 @Composable
-fun CardPrintingsBox(printingsList: List<MTGCard>) {
+fun CardPrintingsBox(navController: NavController, printingsList: List<MTGCard>) {
     Column {
         printingsList.forEach {
-            CardPrintingItem(card = it)
+            CardPrintingItem(navController, card = it)
         }
     }
 }
 
 @Composable
-fun CardPrintingItem(card: MTGCard) {
-    Row {
+fun CardPrintingItem(navController: NavController, card: MTGCard) {
+    Row(modifier = Modifier.clickable {
+        navController.navigate(route = "individualCard/" + card.id)
+    })
+    {
         Text(text = card.set_name + " #" + card.collector_number)
     }
 }
+
 
 @Composable
 fun LegalitiesBox(card: MTGCard) {

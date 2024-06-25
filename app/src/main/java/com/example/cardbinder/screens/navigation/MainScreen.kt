@@ -65,7 +65,10 @@ fun MainScreen(window: Window) {
                         type = NavType.StringType
                     }
                 )) {
-                    IndividualCardScreen(it.arguments?.getString(NAV_ARGUMENT_CARD_ID).toString())
+                    IndividualCardScreen(
+                        navController = navController,
+                        cardId = it.arguments?.getString(NAV_ARGUMENT_CARD_ID).toString()
+                    )
                 }
             }
         }
