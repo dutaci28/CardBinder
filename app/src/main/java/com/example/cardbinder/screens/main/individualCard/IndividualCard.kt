@@ -7,6 +7,7 @@ import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
@@ -18,6 +19,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
@@ -49,6 +52,7 @@ import com.example.cardbinder.model.ImageURIs
 import com.example.cardbinder.model.Legalities
 import com.example.cardbinder.model.MTGCard
 import com.example.cardbinder.model.Ruling
+import com.example.cardbinder.screens.main.navigation.NavigationRoutes
 
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
@@ -102,7 +106,7 @@ fun SharedTransitionScope.IndividualCardScreen(
         }
     }
     Scaffold(topBar = {
-        TopBarWithBackButton()
+        IndividualCardTopBar(navController)
     }, content = { innerPadding ->
         val scrollState = rememberScrollState()
         Column(
@@ -270,8 +274,9 @@ fun calculateMaxWidth(): Dp {
 }
 
 @Composable
-fun TopBarWithBackButton() {
-    Box(
+fun IndividualCardTopBar(navController: NavController) {
+    Row(
+        horizontalArrangement = Arrangement.SpaceBetween,
         modifier = Modifier
             .fillMaxWidth()
             .height(56.dp)
@@ -281,12 +286,6 @@ fun TopBarWithBackButton() {
         val activity = context as? ComponentActivity
         IconButton(
             onClick = {
-                //TODO option to go straight home
-//                navController.navigate(NavigationRoutes.Search.route) {
-//                    popUpTo(NavigationRoutes.Search.route) {
-//                        inclusive = true
-//                    }
-//                }
                 activity?.onBackPressedDispatcher?.onBackPressed()
             },
             modifier = Modifier.padding(10.dp)
@@ -295,6 +294,26 @@ fun TopBarWithBackButton() {
             Icon(
                 imageVector = ImageVector.vectorResource(id = R.drawable.arrowleft),
                 contentDescription = "Back Icon",
+                modifier = Modifier
+                    .height(45.dp)
+                    .width(45.dp)
+            )
+        }
+
+        IconButton(
+            onClick = {
+                navController.navigate(NavigationRoutes.Search.route) {
+                    popUpTo(NavigationRoutes.Search.route) {
+                        inclusive = true
+                    }
+                }
+            },
+            modifier = Modifier.padding(10.dp)
+        )
+        {
+            Icon(
+                imageVector = Icons.Default.Close,
+                contentDescription = "Close Icon",
                 modifier = Modifier
                     .height(45.dp)
                     .width(45.dp)
@@ -321,7 +340,6 @@ fun SharedTransitionScope.MTGCardBigImage(
         AsyncImage(
             model = ImageRequest.Builder(LocalContext.current)
                 .data(imageSource)
-                .crossfade(true)
                 .placeholderMemoryCacheKey("image${card.id}") //  same key as shared element key
                 .memoryCacheKey("image${card.id}") // same key as shared element key
                 .build(),

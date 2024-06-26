@@ -52,7 +52,7 @@ fun SharedTransitionScope.RandomCardWithBackground(
             AsyncImage(
                 model = ImageRequest.Builder(LocalContext.current)
                     .data(imageSource)
-                    .crossfade(true)
+                    .crossfade(200)
                     .build(),
                 contentDescription = "Background Card Image",
                 contentScale = ContentScale.Fit,

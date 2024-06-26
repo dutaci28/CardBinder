@@ -55,7 +55,6 @@ fun SharedTransitionScope.SearchedCardsList(
             } else {
                 Modifier.padding(top = 0.dp)
             }
-
             if (card != null) {
                 MTGCardItem(
                     navController = navController,
@@ -110,7 +109,7 @@ fun SharedTransitionScope.MTGCardItem(
         AsyncImage(
             model = ImageRequest.Builder(LocalContext.current)
                 .data(imageSource)
-                .crossfade(true)
+                .crossfade(200)
                 .placeholderMemoryCacheKey("image${mtgCard.id}") //  same key as shared element key
                 .memoryCacheKey("image${mtgCard.id}") // same key as shared element key
                 .build(),
