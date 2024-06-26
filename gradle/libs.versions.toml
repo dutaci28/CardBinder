@@ -1,6 +1,6 @@
 [versions]
 agp = "8.3.2"
-coilCompose = "1.3.2"
+coilCompose = "2.6.0"
 converterGson = "2.9.0"
 hiltAndroid = "2.51.1"
 hiltCompiler = "1.2.0"
@@ -14,6 +14,7 @@ lifecycleRuntimeKtx = "2.8.2"
 activityCompose = "1.9.0"
 composeBom = "2024.06.00"
 loggingInterceptorVersion = "4.9.0"
+composeAnimation = "1.7.0-beta03"
 navigationCompose = "2.7.7"
 pagingCompose = "3.3.0"
 retrofit = "2.9.0"
@@ -24,6 +25,7 @@ roomPaging = "2.6.1"
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 androidx-hilt-compiler = { module = "androidx.hilt:hilt-compiler", version.ref = "hiltCompiler" }
 androidx-hilt-navigation-compose = { module = "androidx.hilt:hilt-navigation-compose", version.ref = "hiltCompiler" }
+androidx-compose-animation = { group = "androidx.compose.animation", name = "animation", version.ref = "composeAnimation" }
 androidx-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigationCompose" }
 androidx-paging-compose = { module = "androidx.paging:paging-compose", version.ref = "pagingCompose" }
 androidx-room-compiler = { module = "androidx.room:room-compiler", version.ref = "roomPaging" }

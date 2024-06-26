@@ -1,6 +1,8 @@
 package com.example.cardbinder.screens.main.search
 
-import androidx.compose.foundation.Image
+import androidx.compose.animation.AnimatedVisibilityScope
+import androidx.compose.animation.ExperimentalSharedTransitionApi
+import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -22,30 +24,36 @@ import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.paging.compose.LazyPagingItems
-import coil.annotation.ExperimentalCoilApi
-import coil.compose.rememberImagePainter
+import coil.compose.AsyncImage
+import coil.request.ImageRequest
 import com.example.cardbinder.model.MTGCard
 
-@OptIn(ExperimentalCoilApi::class)
+@OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
-fun RandomCardWithBackground(navController: NavController, randomCard: LazyPagingItems<MTGCard>) {
+fun SharedTransitionScope.RandomCardWithBackground(
+    navController: NavController,
+    randomCard: LazyPagingItems<MTGCard>,
+    animatedVisibilityScope:AnimatedVisibilityScope
+) {
     Surface(modifier = Modifier.fillMaxSize()) {
         val backgroundCard: MTGCard
         val randomMTGCardItems by remember { mutableStateOf(randomCard) }
         if (randomMTGCardItems.itemCount != 0) {
             backgroundCard = randomMTGCardItems.itemSnapshotList[0]!!
-            val backgroundPainter =
-                rememberImagePainter(data = backgroundCard.image_uris.png) {
-                    crossfade(durationMillis = 100)
-                }
-            Image(
-                painter = backgroundPainter,
+            val imageSource =
+                if (backgroundCard.layout == "transform" || backgroundCard.layout == "modal_dfc") backgroundCard.faces[0].image_uris.png else backgroundCard.image_uris.png
+            AsyncImage(
+                model = ImageRequest.Builder(LocalContext.current)
+                    .data(imageSource)
+                    .crossfade(true)
+                    .build(),
                 contentDescription = "Background Card Image",
                 contentScale = ContentScale.Fit,
                 modifier = Modifier
@@ -59,16 +67,25 @@ fun RandomCardWithBackground(navController: NavController, randomCard: LazyPagin
                     .rotate(45f)
             )
         }
-        SingleRandomCard(navController = navController, card = randomMTGCardItems)
+        SingleRandomCard(
+            navController = navController,
+            card = randomMTGCardItems,
+            animatedVisibilityScope = animatedVisibilityScope
+        )
     }
 }
 
+@OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
-fun SingleRandomCard(navController: NavController, card: LazyPagingItems<MTGCard>) {
+fun SharedTransitionScope.SingleRandomCard(
+    navController: NavController,
+    card: LazyPagingItems<MTGCard>,
+    animatedVisibilityScope: AnimatedVisibilityScope
+) {
     Column(
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
+        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Text(
             text = "Here's a random card!",
@@ -88,7 +105,8 @@ fun SingleRandomCard(navController: NavController, card: LazyPagingItems<MTGCard
             modifier = Modifier
                 .padding(horizontal = 5.dp)
                 .width(200.dp),
-            topPaddingModifier = Modifier.padding(0.dp)
+            topPaddingModifier = Modifier.padding(0.dp),
+            animatedVisibilityScope = animatedVisibilityScope
         )
     }
 }

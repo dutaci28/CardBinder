@@ -1,6 +1,10 @@
 package com.example.cardbinder.screens.main.individualCard
 
-import androidx.compose.foundation.Image
+import androidx.activity.ComponentActivity
+import androidx.compose.animation.AnimatedVisibilityScope
+import androidx.compose.animation.ExperimentalSharedTransitionApi
+import androidx.compose.animation.SharedTransitionScope
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -13,7 +17,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -26,11 +29,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
@@ -39,84 +41,110 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.paging.compose.collectAsLazyPagingItems
-import coil.annotation.ExperimentalCoilApi
-import coil.compose.ImagePainter
-import coil.compose.rememberImagePainter
+import coil.compose.AsyncImage
+import coil.request.ImageRequest
 import com.example.cardbinder.R
+import com.example.cardbinder.model.CardFace
+import com.example.cardbinder.model.ImageURIs
+import com.example.cardbinder.model.Legalities
 import com.example.cardbinder.model.MTGCard
 import com.example.cardbinder.model.Ruling
-import com.example.cardbinder.screens.main.common.ShimmerEffectImage
-import com.example.cardbinder.screens.main.navigation.NavigationRoutes
 
+@OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
-fun IndividualCardScreen(
+fun SharedTransitionScope.IndividualCardScreen(
     navController: NavController,
     cardId: String,
-    individualCardViewModel: IndividualCardViewModel = hiltViewModel()
+    individualCardViewModel: IndividualCardViewModel = hiltViewModel(),
+    animatedVisibilityScope: AnimatedVisibilityScope
 ) {
     individualCardViewModel.getCardById(id = cardId)
     val searchedCards = individualCardViewModel.searchedCards.collectAsLazyPagingItems()
+    var card = MTGCard(
+        "",
+        "",
+        "",
+        "",
+        0.0,
+        "",
+        "",
+        "",
+        "",
+        listOf(
+            CardFace("", "", "", ImageURIs("", "", "")),
+            CardFace("", "", "", ImageURIs("", "", ""))
+        ),
+        "",
+        "",
+        ImageURIs("", "", ""),
+        Legalities("", "", "", "", "", "", "", "", "", "", "", "", "", ""),
+        ""
+    )
+    var cardPrintingsList: List<MTGCard> = listOf()
+    var rulingsList: List<Ruling> = listOf()
     if (searchedCards.itemSnapshotList.isNotEmpty()) {
-        val card: MTGCard? = searchedCards.itemSnapshotList[0]
-        var cardPrintingsList: List<MTGCard> = listOf()
-        var rulingsList: List<Ruling> = listOf()
-        if (card != null) {
-            individualCardViewModel.getCardPrintings(
-                q = card.oracle_id
-            )
-            val cardPrintings = individualCardViewModel.cardPrintings.collectAsLazyPagingItems()
-            if (cardPrintings.itemSnapshotList.isNotEmpty()) {
-                cardPrintingsList = cardPrintings.itemSnapshotList.items
-            }
-            individualCardViewModel.getRulingsByCardId(
-                id = card.id
-            )
-            val rulings = individualCardViewModel.rulings.collectAsLazyPagingItems()
-            if (rulings.itemSnapshotList.isNotEmpty()) {
-                rulingsList = rulings.itemSnapshotList.items
-            }
-            Scaffold(topBar = {
-                TopBarWithBackButton(navController = navController)
-            }, content = { innerPadding ->
-                val scrollState = rememberScrollState()
-                Column(
-                    modifier = Modifier
-                        .padding(
-                            top = innerPadding.calculateTopPadding(),
-                            bottom = innerPadding.calculateBottomPadding()
-                        )
-                        .verticalScroll(scrollState)
-                        .background(Color.White)
-                ) {
-                    MTGCardBigImage(card = card, cardWidthDp = calculateMaxWidth())
-                    Text(
-                        text = "Illustrated by ${card.artist}",
-                        fontSize = 10.sp,
-                        color = Color.Gray.copy(alpha = 0.8f),
-                        modifier = Modifier.padding(horizontal = 10.dp)
-                    )
-                    Text(
-                        text = card.name,
-                        fontSize = 32.sp,
-                        fontWeight = FontWeight.SemiBold,
-                        modifier = Modifier.padding(horizontal = 20.dp)
-                    )
-                    Text(
-                        text = card.set_name + " #" + card.collector_number,
-                        fontSize = 16.sp,
-                        color = Color.Gray, modifier = Modifier.padding(horizontal = 20.dp)
-                    )
-                    LegalitiesBox(card = card)
-                    CardPrintingsBox(
-                        navController = navController,
-                        printingsList = cardPrintingsList,
-                        currentCard = card
-                    )
-                    RulingsBox(rulingsList = rulingsList)
-                }
-            })
+        card = searchedCards.itemSnapshotList[0]!!
+        cardPrintingsList = listOf()
+        rulingsList = listOf()
+        individualCardViewModel.getCardPrintings(
+            q = card.oracle_id
+        )
+        val cardPrintings = individualCardViewModel.cardPrintings.collectAsLazyPagingItems()
+        if (cardPrintings.itemSnapshotList.isNotEmpty()) {
+            cardPrintingsList = cardPrintings.itemSnapshotList.items
+        }
+        individualCardViewModel.getRulingsByCardId(
+            id = card.id
+        )
+        val rulings = individualCardViewModel.rulings.collectAsLazyPagingItems()
+        if (rulings.itemSnapshotList.isNotEmpty()) {
+            rulingsList = rulings.itemSnapshotList.items
         }
     }
+    Scaffold(topBar = {
+        TopBarWithBackButton()
+    }, content = { innerPadding ->
+        val scrollState = rememberScrollState()
+        Column(
+            modifier = Modifier
+                .padding(
+                    top = innerPadding.calculateTopPadding(),
+                    bottom = innerPadding.calculateBottomPadding()
+                )
+                .verticalScroll(scrollState)
+                .background(Color.White)
+        ) {
+            MTGCardBigImage(
+                card = card,
+                cardWidthDp = calculateMaxWidth(),
+                animatedVisibilityScope = animatedVisibilityScope
+            )
+            Text(
+                text = "Illustrated by ${card.artist}",
+                fontSize = 10.sp,
+                color = Color.Gray.copy(alpha = 0.8f),
+                modifier = Modifier.padding(horizontal = 10.dp)
+            )
+            Text(
+                text = card.name,
+                fontSize = 32.sp,
+                fontWeight = FontWeight.SemiBold,
+                modifier = Modifier.padding(horizontal = 20.dp)
+            )
+            Text(
+                text = card.set_name + " #" + card.collector_number,
+                fontSize = 16.sp,
+                color = Color.Gray, modifier = Modifier.padding(horizontal = 20.dp)
+            )
+            LegalitiesBox(card = card)
+            CardPrintingsBox(
+                navController = navController,
+                printingsList = cardPrintingsList,
+                currentCard = card
+            )
+            RulingsBox(rulingsList = rulingsList)
+        }
+    })
 }
 
 @Composable
@@ -242,20 +270,24 @@ fun calculateMaxWidth(): Dp {
 }
 
 @Composable
-fun TopBarWithBackButton(navController: NavController) {
+fun TopBarWithBackButton() {
     Box(
         modifier = Modifier
             .fillMaxWidth()
             .height(56.dp)
             .background(Color.White)
     ) {
+        val context = LocalContext.current
+        val activity = context as? ComponentActivity
         IconButton(
             onClick = {
-                navController.navigate(NavigationRoutes.Search.route) {
-                    popUpTo(NavigationRoutes.Search.route) {
-                        inclusive = true
-                    }
-                }
+                //TODO option to go straight home
+//                navController.navigate(NavigationRoutes.Search.route) {
+//                    popUpTo(NavigationRoutes.Search.route) {
+//                        inclusive = true
+//                    }
+//                }
+                activity?.onBackPressedDispatcher?.onBackPressed()
             },
             modifier = Modifier.padding(10.dp)
         )
@@ -271,49 +303,40 @@ fun TopBarWithBackButton(navController: NavController) {
     }
 }
 
-@OptIn(ExperimentalCoilApi::class)
+@OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
-fun MTGCardBigImage(card: MTGCard, cardWidthDp: Dp) {
+fun SharedTransitionScope.MTGCardBigImage(
+    card: MTGCard,
+    cardWidthDp: Dp,
+    animatedVisibilityScope: AnimatedVisibilityScope
+) {
     val imageSource =
         if (card.layout == "transform" || card.layout == "modal_dfc") card.faces[0].image_uris.png else card.image_uris.png
-    val painter = rememberImagePainter(data = imageSource) { crossfade(durationMillis = 100) }
-    var isLoading by remember { mutableStateOf(false) }
-    isLoading = when (painter.state) {
-        is ImagePainter.State.Loading -> {
-            true
-        }
-
-        is ImagePainter.State.Success -> {
-            false
-        }
-
-        else -> {
-            false
-        }
-    }
     Box(
         modifier = Modifier
             .width(cardWidthDp)
             .height(cardWidthDp.times(1.4f)),
         contentAlignment = Alignment.Center
     ) {
-        ShimmerEffectImage(
-            isLoading = isLoading,
-            contentAfterLoading = {
-                Image(
-                    painter = painter,
-                    contentDescription = "Card Image",
-                    contentScale = ContentScale.Fit,
-                    modifier = Modifier
-                        .shadow(elevation = 4.dp, shape = RoundedCornerShape(20.dp))
-                        .padding(5.dp)
-                        .fillMaxSize()
-                )
-            },
+        AsyncImage(
+            model = ImageRequest.Builder(LocalContext.current)
+                .data(imageSource)
+                .crossfade(true)
+                .placeholderMemoryCacheKey("image${card.id}") //  same key as shared element key
+                .memoryCacheKey("image${card.id}") // same key as shared element key
+                .build(),
+            contentDescription = "Card Image",
+            contentScale = ContentScale.Fit,
             modifier = Modifier
-                .clip(shape = RoundedCornerShape(22.dp, 22.dp, 22.dp, 22.dp))
-                .fillMaxSize()
                 .padding(5.dp)
+                .fillMaxSize()
+                .sharedElement(
+                    state = rememberSharedContentState(key = "image${card.id}"),
+                    animatedVisibilityScope = animatedVisibilityScope,
+                    boundsTransform = { _, _ ->
+                        tween(durationMillis = 300)
+                    }
+                )
         )
     }
 }

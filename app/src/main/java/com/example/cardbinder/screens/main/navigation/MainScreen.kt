@@ -2,6 +2,8 @@ package com.example.cardbinder.screens.main.navigation
 
 import android.annotation.SuppressLint
 import android.view.Window
+import androidx.compose.animation.ExperimentalSharedTransitionApi
+import androidx.compose.animation.SharedTransitionLayout
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.statusBarsPadding
@@ -28,6 +30,7 @@ import com.example.cardbinder.screens.main.individualCard.IndividualCardScreen
 import com.example.cardbinder.screens.main.search.SearchScreen
 import com.example.cardbinder.util.Constants.Companion.NAV_ARGUMENT_CARD_ID
 
+@OptIn(ExperimentalSharedTransitionApi::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun MainScreen(window: Window) {
@@ -47,28 +50,31 @@ fun MainScreen(window: Window) {
                 .fillMaxSize()
                 .statusBarsPadding()
         ) {
-            NavHost(
-                navController = navController,
-                startDestination = NavigationRoutes.Search.route
-            ) {
-                composable(route = NavigationRoutes.Collection.route) {
-                    CollectionScreen()
-                }
-                composable(route = NavigationRoutes.Search.route) {
-                    SearchScreen(navController = navController)
-                }
-                composable(route = NavigationRoutes.Decks.route) {
-                    DecksScreen()
-                }
-                composable(route = NavigationRoutes.IndividualCard.route, arguments = listOf(
-                    navArgument(name = NAV_ARGUMENT_CARD_ID) {
-                        type = NavType.StringType
+            SharedTransitionLayout {
+                NavHost(
+                    navController = navController,
+                    startDestination = NavigationRoutes.Search.route
+                ) {
+                    composable(route = NavigationRoutes.Collection.route) {
+                        CollectionScreen()
                     }
-                )) {
-                    IndividualCardScreen(
-                        navController = navController,
-                        cardId = it.arguments?.getString(NAV_ARGUMENT_CARD_ID).toString()
-                    )
+                    composable(route = NavigationRoutes.Search.route) {
+                        SearchScreen(navController = navController, animatedVisibilityScope = this)
+                    }
+                    composable(route = NavigationRoutes.Decks.route) {
+                        DecksScreen()
+                    }
+                    composable(route = NavigationRoutes.IndividualCard.route, arguments = listOf(
+                        navArgument(name = NAV_ARGUMENT_CARD_ID) {
+                            type = NavType.StringType
+                        }
+                    )) {
+                        IndividualCardScreen(
+                            navController = navController,
+                            cardId = it.arguments?.getString(NAV_ARGUMENT_CARD_ID).toString(),
+                            animatedVisibilityScope = this
+                        )
+                    }
                 }
             }
         }

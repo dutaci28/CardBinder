@@ -1,6 +1,9 @@
 package com.example.cardbinder.screens.main.search
 
 import android.annotation.SuppressLint
+import androidx.compose.animation.AnimatedVisibilityScope
+import androidx.compose.animation.ExperimentalSharedTransitionApi
+import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -34,12 +37,13 @@ import androidx.navigation.NavController
 import androidx.paging.compose.collectAsLazyPagingItems
 import coil.annotation.ExperimentalCoilApi
 
-@OptIn(ExperimentalCoilApi::class)
+@OptIn(ExperimentalCoilApi::class, ExperimentalSharedTransitionApi::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun SearchScreen(
+fun SharedTransitionScope.SearchScreen(
     navController: NavController,
-    searchViewModel: SearchViewModel = hiltViewModel()
+    searchViewModel: SearchViewModel = hiltViewModel(),
+    animatedVisibilityScope:AnimatedVisibilityScope
 ) {
     val getAllCards = searchViewModel.getAllCards.collectAsLazyPagingItems()
     val getRandomCard = searchViewModel.getRandomCard.collectAsLazyPagingItems()
@@ -60,13 +64,18 @@ fun SearchScreen(
         },
         content = { innerPadding ->
             if (searchedCards.itemCount == 0) {
-                RandomCardWithBackground(navController = navController, randomCard = getRandomCard)
+                RandomCardWithBackground(
+                    navController = navController,
+                    randomCard = getRandomCard,
+                    animatedVisibilityScope = animatedVisibilityScope
+                )
             } else {
                 SearchedCardsList(
                     navController = navController,
                     items = searchedCards,
                     modifier = Modifier.padding(horizontal = 5.dp),
-                    topPaddingModifier = Modifier.padding(top = innerPadding.calculateTopPadding())
+                    topPaddingModifier = Modifier.padding(top = innerPadding.calculateTopPadding()),
+                    animatedVisibilityScope = animatedVisibilityScope
                 )
             }
 
