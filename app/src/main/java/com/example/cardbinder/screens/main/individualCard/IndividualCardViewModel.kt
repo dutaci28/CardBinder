@@ -1,4 +1,4 @@
-package com.example.cardbinder.screens.individualCard
+package com.example.cardbinder.screens.main.individualCard
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

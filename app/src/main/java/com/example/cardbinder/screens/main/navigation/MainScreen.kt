@@ -1,4 +1,4 @@
-package com.example.cardbinder.screens.navigation
+package com.example.cardbinder.screens.main.navigation
 
 import android.annotation.SuppressLint
 import android.view.Window
@@ -22,10 +22,10 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import com.example.cardbinder.screens.collection.CollectionScreen
-import com.example.cardbinder.screens.decks.DecksScreen
-import com.example.cardbinder.screens.individualCard.IndividualCardScreen
-import com.example.cardbinder.screens.search.SearchScreen
+import com.example.cardbinder.screens.main.collection.CollectionScreen
+import com.example.cardbinder.screens.main.decks.DecksScreen
+import com.example.cardbinder.screens.main.individualCard.IndividualCardScreen
+import com.example.cardbinder.screens.main.search.SearchScreen
 import com.example.cardbinder.util.Constants.Companion.NAV_ARGUMENT_CARD_ID
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")

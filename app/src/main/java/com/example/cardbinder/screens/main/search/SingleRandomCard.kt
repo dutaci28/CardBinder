@@ -1,4 +1,4 @@
-package com.example.cardbinder.screens.search
+package com.example.cardbinder.screens.main.search
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -18,7 +18,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.paging.compose.LazyPagingItems
 import com.example.cardbinder.model.MTGCard
-import com.example.cardbinder.screens.common.CardsListContent
+import com.example.cardbinder.screens.main.common.CardsListContent
 
 @Composable
 fun SingleRandomCard(navController: NavController, card: LazyPagingItems<MTGCard>) {

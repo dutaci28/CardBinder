@@ -1,4 +1,4 @@
-package com.example.cardbinder.screens.common
+package com.example.cardbinder.screens.main.common
 
 import android.util.Log
 import androidx.compose.foundation.Image

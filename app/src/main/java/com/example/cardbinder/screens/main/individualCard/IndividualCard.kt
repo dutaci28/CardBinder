@@ -1,4 +1,4 @@
-package com.example.cardbinder.screens.individualCard
+package com.example.cardbinder.screens.main.individualCard
 
 import androidx.activity.ComponentActivity
 import androidx.compose.foundation.Image
@@ -47,7 +47,7 @@ import coil.compose.rememberImagePainter
 import com.example.cardbinder.R
 import com.example.cardbinder.model.MTGCard
 import com.example.cardbinder.model.Ruling
-import com.example.cardbinder.screens.common.ShimmerEffectImage
+import com.example.cardbinder.screens.main.common.ShimmerEffectImage
 
 @Composable
 fun IndividualCardScreen(

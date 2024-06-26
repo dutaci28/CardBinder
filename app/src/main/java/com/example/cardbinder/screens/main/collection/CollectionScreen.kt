@@ -1,4 +1,4 @@
-package com.example.cardbinder.screens.collection
+package com.example.cardbinder.screens.main.collection
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
@@ -7,7 +7,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.example.cardbinder.screens.search.SearchWidget
+import com.example.cardbinder.screens.main.search.SearchWidget
 
 @Composable
 fun CollectionScreen(

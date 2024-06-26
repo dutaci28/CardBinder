@@ -1,4 +1,4 @@
-package com.example.cardbinder.screens.search
+package com.example.cardbinder.screens.main.search
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.background
@@ -13,7 +13,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.paging.compose.collectAsLazyPagingItems
-import com.example.cardbinder.screens.common.CardsListContent
+import com.example.cardbinder.screens.main.common.CardsListContent
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable

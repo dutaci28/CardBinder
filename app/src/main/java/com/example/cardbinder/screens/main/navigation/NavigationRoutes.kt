@@ -1,4 +1,4 @@
-package com.example.cardbinder.screens.navigation
+package com.example.cardbinder.screens.main.navigation
 
 import com.example.cardbinder.util.Constants.Companion.NAV_ARGUMENT_CARD_ID
 
