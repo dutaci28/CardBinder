@@ -7,7 +7,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.example.cardbinder.screens.main.search.SearchWidget
+import com.example.cardbinder.screens.main.search.SearchScreenTopBar
 
 @Composable
 fun CollectionScreen(
@@ -15,7 +15,7 @@ fun CollectionScreen(
 ) {
     Scaffold(
         topBar = {
-            SearchWidget(
+            SearchScreenTopBar(
                 text = "Text",
                 onTextChange = {},
                 onSearchClicked = {}

@@ -1,4 +1,4 @@
-package com.example.cardbinder.screens.main.common
+package com.example.cardbinder.screens.main.search
 
 import android.util.Log
 import androidx.compose.foundation.Image
@@ -33,9 +33,10 @@ import coil.annotation.ExperimentalCoilApi
 import coil.compose.ImagePainter
 import coil.compose.rememberImagePainter
 import com.example.cardbinder.model.MTGCard
+import com.example.cardbinder.screens.main.common.ShimmerEffectImage
 
 @Composable
-fun CardsListContent(
+fun SearchedCardsList(
     navController: NavController,
     items: LazyPagingItems<MTGCard>,
     modifier: Modifier,
