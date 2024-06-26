@@ -1,6 +1,5 @@
 package com.example.cardbinder.screens.main.individualCard
 
-import androidx.activity.ComponentActivity
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -32,7 +31,6 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
@@ -48,6 +46,7 @@ import com.example.cardbinder.R
 import com.example.cardbinder.model.MTGCard
 import com.example.cardbinder.model.Ruling
 import com.example.cardbinder.screens.main.common.ShimmerEffectImage
+import com.example.cardbinder.screens.main.navigation.NavigationRoutes
 
 @Composable
 fun IndividualCardScreen(
@@ -77,7 +76,7 @@ fun IndividualCardScreen(
                 rulingsList = rulings.itemSnapshotList.items
             }
             Scaffold(topBar = {
-                TopBarWithBackButton()
+                TopBarWithBackButton(navController = navController)
             }, content = { innerPadding ->
                 val scrollState = rememberScrollState()
                 Column(
@@ -108,7 +107,11 @@ fun IndividualCardScreen(
                         color = Color.Gray, modifier = Modifier.padding(horizontal = 20.dp)
                     )
                     LegalitiesBox(card = card)
-                    CardPrintingsBox(navController, printingsList = cardPrintingsList)
+                    CardPrintingsBox(
+                        navController = navController,
+                        printingsList = cardPrintingsList,
+                        currentCard = card
+                    )
                     RulingsBox(rulingsList = rulingsList)
                 }
             })
@@ -145,7 +148,11 @@ fun RulingItem(ruling: Ruling) {
 }
 
 @Composable
-fun CardPrintingsBox(navController: NavController, printingsList: List<MTGCard>) {
+fun CardPrintingsBox(
+    navController: NavController,
+    printingsList: List<MTGCard>,
+    currentCard: MTGCard
+) {
     Column(modifier = Modifier.padding(horizontal = 20.dp, vertical = 10.dp)) {
         Text(
             text = "Prints",
@@ -154,20 +161,34 @@ fun CardPrintingsBox(navController: NavController, printingsList: List<MTGCard>)
             modifier = Modifier.padding(bottom = 5.dp)
         )
         printingsList.forEach {
-            CardPrintingItem(navController, card = it)
+            CardPrintingItem(navController = navController, card = it, currentCard = currentCard)
         }
     }
 }
 
 @Composable
-fun CardPrintingItem(navController: NavController, card: MTGCard) {
-    Row(modifier = Modifier.clickable {
-        navController.navigate(route = "individualCard/" + card.id)
-    })
-    {
-        Text(text = card.set_name)
-        Text(" #" + card.collector_number, color = Color.Gray.copy(alpha = 0.8f))
-    }
+fun CardPrintingItem(navController: NavController, card: MTGCard, currentCard: MTGCard) {
+    if (card != currentCard)
+        Row(modifier = Modifier
+            .clickable {
+                navController.navigate(route = "individualCard/" + card.id)
+            }
+            .padding(bottom = 3.dp))
+        {
+            Text(text = card.set_name)
+            Text(" #" + card.collector_number, color = Color.Gray.copy(alpha = 0.8f))
+        }
+    else
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(end = 20.dp, bottom = 3.dp)
+                .background(Color.Gray.copy(alpha = 0.3f))
+        )
+        {
+            Text(text = card.set_name, color = Color.Gray.copy(alpha = 0.8f))
+            Text(" #" + card.collector_number, color = Color.Gray.copy(alpha = 0.8f))
+        }
 }
 
 
@@ -221,9 +242,7 @@ fun calculateMaxWidth(): Dp {
 }
 
 @Composable
-fun TopBarWithBackButton() {
-    val context = LocalContext.current
-    val activity = context as? ComponentActivity
+fun TopBarWithBackButton(navController: NavController) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -232,7 +251,11 @@ fun TopBarWithBackButton() {
     ) {
         IconButton(
             onClick = {
-                activity?.onBackPressedDispatcher?.onBackPressed()
+                navController.navigate(NavigationRoutes.Search.route) {
+                    popUpTo(NavigationRoutes.Search.route) {
+                        inclusive = true
+                    }
+                }
             },
             modifier = Modifier.padding(10.dp)
         )

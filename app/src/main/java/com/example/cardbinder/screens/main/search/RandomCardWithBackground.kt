@@ -18,6 +18,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.BlurredEdgeTreatment
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.blur
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.layout.ContentScale
@@ -55,6 +56,7 @@ fun RandomCardWithBackground(navController: NavController, randomCard: LazyPagin
                         edgeTreatment = BlurredEdgeTreatment.Unbounded
                     )
                     .alpha(0.3f)
+                    .rotate(45f)
             )
         }
         SingleRandomCard(navController = navController, card = randomMTGCardItems)
