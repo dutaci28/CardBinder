@@ -63,12 +63,20 @@ fun LogInScreen(navController: NavController) {
                 hideCharacters = true,
                 focusRequester = focusRequester,
                 onGo = {
-                    checkInputsAndNavigateToMain(navController)
+                    checkInputsAndNavigateToMain(
+                        navController = navController,
+                        email = emailText.value,
+                        password = passwordText.value
+                    )
                 }
             )
             Button(
                 onClick = {
-                    checkInputsAndNavigateToMain(navController)
+                    checkInputsAndNavigateToMain(
+                        navController = navController,
+                        email = emailText.value,
+                        password = passwordText.value
+                    )
                 },
                 modifier = Modifier.shadow(10.dp, shape = RoundedCornerShape(5.dp))
             ) { Text(text = "Log In") }
@@ -156,7 +164,15 @@ fun AuthTextField(
     }
 }
 
-fun checkInputsAndNavigateToMain(navController: NavController){
+fun checkInputsAndNavigateToMain(navController: NavController, email: String, password: String) {
+    //TODO uncomment this when logic is ready
+//    if (checkEmailValidity(email) && checkPasswordValidity(password))
+//        navController.navigate(route = "search/" + false) {
+//            popUpTo(NavigationRoutes.LogIn.route) {
+//                inclusive = true
+//            }
+//        }
+
     navController.navigate(route = "search/" + false) {
         popUpTo(NavigationRoutes.LogIn.route) {
             inclusive = true
