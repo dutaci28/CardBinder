@@ -3,6 +3,10 @@ package com.example.cardbinder.screens.main.search
 import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionScope
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -78,6 +82,19 @@ fun SharedTransitionScope.SingleRandomCard(
                 crossfade(true)
             }).build()
         )
+    val infiniteTransition = rememberInfiniteTransition()
+    val angle by infiniteTransition.animateFloat(
+        initialValue = -30f,
+        targetValue = 30f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(
+                durationMillis = 10000,
+                easing = { fraction ->
+                    ((1 - kotlin.math.cos(fraction * kotlin.math.PI)) / 2).toFloat()
+                }),
+            repeatMode = RepeatMode.Reverse
+        )
+    )
     Image(
         painter = painter,
         contentDescription = "Background Card Image",
@@ -90,7 +107,7 @@ fun SharedTransitionScope.SingleRandomCard(
                 edgeTreatment = BlurredEdgeTreatment.Unbounded
             )
             .alpha(0.3f)
-            .rotate(45f)
+            .rotate(angle)
     )
     Column(
         modifier = Modifier.fillMaxSize(),
