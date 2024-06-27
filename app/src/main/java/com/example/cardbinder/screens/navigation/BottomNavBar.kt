@@ -1,4 +1,4 @@
-package com.example.cardbinder.screens.main.navigation
+package com.example.cardbinder.screens.navigation
 
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.padding

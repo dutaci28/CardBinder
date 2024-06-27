@@ -1,4 +1,4 @@
-package com.example.cardbinder.screens.main.navigation
+package com.example.cardbinder.screens.navigation
 
 import android.annotation.SuppressLint
 import android.view.Window

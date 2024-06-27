@@ -50,7 +50,7 @@ import coil.request.ImageRequest
 import com.example.cardbinder.R
 import com.example.cardbinder.model.MTGCard
 import com.example.cardbinder.model.Ruling
-import com.example.cardbinder.screens.main.navigation.NavigationRoutes
+import com.example.cardbinder.screens.navigation.NavigationRoutes
 
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable

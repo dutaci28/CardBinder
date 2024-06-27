@@ -35,15 +35,14 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.paging.compose.collectAsLazyPagingItems
-import coil.annotation.ExperimentalCoilApi
 
-@OptIn(ExperimentalCoilApi::class, ExperimentalSharedTransitionApi::class)
+@OptIn(ExperimentalSharedTransitionApi::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun SharedTransitionScope.SearchScreen(
     navController: NavController,
     searchViewModel: SearchViewModel = hiltViewModel(),
-    animatedVisibilityScope:AnimatedVisibilityScope
+    animatedVisibilityScope: AnimatedVisibilityScope
 ) {
     val getAllCards = searchViewModel.getAllCards.collectAsLazyPagingItems()
     val getRandomCard = searchViewModel.getRandomCard.collectAsLazyPagingItems()
@@ -132,20 +131,20 @@ fun SearchScreenTopBar(
                 )
             },
             trailingIcon = {
-                IconButton(
-                    onClick = {
-                        keyboardController?.hide()
-                        focusManager.clearFocus()
-                        onTextChange("")
-                    }
-                ) {
-                    if (text.isNotEmpty())
+                if (text.isNotEmpty())
+                    IconButton(
+                        onClick = {
+                            keyboardController?.hide()
+                            focusManager.clearFocus()
+                            onTextChange("")
+                        }
+                    ) {
                         Icon(
                             imageVector = Icons.Default.Close,
                             contentDescription = "Empty Text Icon",
                             tint = Color.Gray
                         )
-                }
+                    }
             },
             keyboardOptions = KeyboardOptions(
                 imeAction = ImeAction.Search

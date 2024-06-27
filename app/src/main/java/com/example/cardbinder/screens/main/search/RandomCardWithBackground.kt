@@ -42,9 +42,9 @@ fun SharedTransitionScope.RandomCardWithBackground(
     randomCard: LazyPagingItems<MTGCard>,
     animatedVisibilityScope:AnimatedVisibilityScope
 ) {
+    val randomMTGCardItems by remember { mutableStateOf(randomCard) }
     Surface(modifier = Modifier.fillMaxSize()) {
         val backgroundCard: MTGCard
-        val randomMTGCardItems by remember { mutableStateOf(randomCard) }
         if (randomMTGCardItems.itemCount != 0) {
             backgroundCard = randomMTGCardItems.itemSnapshotList[0]!!
             val imageSource =

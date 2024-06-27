@@ -44,7 +44,7 @@ import com.example.cardbinder.R
 import com.example.cardbinder.model.CardCollectionEntry
 import com.example.cardbinder.model.ImageURIs
 import com.example.cardbinder.model.MTGCard
-import com.example.cardbinder.screens.main.navigation.NavigationRoutes
+import com.example.cardbinder.screens.navigation.NavigationRoutes
 
 @Composable
 fun CollectionScreen(
