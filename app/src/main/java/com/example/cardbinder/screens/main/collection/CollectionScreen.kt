@@ -3,6 +3,7 @@ package com.example.cardbinder.screens.main.collection
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -28,6 +29,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.BlurredEdgeTreatment
+import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.blur
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -38,7 +42,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import coil.compose.AsyncImage
+import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.example.cardbinder.R
 import com.example.cardbinder.model.CardCollectionEntry
@@ -169,23 +173,49 @@ fun CardPager(collectionCards: List<CardCollectionEntry>) {
             targetValue = if (pageOffset != 0.0f) 0.75f else 1f,
             animationSpec = tween(300)
         )
-        AsyncImage(
-            model = ImageRequest.Builder(LocalContext.current)
-                .data(collectionCards[index].card.image_uris.png)
-                .build(),
-            contentDescription = "Card Image",
-            contentScale = ContentScale.Fit,
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(40.dp)
-                .graphicsLayer {
-                    scaleX = imageSizeScale
-                    scaleY = imageSizeScale
-                }
-                .clickable {
-                    //TODO REDIRECT TO INDIVIDUAL CARD VIEW PAGE
-                }
-        )
+        val imageSource =
+            if (collectionCards[index].card.layout == "transform" || collectionCards[index].card.layout == "modal_dfc")
+                collectionCards[index].card.faces[0].image_uris.png
+            else collectionCards[index].card.image_uris.png
+        val painter =
+            rememberAsyncImagePainter(
+                ImageRequest.Builder(LocalContext.current).data(
+                    data = imageSource
+                ).apply(block = fun ImageRequest.Builder.() {
+                    crossfade(true)
+                }).build()
+            )
+        Box(modifier = Modifier.fillMaxSize()) {
+            Image(
+                painter = painter,
+                contentDescription = "Background Card Image",
+                contentScale = ContentScale.Fit,
+                modifier = Modifier
+                    .background(Color.White)
+                    .blur(
+                        radiusX = 10.dp,
+                        radiusY = 10.dp,
+                        edgeTreatment = BlurredEdgeTreatment.Unbounded
+                    )
+                    .alpha(0.3f)
+                    .fillMaxSize()
+            )
+            Image(
+                painter = painter,
+                contentDescription = "Card Image",
+                contentScale = ContentScale.Fit,
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(50.dp)
+                    .graphicsLayer {
+                        scaleX = imageSizeScale
+                        scaleY = imageSizeScale
+                    }
+                    .clickable {
+                        //TODO REDIRECT TO INDIVIDUAL CARD VIEW PAGE
+                    }
+            )
+        }
     }
     Row(
         horizontalArrangement = Arrangement.SpaceBetween,

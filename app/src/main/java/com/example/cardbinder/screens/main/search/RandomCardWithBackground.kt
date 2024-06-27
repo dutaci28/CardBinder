@@ -3,10 +3,15 @@ package com.example.cardbinder.screens.main.search
 import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionScope
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Surface
@@ -31,7 +36,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.paging.compose.LazyPagingItems
-import coil.compose.AsyncImage
+import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.example.cardbinder.model.MTGCard
 
@@ -40,38 +45,19 @@ import com.example.cardbinder.model.MTGCard
 fun SharedTransitionScope.RandomCardWithBackground(
     navController: NavController,
     randomCard: LazyPagingItems<MTGCard>,
-    animatedVisibilityScope:AnimatedVisibilityScope
+    animatedVisibilityScope: AnimatedVisibilityScope
 ) {
     val randomMTGCardItems by remember { mutableStateOf(randomCard) }
     Surface(modifier = Modifier.fillMaxSize()) {
-        val backgroundCard: MTGCard
+        val displayCard: MTGCard
         if (randomMTGCardItems.itemCount != 0) {
-            backgroundCard = randomMTGCardItems.itemSnapshotList[0]!!
-            val imageSource =
-                if (backgroundCard.layout == "transform" || backgroundCard.layout == "modal_dfc") backgroundCard.faces[0].image_uris.png else backgroundCard.image_uris.png
-            AsyncImage(
-                model = ImageRequest.Builder(LocalContext.current)
-                    .data(imageSource)
-                    .crossfade(200)
-                    .build(),
-                contentDescription = "Background Card Image",
-                contentScale = ContentScale.Fit,
-                modifier = Modifier
-                    .background(Color.White)
-                    .blur(
-                        radiusX = 10.dp,
-                        radiusY = 10.dp,
-                        edgeTreatment = BlurredEdgeTreatment.Unbounded
-                    )
-                    .alpha(0.3f)
-                    .rotate(45f)
+            displayCard = randomMTGCardItems.itemSnapshotList[0]!!
+            SingleRandomCard(
+                navController = navController,
+                card = displayCard,
+                animatedVisibilityScope = animatedVisibilityScope
             )
         }
-        SingleRandomCard(
-            navController = navController,
-            card = randomMTGCardItems,
-            animatedVisibilityScope = animatedVisibilityScope
-        )
     }
 }
 
@@ -79,9 +65,33 @@ fun SharedTransitionScope.RandomCardWithBackground(
 @Composable
 fun SharedTransitionScope.SingleRandomCard(
     navController: NavController,
-    card: LazyPagingItems<MTGCard>,
+    card: MTGCard,
     animatedVisibilityScope: AnimatedVisibilityScope
 ) {
+    val imageSource =
+        if (card.layout == "transform" || card.layout == "modal_dfc") card.faces[0].image_uris.png else card.image_uris.png
+    val painter =
+        rememberAsyncImagePainter(
+            ImageRequest.Builder(LocalContext.current).data(
+                data = imageSource
+            ).apply(block = fun ImageRequest.Builder.() {
+                crossfade(true)
+            }).build()
+        )
+    Image(
+        painter = painter,
+        contentDescription = "Background Card Image",
+        contentScale = ContentScale.Fit,
+        modifier = Modifier
+            .background(Color.White)
+            .blur(
+                radiusX = 10.dp,
+                radiusY = 10.dp,
+                edgeTreatment = BlurredEdgeTreatment.Unbounded
+            )
+            .alpha(0.3f)
+            .rotate(45f)
+    )
     Column(
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Center,
@@ -99,14 +109,30 @@ fun SharedTransitionScope.SingleRandomCard(
             ),
             modifier = Modifier.padding(bottom = 6.dp)
         )
-        SearchedCardsList(
-            navController = navController,
-            items = card,
+        Box(
             modifier = Modifier
-                .padding(horizontal = 5.dp)
+                .clickable {
+                    navController.navigate(route = "individualCard/" + card.id)
+                }
+                .padding(vertical = 5.dp)
+                .height(280.dp)
                 .width(200.dp),
-            topPaddingModifier = Modifier.padding(0.dp),
-            animatedVisibilityScope = animatedVisibilityScope
-        )
+            contentAlignment = Alignment.Center
+        ) {
+            Image(
+                painter = painter,
+                contentDescription = "Card Image",
+                contentScale = ContentScale.Fit,
+                modifier = Modifier
+                    .padding(5.dp)
+                    .sharedElement(
+                        state = rememberSharedContentState(key = "image${card.id}"),
+                        animatedVisibilityScope = animatedVisibilityScope,
+                        boundsTransform = { _, _ ->
+                            tween(durationMillis = 300)
+                        }
+                    )
+            )
+        }
     }
 }
