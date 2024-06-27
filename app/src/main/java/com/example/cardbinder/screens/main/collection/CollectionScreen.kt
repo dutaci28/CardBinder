@@ -55,22 +55,38 @@ fun CollectionScreen(
         mutableStateListOf(
             CardCollectionEntry(
                 MTGCard.getEmptyCard()
-                    .copy(image_uris = ImageURIs("https://cards.scryfall.io/png/front/7/2/721f76bb-3296-4ed0-8f51-204d09c7cbe3.png?1562917810")),
+                    .copy(
+                        name = "Lotus Weaver",
+                        collector_number = "45",
+                        image_uris = ImageURIs("https://cards.scryfall.io/png/front/7/2/721f76bb-3296-4ed0-8f51-204d09c7cbe3.png?1562917810")
+                    ),
                 1
             ),
             CardCollectionEntry(
                 MTGCard.getEmptyCard()
-                    .copy(image_uris = ImageURIs("https://cards.scryfall.io/png/front/c/6/c60ea64d-0209-4ca4-bee6-f9eb63784c9e.png?1562936877")),
+                    .copy(
+                        name = "Big dude guy",
+                        collector_number = "311",
+                        image_uris = ImageURIs("https://cards.scryfall.io/png/front/c/6/c60ea64d-0209-4ca4-bee6-f9eb63784c9e.png?1562936877")
+                    ),
                 2
             ),
             CardCollectionEntry(
                 MTGCard.getEmptyCard()
-                    .copy(image_uris = ImageURIs("https://cards.scryfall.io/png/front/0/8/089e12c0-e60f-4b60-a2eb-b6c1d088ac50.png?1562896733")),
+                    .copy(
+                        name = "Blue Eyes White dragon",
+                        collector_number = "21",
+                        image_uris = ImageURIs("https://cards.scryfall.io/png/front/0/8/089e12c0-e60f-4b60-a2eb-b6c1d088ac50.png?1562896733")
+                    ),
                 3
             ),
             CardCollectionEntry(
                 MTGCard.getEmptyCard()
-                    .copy(image_uris = ImageURIs("https://cards.scryfall.io/png/front/7/2/721f76bb-3296-4ed0-8f51-204d09c7cbe3.png?1562917810")),
+                    .copy(
+                        name = "Whatever card",
+                        collector_number = "1",
+                        image_uris = ImageURIs("https://cards.scryfall.io/png/front/7/2/721f76bb-3296-4ed0-8f51-204d09c7cbe3.png?1562917810")
+                    ),
                 2
             )
         )
@@ -90,7 +106,7 @@ fun CollectionScreen(
                     .padding(top = innerPadding.calculateTopPadding(), bottom = 140.dp)
             ) {
                 if (collectionViewToggle.value) {
-                    CardList(collectionCards = collectionCards)
+                    CollectionCardList(collectionCards = collectionCards)
                 } else {
                     CardPager(collectionCards = collectionCards)
                 }
@@ -100,8 +116,22 @@ fun CollectionScreen(
 }
 
 @Composable
-fun CardList(collectionCards: List<CardCollectionEntry>) {
+fun CollectionCardList(collectionCards: List<CardCollectionEntry>) {
+    Column(modifier = Modifier.fillMaxSize()) {
+        collectionCards.forEach {
+            CollectionCardListItem(cardCollectionEntry = it)
+        }
+    }
+}
 
+@Composable
+fun CollectionCardListItem(cardCollectionEntry: CardCollectionEntry) {
+    Row(Modifier.fillMaxWidth()) {
+        Text(text = cardCollectionEntry.amount.toString() + "x")
+        Text(text = cardCollectionEntry.card.name)
+        Text(text = "#" + cardCollectionEntry.card.collector_number, color = Color.Gray)
+
+    }
 }
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -203,9 +233,7 @@ fun CollectionScreenTopBar(
             .background(Color.White)
     ) {
         IconButton(
-            onClick = {
-                navController.navigate(NavigationRoutes.Search.route)
-            },
+            onClick = { navController.navigate(NavigationRoutes.Search.route) },
             modifier = Modifier.padding(10.dp)
         )
         {
@@ -221,9 +249,7 @@ fun CollectionScreenTopBar(
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(text = "List view", color = Color.Gray)
                 IconButton(
-                    onClick = {
-                        collectionViewToggle.value = !collectionViewToggle.value
-                    },
+                    onClick = { collectionViewToggle.value = !collectionViewToggle.value },
                     modifier = Modifier.padding(10.dp)
                 )
                 {
@@ -240,9 +266,7 @@ fun CollectionScreenTopBar(
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(text = "Pager view", color = Color.Gray)
                 IconButton(
-                    onClick = {
-                        collectionViewToggle.value = !collectionViewToggle.value
-                    },
+                    onClick = { collectionViewToggle.value = !collectionViewToggle.value },
                     modifier = Modifier.padding(10.dp)
                 )
                 {
