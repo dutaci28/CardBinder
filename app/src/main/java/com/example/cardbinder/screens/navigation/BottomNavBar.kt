@@ -31,13 +31,15 @@ fun BottomNavBar(navController: NavHostController) {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry?.destination
     NavigationBar(
-        modifier = Modifier.graphicsLayer {
-            shadowElevation = 50.dp.toPx()
-        }.padding(top = 10.dp),
+        modifier = Modifier
+            .graphicsLayer {
+                shadowElevation = 50.dp.toPx()
+            }
+            .padding(top = 10.dp),
         containerColor = Color.White.copy(alpha = 0.9f)
     ) {
         screens.forEach { screen ->
-            AddItem(
+            NavItem(
                 screen = screen,
                 currentDestination = currentDestination,
                 navController = navController
@@ -47,7 +49,7 @@ fun BottomNavBar(navController: NavHostController) {
 }
 
 @Composable
-fun RowScope.AddItem(
+fun RowScope.NavItem(
     screen: NavigationRoutes,
     currentDestination: NavDestination?,
     navController: NavHostController
@@ -90,10 +92,16 @@ fun RowScope.AddItem(
         },
         selected = currentDestination?.hierarchy?.any { it.route == screen.route } == true,
         onClick = {
-            navController.navigate(screen.route) {
-                popUpTo(navController.graph.findStartDestination().id)
-                launchSingleTop = true
-            }
+            if (screen.route == NavigationRoutes.Search.route)
+                navController.navigate(route = "search/" + false) {
+                    popUpTo(navController.graph.findStartDestination().id)
+                    launchSingleTop = true
+                }
+            else
+                navController.navigate(screen.route) {
+                    popUpTo(navController.graph.findStartDestination().id)
+                    launchSingleTop = true
+                }
         }
     )
 }
