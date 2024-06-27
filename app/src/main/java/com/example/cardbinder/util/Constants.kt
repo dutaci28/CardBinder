@@ -9,5 +9,6 @@ class Constants {
         const val MTG_CARD_DATABASE = "mtg_card_database"
         const val ITEMS_PER_PAGE = 175 //default for scryfall
         const val NAV_ARGUMENT_CARD_ID = "id"
+        const val NAV_ARGUMENT_SHOULD_FOCUS_SEARCH = "should_focus_search"
     }
 }

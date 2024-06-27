@@ -1,6 +1,7 @@
 package com.example.cardbinder.screens.navigation
 
 import com.example.cardbinder.util.Constants.Companion.NAV_ARGUMENT_CARD_ID
+import com.example.cardbinder.util.Constants.Companion.NAV_ARGUMENT_SHOULD_FOCUS_SEARCH
 
 sealed class NavigationRoutes(
     val route: String,
@@ -22,7 +23,7 @@ sealed class NavigationRoutes(
     )
 
     data object Search : NavigationRoutes(
-        route = "search",
+        route = "search/{$NAV_ARGUMENT_SHOULD_FOCUS_SEARCH}",
         title = "Search"
     )
 

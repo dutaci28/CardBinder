@@ -44,7 +44,6 @@ import com.example.cardbinder.R
 import com.example.cardbinder.model.CardCollectionEntry
 import com.example.cardbinder.model.ImageURIs
 import com.example.cardbinder.model.MTGCard
-import com.example.cardbinder.screens.navigation.NavigationRoutes
 
 @Composable
 fun CollectionScreen(
@@ -233,7 +232,7 @@ fun CollectionScreenTopBar(
             .background(Color.White)
     ) {
         IconButton(
-            onClick = { navController.navigate(NavigationRoutes.Search.route) },
+            onClick = { navController.navigate(route = "search/" + true) },
             modifier = Modifier.padding(10.dp)
         )
         {

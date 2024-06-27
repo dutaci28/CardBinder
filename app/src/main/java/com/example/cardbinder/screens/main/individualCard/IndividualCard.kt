@@ -277,7 +277,7 @@ fun IndividualCardTopBar(navController: NavController) {
 
         IconButton(
             onClick = {
-                navController.navigate(NavigationRoutes.Search.route) {
+                navController.navigate(route = "search/" + false) {
                     popUpTo(NavigationRoutes.Search.route) {
                         inclusive = true
                     }

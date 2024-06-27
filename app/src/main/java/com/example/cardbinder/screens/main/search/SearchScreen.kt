@@ -21,9 +21,13 @@ import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalFocusManager
@@ -42,12 +46,14 @@ import androidx.paging.compose.collectAsLazyPagingItems
 fun SharedTransitionScope.SearchScreen(
     navController: NavController,
     searchViewModel: SearchViewModel = hiltViewModel(),
+    shouldFocus: Boolean,
     animatedVisibilityScope: AnimatedVisibilityScope
 ) {
     val getAllCards = searchViewModel.getAllCards.collectAsLazyPagingItems()
     val getRandomCard = searchViewModel.getRandomCard.collectAsLazyPagingItems()
     val searchQuery by searchViewModel.searchQuery
     val searchedCards = searchViewModel.searchedCards.collectAsLazyPagingItems()
+    val focusRequester = remember { FocusRequester() }
 
     Scaffold(
         topBar = {
@@ -58,7 +64,9 @@ fun SharedTransitionScope.SearchScreen(
                 },
                 onSearchClicked = {
                     searchViewModel.searchCardsByName(name = it)
-                }
+                },
+                shouldFocus = shouldFocus,
+                focusRequester = focusRequester
             )
         },
         content = { innerPadding ->
@@ -86,7 +94,9 @@ fun SharedTransitionScope.SearchScreen(
 fun SearchScreenTopBar(
     text: String,
     onTextChange: (String) -> Unit,
-    onSearchClicked: (String) -> Unit
+    onSearchClicked: (String) -> Unit,
+    shouldFocus: Boolean,
+    focusRequester: FocusRequester
 ) {
     Box(
         contentAlignment = Alignment.TopCenter,
@@ -95,7 +105,7 @@ fun SearchScreenTopBar(
     ) {
         val keyboardController = LocalSoftwareKeyboardController.current
         val focusManager = LocalFocusManager.current
-
+        if (shouldFocus) LaunchedEffect(Unit) { focusRequester.requestFocus() }
         OutlinedTextField(
             modifier = Modifier
                 .fillMaxWidth(0.95f)
@@ -109,7 +119,8 @@ fun SearchScreenTopBar(
                 .background(
                     color = Color.White.copy(alpha = 0.9f),
                     shape = RoundedCornerShape(8.dp)
-                ),
+                )
+                .focusRequester(focusRequester),
             colors = OutlinedTextFieldDefaults.colors(
                 focusedTextColor = Color.Gray,
                 unfocusedTextColor = Color.Gray,

@@ -7,20 +7,13 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.example.cardbinder.screens.main.search.SearchScreenTopBar
 
 @Composable
 fun DecksScreen(
     decksViewModel: DecksViewModel = hiltViewModel()
 ) {
     Scaffold(
-        topBar = {
-            SearchScreenTopBar(
-                text = "Text",
-                onTextChange = {},
-                onSearchClicked = {}
-            )
-        },
+        topBar = {},
         content = { innerPadding ->
             Box(modifier = Modifier.padding(innerPadding.calculateTopPadding())) {
                 Text(text = "Decks")

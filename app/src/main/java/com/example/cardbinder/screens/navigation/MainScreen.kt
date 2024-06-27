@@ -32,6 +32,7 @@ import com.example.cardbinder.screens.main.decks.DecksScreen
 import com.example.cardbinder.screens.main.individualCard.IndividualCardScreen
 import com.example.cardbinder.screens.main.search.SearchScreen
 import com.example.cardbinder.util.Constants.Companion.NAV_ARGUMENT_CARD_ID
+import com.example.cardbinder.util.Constants.Companion.NAV_ARGUMENT_SHOULD_FOCUS_SEARCH
 
 @OptIn(ExperimentalSharedTransitionApi::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -75,8 +76,16 @@ fun MainScreen(window: Window) {
                     composable(route = NavigationRoutes.Collection.route) {
                         CollectionScreen(navController = navController)
                     }
-                    composable(route = NavigationRoutes.Search.route) {
-                        SearchScreen(navController = navController, animatedVisibilityScope = this)
+                    composable(route = NavigationRoutes.Search.route, arguments = listOf(
+                        navArgument(name = NAV_ARGUMENT_SHOULD_FOCUS_SEARCH) {
+                            type = NavType.BoolType
+                        }
+                    )) {
+                        SearchScreen(
+                            navController = navController, shouldFocus = it.arguments?.getBoolean(
+                                NAV_ARGUMENT_SHOULD_FOCUS_SEARCH
+                            ).toString().toBoolean(), animatedVisibilityScope = this
+                        )
                     }
                     composable(route = NavigationRoutes.Decks.route) {
                         DecksScreen()
