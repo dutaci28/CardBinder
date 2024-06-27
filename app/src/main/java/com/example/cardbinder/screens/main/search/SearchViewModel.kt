@@ -20,8 +20,6 @@ class SearchViewModel @Inject constructor(
     private val _searchQuery = mutableStateOf("")
     val searchQuery = _searchQuery
     private val _searchedCards = MutableStateFlow<PagingData<MTGCard>>(PagingData.empty())
-    val getAllCards = repo.getAllCards()
-    val getRandomCard = repo.getRandomCard()
     val searchedCards = _searchedCards
 
     fun updateSearchQuery(query: String) {
@@ -36,13 +34,4 @@ class SearchViewModel @Inject constructor(
             }
         }
     }
-
-    fun getRandomCard() {
-        viewModelScope.launch {
-            repo.getRandomCard().cachedIn(viewModelScope).collect {
-                _searchedCards.value = it
-            }
-        }
-    }
-
 }

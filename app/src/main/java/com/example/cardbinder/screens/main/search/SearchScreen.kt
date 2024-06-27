@@ -38,7 +38,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
+import com.example.cardbinder.model.MTGCard
 
 @OptIn(ExperimentalSharedTransitionApi::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -47,10 +49,9 @@ fun SharedTransitionScope.SearchScreen(
     navController: NavController,
     searchViewModel: SearchViewModel = hiltViewModel(),
     shouldFocus: Boolean,
+    randomCardData: LazyPagingItems<MTGCard>,
     animatedVisibilityScope: AnimatedVisibilityScope
 ) {
-    val getAllCards = searchViewModel.getAllCards.collectAsLazyPagingItems()
-    val getRandomCard = searchViewModel.getRandomCard.collectAsLazyPagingItems()
     val searchQuery by searchViewModel.searchQuery
     val searchedCards = searchViewModel.searchedCards.collectAsLazyPagingItems()
     val focusRequester = remember { FocusRequester() }
@@ -73,7 +74,7 @@ fun SharedTransitionScope.SearchScreen(
             if (searchedCards.itemCount == 0) {
                 RandomCardWithBackground(
                     navController = navController,
-                    randomCard = getRandomCard,
+                    randomCard = randomCardData,
                     animatedVisibilityScope = animatedVisibilityScope
                 )
             } else {

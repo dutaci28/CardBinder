@@ -19,12 +19,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalView
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import androidx.paging.compose.collectAsLazyPagingItems
 import com.example.cardbinder.screens.authentication.login.LogInScreen
 import com.example.cardbinder.screens.authentication.register.RegisterScreen
 import com.example.cardbinder.screens.main.collection.CollectionScreen
@@ -37,7 +39,7 @@ import com.example.cardbinder.util.Constants.Companion.NAV_ARGUMENT_SHOULD_FOCUS
 @OptIn(ExperimentalSharedTransitionApi::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun MainScreen(window: Window) {
+fun MainScreen(window: Window, mainScreenViewModel: MainScreenViewModel = hiltViewModel()) {
     val navController = rememberNavController()
     var showBottomBar by rememberSaveable { mutableStateOf(true) }
     val navBackStackEntry by navController.currentBackStackEntryAsState()
@@ -53,6 +55,7 @@ fun MainScreen(window: Window) {
     val isLoggedIn = false
     val startDestination =
         if (isLoggedIn) NavigationRoutes.Search.route else NavigationRoutes.LogIn.route
+    val getRandomCard = mainScreenViewModel.getRandomCard.collectAsLazyPagingItems()
 
     UpdateStatusBarColor(color = Color.Black, window = window)
     Scaffold(bottomBar = { if (showBottomBar) BottomNavBar(navController = navController) }) {
@@ -82,9 +85,12 @@ fun MainScreen(window: Window) {
                         }
                     )) {
                         SearchScreen(
-                            navController = navController, shouldFocus = it.arguments?.getBoolean(
+                            navController = navController,
+                            shouldFocus = it.arguments?.getBoolean(
                                 NAV_ARGUMENT_SHOULD_FOCUS_SEARCH
-                            ).toString().toBoolean(), animatedVisibilityScope = this
+                            ).toString().toBoolean(),
+                            randomCardData = getRandomCard,
+                            animatedVisibilityScope = this
                         )
                     }
                     composable(route = NavigationRoutes.Decks.route) {
