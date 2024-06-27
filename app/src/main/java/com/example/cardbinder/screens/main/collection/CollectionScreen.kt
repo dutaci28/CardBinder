@@ -7,6 +7,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -18,7 +19,9 @@ import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
@@ -32,105 +35,100 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.example.cardbinder.R
+import com.example.cardbinder.model.CardCollectionEntry
 import com.example.cardbinder.model.ImageURIs
 import com.example.cardbinder.model.MTGCard
+import com.example.cardbinder.screens.main.navigation.NavigationRoutes
 
 @Composable
 fun CollectionScreen(
-    collectionViewModel: CollectionViewModel = hiltViewModel()
+    collectionViewModel: CollectionViewModel = hiltViewModel(),
+    navController: NavController
 ) {
     val collectionCards = remember {
         mutableStateListOf(
-            MTGCard.getEmptyCard()
-                .copy(image_uris = ImageURIs("https://cards.scryfall.io/png/front/7/2/721f76bb-3296-4ed0-8f51-204d09c7cbe3.png?1562917810")),
-            MTGCard.getEmptyCard()
-                .copy(image_uris = ImageURIs("https://cards.scryfall.io/png/front/c/6/c60ea64d-0209-4ca4-bee6-f9eb63784c9e.png?1562936877")),
-            MTGCard.getEmptyCard()
-                .copy(image_uris = ImageURIs("https://cards.scryfall.io/png/front/0/8/089e12c0-e60f-4b60-a2eb-b6c1d088ac50.png?1562896733")),
-            MTGCard.getEmptyCard()
-                .copy(image_uris = ImageURIs("https://cards.scryfall.io/png/front/7/2/721f76bb-3296-4ed0-8f51-204d09c7cbe3.png?1562917810")),
+            CardCollectionEntry(
+                MTGCard.getEmptyCard()
+                    .copy(image_uris = ImageURIs("https://cards.scryfall.io/png/front/7/2/721f76bb-3296-4ed0-8f51-204d09c7cbe3.png?1562917810")),
+                1
+            ),
+            CardCollectionEntry(
+                MTGCard.getEmptyCard()
+                    .copy(image_uris = ImageURIs("https://cards.scryfall.io/png/front/c/6/c60ea64d-0209-4ca4-bee6-f9eb63784c9e.png?1562936877")),
+                2
+            ),
+            CardCollectionEntry(
+                MTGCard.getEmptyCard()
+                    .copy(image_uris = ImageURIs("https://cards.scryfall.io/png/front/0/8/089e12c0-e60f-4b60-a2eb-b6c1d088ac50.png?1562896733")),
+                3
+            ),
+            CardCollectionEntry(
+                MTGCard.getEmptyCard()
+                    .copy(image_uris = ImageURIs("https://cards.scryfall.io/png/front/7/2/721f76bb-3296-4ed0-8f51-204d09c7cbe3.png?1562917810")),
+                2
+            )
         )
     }
-
+    val collectionViewToggle = remember { mutableStateOf(false) }
     Scaffold(
         topBar = {
-            CollectionScreenTopBar()
+            CollectionScreenTopBar(
+                collectionViewToggle = collectionViewToggle,
+                navController = navController
+            )
         },
         content = { innerPadding ->
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(top = innerPadding.calculateTopPadding())
+                    .padding(top = innerPadding.calculateTopPadding(), bottom = 140.dp)
             ) {
-                CardPager(collectionCards = collectionCards)
+                if (collectionViewToggle.value) {
+                    CardList(collectionCards = collectionCards)
+                } else {
+                    CardPager(collectionCards = collectionCards)
+                }
             }
         }
     )
 }
 
 @Composable
-fun CollectionScreenTopBar() {
-    val collectionViewToggle = remember { mutableStateOf(false) }
-    Row(
-        horizontalArrangement = Arrangement.End,
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(56.dp)
-            .background(Color.White)
-    ) {
-        IconButton(
-            onClick = {
-                collectionViewToggle.value = !collectionViewToggle.value
-            },
-            modifier = Modifier.padding(10.dp)
-        )
-        {
-            if(collectionViewToggle.value){
-                Icon(
-                    imageVector = ImageVector.vectorResource(id = R.drawable.cardlist),
-                    contentDescription = "Back Icon",
-                    modifier = Modifier
-                        .height(45.dp)
-                        .width(45.dp)
-                )
-            } else {
-                Icon(
-                    imageVector = ImageVector.vectorResource(id = R.drawable.cardpager),
-                    contentDescription = "Back Icon",
-                    modifier = Modifier
-                        .height(45.dp)
-                        .width(45.dp)
-                )
-            }
-        }
-    }
+fun CardList(collectionCards: List<CardCollectionEntry>) {
+
 }
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun CardPager(collectionCards: List<MTGCard>) {
+fun CardPager(collectionCards: List<CardCollectionEntry>) {
     val pagerState = rememberPagerState(pageCount = { collectionCards.size })
-    val arrowVisibilityList = remember {
-        mutableStateListOf(1f, 1f)
+    val arrowVisibilityList = remember { mutableStateListOf(1f, 1f) }
+    val currentEntry = remember {
+        mutableStateOf(CardCollectionEntry.getEmptyEntry())
     }
 
     HorizontalPager(
         state = pagerState,
         modifier = Modifier.fillMaxSize()
     ) { index ->
+        currentEntry.value = collectionCards[pagerState.currentPage]
         when (pagerState.currentPage) {
             0 -> {
                 arrowVisibilityList[0] = 0f
                 arrowVisibilityList[1] = 1f
             }
+
             collectionCards.size - 1 -> {
                 arrowVisibilityList[0] = 1f
                 arrowVisibilityList[1] = 0f
             }
+
             else -> {
                 arrowVisibilityList[0] = 1f
                 arrowVisibilityList[1] = 1f
@@ -144,7 +142,7 @@ fun CardPager(collectionCards: List<MTGCard>) {
         )
         AsyncImage(
             model = ImageRequest.Builder(LocalContext.current)
-                .data(collectionCards[index].image_uris.png)
+                .data(collectionCards[index].card.image_uris.png)
                 .build(),
             contentDescription = "Card Image",
             contentScale = ContentScale.Fit,
@@ -169,13 +167,94 @@ fun CardPager(collectionCards: List<MTGCard>) {
             imageVector = ImageVector.vectorResource(id = R.drawable.arrowleft),
             contentDescription = "Swipe left icon",
             tint = Color.Gray.copy(alpha = arrowVisibilityList[0]),
-            modifier = Modifier.padding(40.dp)
+            modifier = Modifier.padding(10.dp)
         )
         Icon(
             imageVector = ImageVector.vectorResource(id = R.drawable.arrowright),
             contentDescription = "Swipe right icon",
             tint = Color.Gray.copy(alpha = arrowVisibilityList[1]),
-            modifier = Modifier.padding(40.dp)
+            modifier = Modifier.padding(10.dp)
         )
+    }
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        verticalArrangement = Arrangement.Bottom,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(
+            text = "x ${currentEntry.value.amount}",
+            color = Color.Gray,
+            fontSize = 24.sp
+        )
+    }
+}
+
+@Composable
+fun CollectionScreenTopBar(
+    collectionViewToggle: MutableState<Boolean>,
+    navController: NavController
+) {
+    Row(
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(56.dp)
+            .background(Color.White)
+    ) {
+        IconButton(
+            onClick = {
+                navController.navigate(NavigationRoutes.Search.route)
+            },
+            modifier = Modifier.padding(10.dp)
+        )
+        {
+            Icon(
+                imageVector = ImageVector.vectorResource(id = R.drawable.plus),
+                contentDescription = "Add Card Icon",
+                modifier = Modifier
+                    .height(45.dp)
+                    .width(45.dp)
+            )
+        }
+        if (collectionViewToggle.value) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(text = "List view", color = Color.Gray)
+                IconButton(
+                    onClick = {
+                        collectionViewToggle.value = !collectionViewToggle.value
+                    },
+                    modifier = Modifier.padding(10.dp)
+                )
+                {
+                    Icon(
+                        imageVector = ImageVector.vectorResource(id = R.drawable.cardlist),
+                        contentDescription = "Back Icon",
+                        modifier = Modifier
+                            .height(45.dp)
+                            .width(45.dp)
+                    )
+                }
+            }
+        } else {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(text = "Pager view", color = Color.Gray)
+                IconButton(
+                    onClick = {
+                        collectionViewToggle.value = !collectionViewToggle.value
+                    },
+                    modifier = Modifier.padding(10.dp)
+                )
+                {
+                    Icon(
+                        imageVector = ImageVector.vectorResource(id = R.drawable.cardpager),
+                        contentDescription = "Back Icon",
+                        modifier = Modifier
+                            .height(45.dp)
+                            .width(45.dp)
+                    )
+                }
+            }
+        }
     }
 }

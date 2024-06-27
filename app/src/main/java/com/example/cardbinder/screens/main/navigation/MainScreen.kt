@@ -58,7 +58,7 @@ fun MainScreen(window: Window) {
                     startDestination = NavigationRoutes.Search.route
                 ) {
                     composable(route = NavigationRoutes.Collection.route) {
-                        CollectionScreen()
+                        CollectionScreen(navController = navController)
                     }
                     composable(route = NavigationRoutes.Search.route) {
                         SearchScreen(navController = navController, animatedVisibilityScope = this)
