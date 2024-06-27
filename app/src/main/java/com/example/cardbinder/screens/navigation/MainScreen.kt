@@ -25,6 +25,8 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.example.cardbinder.screens.authentication.login.LogInScreen
+import com.example.cardbinder.screens.authentication.register.RegisterScreen
 import com.example.cardbinder.screens.main.collection.CollectionScreen
 import com.example.cardbinder.screens.main.decks.DecksScreen
 import com.example.cardbinder.screens.main.individualCard.IndividualCardScreen
@@ -41,8 +43,15 @@ fun MainScreen(window: Window) {
 
     showBottomBar = when (navBackStackEntry?.destination?.route) {
         NavigationRoutes.IndividualCard.route -> false
+        NavigationRoutes.LogIn.route -> false
+        NavigationRoutes.Register.route -> false
         else -> true
     }
+
+    //TODO add preference provider logic for staying logged in
+    val isLoggedIn = false
+    val startDestination =
+        if (isLoggedIn) NavigationRoutes.Search.route else NavigationRoutes.LogIn.route
 
     UpdateStatusBarColor(color = Color.Black, window = window)
     Scaffold(bottomBar = { if (showBottomBar) BottomNavBar(navController = navController) }) {
@@ -55,8 +64,14 @@ fun MainScreen(window: Window) {
             SharedTransitionLayout {
                 NavHost(
                     navController = navController,
-                    startDestination = NavigationRoutes.Search.route
+                    startDestination = startDestination
                 ) {
+                    composable(route = NavigationRoutes.LogIn.route) {
+                        LogInScreen(navController = navController)
+                    }
+                    composable(route = NavigationRoutes.Register.route) {
+                        RegisterScreen(navController = navController)
+                    }
                     composable(route = NavigationRoutes.Collection.route) {
                         CollectionScreen(navController = navController)
                     }
@@ -67,9 +82,7 @@ fun MainScreen(window: Window) {
                         DecksScreen()
                     }
                     composable(route = NavigationRoutes.IndividualCard.route, arguments = listOf(
-                        navArgument(name = NAV_ARGUMENT_CARD_ID) {
-                            type = NavType.StringType
-                        }
+                        navArgument(name = NAV_ARGUMENT_CARD_ID) { type = NavType.StringType }
                     )) {
                         IndividualCardScreen(
                             navController = navController,

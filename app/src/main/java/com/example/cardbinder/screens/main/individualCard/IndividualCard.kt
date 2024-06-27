@@ -69,16 +69,12 @@ fun SharedTransitionScope.IndividualCardScreen(
         card = searchedCards.itemSnapshotList[0]!!
         cardPrintingsList = listOf()
         rulingsList = listOf()
-        individualCardViewModel.getCardPrintings(
-            q = card.oracle_id
-        )
+        individualCardViewModel.getCardPrintings(q = card.oracle_id)
         val cardPrintings = individualCardViewModel.cardPrintings.collectAsLazyPagingItems()
         if (cardPrintings.itemSnapshotList.isNotEmpty()) {
             cardPrintingsList = cardPrintings.itemSnapshotList.items
         }
-        individualCardViewModel.getRulingsByCardId(
-            id = card.id
-        )
+        individualCardViewModel.getRulingsByCardId(id = card.id)
         val rulings = individualCardViewModel.rulings.collectAsLazyPagingItems()
         if (rulings.itemSnapshotList.isNotEmpty()) {
             rulingsList = rulings.itemSnapshotList.items

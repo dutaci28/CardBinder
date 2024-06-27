@@ -26,6 +26,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
@@ -33,14 +34,15 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 
 @Composable
-fun LogInScreen() {
-    Box(modifier = Modifier.fillMaxSize()) {
+fun LogInScreen(navController: NavController) {
+    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
         val emailText = remember { mutableStateOf("") }
         val passwordText = remember { mutableStateOf("") }
 
-        Column(modifier = Modifier.fillMaxSize()) {
+        Column() {
             AuthTextField(text = emailText, checkValidityFunction = ::checkEmailValidity)
             AuthTextField(text = passwordText, checkValidityFunction = ::checkPasswordValidity)
             Button(onClick = { Log.d("CARDS", "Inputs valid") }) { Text(text = "Login") }
