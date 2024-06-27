@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.view.Window
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionLayout
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.statusBarsPadding
@@ -49,6 +50,7 @@ fun MainScreen(window: Window) {
             modifier = Modifier
                 .fillMaxSize()
                 .statusBarsPadding()
+                .background(Color.White)
         ) {
             SharedTransitionLayout {
                 NavHost(

@@ -38,6 +38,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -47,9 +48,6 @@ import androidx.paging.compose.collectAsLazyPagingItems
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.example.cardbinder.R
-import com.example.cardbinder.model.CardFace
-import com.example.cardbinder.model.ImageURIs
-import com.example.cardbinder.model.Legalities
 import com.example.cardbinder.model.MTGCard
 import com.example.cardbinder.model.Ruling
 import com.example.cardbinder.screens.main.navigation.NavigationRoutes
@@ -64,26 +62,7 @@ fun SharedTransitionScope.IndividualCardScreen(
 ) {
     individualCardViewModel.getCardById(id = cardId)
     val searchedCards = individualCardViewModel.searchedCards.collectAsLazyPagingItems()
-    var card = MTGCard(
-        "",
-        "",
-        "",
-        "",
-        0.0,
-        "",
-        "",
-        "",
-        "",
-        listOf(
-            CardFace("", "", "", ImageURIs("", "", "")),
-            CardFace("", "", "", ImageURIs("", "", ""))
-        ),
-        "",
-        "",
-        ImageURIs("", "", ""),
-        Legalities("", "", "", "", "", "", "", "", "", "", "", "", "", ""),
-        ""
-    )
+    var card = MTGCard.getEmptyCard()
     var cardPrintingsList: List<MTGCard> = listOf()
     var rulingsList: List<Ruling> = listOf()
     if (searchedCards.itemSnapshotList.isNotEmpty()) {
@@ -207,7 +186,7 @@ fun CardPrintingItem(navController: NavController, card: MTGCard, currentCard: M
             }
             .padding(bottom = 3.dp))
         {
-            Text(text = card.set_name)
+            Text(text = card.set_name, overflow = TextOverflow.Ellipsis)
             Text(" #" + card.collector_number, color = Color.Gray.copy(alpha = 0.8f))
         }
     else

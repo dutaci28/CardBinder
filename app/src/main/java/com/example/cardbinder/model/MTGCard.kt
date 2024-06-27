@@ -47,4 +47,29 @@ data class MTGCard(
         "not_legal"
     ),
     val artist: String = ""
-)
+) {
+    companion object {
+        fun getEmptyCard(): MTGCard {
+            return MTGCard(
+                "",
+                "",
+                "",
+                "",
+                0.0,
+                "",
+                "",
+                "",
+                "",
+                listOf(
+                    CardFace("", "", "", ImageURIs("", "", "")),
+                    CardFace("", "", "", ImageURIs("", "", ""))
+                ),
+                "",
+                "",
+                ImageURIs("", "", ""),
+                Legalities("", "", "", "", "", "", "", "", "", "", "", "", "", ""),
+                ""
+            )
+        }
+    }
+}
