@@ -83,6 +83,16 @@ fun LogInScreen(navController: NavController) {
                 },
                 modifier = Modifier.shadow(10.dp, shape = RoundedCornerShape(5.dp))
             ) { Text(text = "Create an account") }
+            Button(
+                onClick = {
+                    navController.navigate(route = "search/" + false) {
+                        popUpTo(NavigationRoutes.LogIn.route) {
+                            inclusive = true
+                        }
+                    }
+                },
+                modifier = Modifier.shadow(10.dp, shape = RoundedCornerShape(5.dp))
+            ) { Text(text = "Skip") }
         }
     }
 }
