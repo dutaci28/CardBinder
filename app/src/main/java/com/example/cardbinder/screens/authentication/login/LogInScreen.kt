@@ -10,6 +10,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
@@ -21,6 +22,8 @@ import com.example.cardbinder.screens.authentication.common.checkEmailValidity
 import com.example.cardbinder.screens.authentication.common.checkLoginInputsAndNavigateToMain
 import com.example.cardbinder.screens.authentication.common.checkPasswordValidity
 import com.example.cardbinder.screens.navigation.NavigationRoutes
+import com.google.firebase.Firebase
+import com.google.firebase.auth.auth
 
 @Composable
 fun LogInScreen(navController: NavController) {
@@ -28,6 +31,9 @@ fun LogInScreen(navController: NavController) {
         val emailText = remember { mutableStateOf("") }
         val passwordText = remember { mutableStateOf("") }
         val focusRequester = remember { FocusRequester() }
+        val auth = Firebase.auth
+        val coroutineScope = rememberCoroutineScope()
+
 
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             AuthTextField(
@@ -49,7 +55,9 @@ fun LogInScreen(navController: NavController) {
                     checkLoginInputsAndNavigateToMain(
                         navController = navController,
                         email = emailText.value,
-                        password = passwordText.value
+                        password = passwordText.value,
+                        auth = auth,
+                        coroutineScope = coroutineScope
                     )
                 }, invalidText = "Password complexity too low"
             )
@@ -58,7 +66,9 @@ fun LogInScreen(navController: NavController) {
                     checkLoginInputsAndNavigateToMain(
                         navController = navController,
                         email = emailText.value,
-                        password = passwordText.value
+                        password = passwordText.value,
+                        auth = auth,
+                        coroutineScope = coroutineScope
                     )
                 },
                 modifier = Modifier.shadow(10.dp, shape = RoundedCornerShape(5.dp))

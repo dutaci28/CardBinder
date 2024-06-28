@@ -1,5 +1,6 @@
 package com.example.cardbinder.screens.authentication.common
 
+import android.util.Log
 import android.util.Patterns
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -33,6 +34,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.cardbinder.screens.navigation.NavigationRoutes
+import com.google.firebase.auth.FirebaseAuth
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 
 @Composable
 fun AuthTextField(
@@ -125,42 +129,52 @@ fun AuthTextField(
 fun checkLoginInputsAndNavigateToMain(
     navController: NavController,
     email: String,
-    password: String
+    password: String,
+    auth: FirebaseAuth,
+    coroutineScope: CoroutineScope
 ) {
-    //TODO uncomment this when logic is ready
-//    if (checkEmailValidity(email) && checkPasswordValidity(password))
-//        navController.navigate(route = "search/" + false) {
-//            popUpTo(NavigationRoutes.LogIn.route) {
-//                inclusive = true
-//            }
-//        }
-
-    navController.navigate(route = "search/" + false) {
-        popUpTo(NavigationRoutes.LogIn.route) {
-            inclusive = true
+    if (checkEmailValidity(email) && checkPasswordValidity(password))
+        coroutineScope.launch {
+            auth.signInWithEmailAndPassword(email, password).addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    navController.navigate(route = "search/" + false) {
+                        popUpTo(NavigationRoutes.LogIn.route) {
+                            inclusive = true
+                        }
+                    }
+                } else {
+                    Log.d("LOGIN FAILED", task.exception?.message.toString())
+                }
+            }
         }
-    }
+    else Log.d("LOGIN FAILED", "Email or password invalid")
 }
 
 fun checkRegisterInputsAndNavigateToMain(
     navController: NavController,
     email: String,
     password: String,
-    repeatedPassword: String
+    repeatedPassword: String,
+    auth: FirebaseAuth,
+    coroutineScope: CoroutineScope
 ) {
-    //TODO uncomment this when logic is ready
-//    if (checkEmailValidity(email) && checkPasswordValidity(password) && password == repeatedPassword)
-//        navController.navigate(route = "search/" + false) {
-//            popUpTo(NavigationRoutes.LogIn.route) {
-//                inclusive = true
-//            }
-//        }
-
-    navController.navigate(route = "search/" + false) {
-        popUpTo(NavigationRoutes.LogIn.route) {
-            inclusive = true
-        }
-    }
+    if (checkEmailValidity(email) && checkPasswordValidity(password) && password == repeatedPassword)
+        coroutineScope.launch {
+            auth.createUserWithEmailAndPassword(email, password).addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    if (auth.currentUser != null) {
+                        Log.d("REGISTER SUCCESS", "LOGGED IN")
+                    }
+                    navController.navigate(route = "search/" + false) {
+                        popUpTo(NavigationRoutes.LogIn.route) {
+                            inclusive = true
+                        }
+                    }
+                } else {
+                    Log.d("REGISTER FAILED", task.exception?.message.toString())
+                }
+            }
+        } else Log.d("REGISTER FAILED", "Email or password invalid or passwords dont match")
 }
 
 fun checkEmailValidity(email: String): Boolean = Patterns.EMAIL_ADDRESS.matcher(email).matches()

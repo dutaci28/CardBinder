@@ -94,7 +94,7 @@ fun MainScreen(window: Window, mainScreenViewModel: MainScreenViewModel = hiltVi
                         )
                     }
                     composable(route = NavigationRoutes.Decks.route) {
-                        DecksScreen()
+                        DecksScreen(navController = navController)
                     }
                     composable(route = NavigationRoutes.IndividualCard.route, arguments = listOf(
                         navArgument(name = NAV_ARGUMENT_CARD_ID) { type = NavType.StringType }
