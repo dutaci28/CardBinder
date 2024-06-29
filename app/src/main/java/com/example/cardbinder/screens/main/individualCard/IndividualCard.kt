@@ -172,7 +172,7 @@ fun addItemToCurrentUserCollection(
     cardCollectionEntry: CardCollectionEntry,
     onSuccessListener: () -> Unit = {}
 ) {
-    val itemsCollection = db.collection("collection-${currentUser.uid}")
+    val itemsCollection = db.collection("collection-${currentUser.email}")
     itemsCollection.add(cardCollectionEntry).addOnSuccessListener { documentReference ->
         Log.d("Firestore", "DocumentSnapshot added with ID: ${documentReference.id}")
         onSuccessListener()

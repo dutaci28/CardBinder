@@ -59,7 +59,7 @@ fun CollectionScreen(
     navController: NavController
 ) {
     val db = Firebase.firestore
-    val itemsCollection = db.collection("collection-" + (Firebase.auth.currentUser?.uid ?: ""))
+    val itemsCollection = db.collection("collection-" + (Firebase.auth.currentUser?.email ?: ""))
     val collectionCards = remember { mutableStateListOf<CardCollectionEntry>() }
 
     DisposableEffect(itemsCollection) {
