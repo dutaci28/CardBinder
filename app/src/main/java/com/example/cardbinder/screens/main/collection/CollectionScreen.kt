@@ -63,48 +63,51 @@ fun CollectionScreen(
     val collectionCards = remember { mutableStateListOf<CardCollectionEntry>() }
 
     DisposableEffect(itemsCollection) {
-        val listenerRegistration: ListenerRegistration = itemsCollection.addSnapshotListener { snapshot, e ->
-            if (e != null) {
-                // Handle errors
-                return@addSnapshotListener
-            }
+        val listenerRegistration: ListenerRegistration =
+            itemsCollection.addSnapshotListener { snapshot, e ->
+                if (e != null) {
+                    // Handle errors
+                    return@addSnapshotListener
+                }
 
-            if (snapshot != null) {
-                for (dc in snapshot.documentChanges) {
-                    if (dc.type == DocumentChange.Type.ADDED) {
-                        val item = dc.document.toObject(CardCollectionEntry::class.java)
-                        collectionCards.add(item)
-
+                if (snapshot != null) {
+                    for (dc in snapshot.documentChanges) {
+                        if (dc.type == DocumentChange.Type.ADDED) {
+                            val item = dc.document.toObject(CardCollectionEntry::class.java)
+                            collectionCards.add(item)
+                        }
                     }
                 }
             }
-        }
 
         onDispose { listenerRegistration.remove() }
     }
-
     val collectionViewToggle = remember { mutableStateOf(false) }
-    Scaffold(
-        topBar = {
-            CollectionScreenTopBar(
-                collectionViewToggle = collectionViewToggle,
-                navController = navController
-            )
-        },
-        content = { innerPadding ->
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(top = innerPadding.calculateTopPadding(), bottom = 140.dp)
-            ) {
-                if (collectionViewToggle.value) {
-                    CollectionCardList(collectionCards = collectionCards)
-                } else {
-                    CardPager(collectionCards = collectionCards)
+
+    if (collectionCards.isEmpty())
+        Text(text = "Looks like your collection is empty!")
+    else
+        Scaffold(
+            topBar = {
+                CollectionScreenTopBar(
+                    collectionViewToggle = collectionViewToggle,
+                    navController = navController
+                )
+            },
+            content = { innerPadding ->
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(top = innerPadding.calculateTopPadding(), bottom = 140.dp)
+                ) {
+                    if (collectionViewToggle.value) {
+                        CollectionCardList(collectionCards = collectionCards)
+                    } else {
+                        CardPager(collectionCards = collectionCards)
+                    }
                 }
             }
-        }
-    )
+        )
 }
 
 @Composable
