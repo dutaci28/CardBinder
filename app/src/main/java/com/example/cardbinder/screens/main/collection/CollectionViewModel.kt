@@ -7,4 +7,5 @@ import javax.inject.Inject
 
 @HiltViewModel
 class CollectionViewModel @Inject constructor(repository: Repository) : ViewModel() {
+
 }

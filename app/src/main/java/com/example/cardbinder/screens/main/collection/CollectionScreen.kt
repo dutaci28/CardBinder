@@ -22,6 +22,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
@@ -46,54 +47,42 @@ import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.example.cardbinder.R
 import com.example.cardbinder.model.CardCollectionEntry
-import com.example.cardbinder.model.ImageURIs
-import com.example.cardbinder.model.MTGCard
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.firestore.DocumentChange
+import com.google.firebase.firestore.ListenerRegistration
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.ktx.Firebase
 
 @Composable
 fun CollectionScreen(
     collectionViewModel: CollectionViewModel = hiltViewModel(),
     navController: NavController
 ) {
-    val collectionCards = remember {
-        mutableStateListOf(
-            CardCollectionEntry(
-                MTGCard.getEmptyCard()
-                    .copy(
-                        name = "Lotus Weaver",
-                        collector_number = "45",
-                        image_uris = ImageURIs("https://cards.scryfall.io/png/front/7/2/721f76bb-3296-4ed0-8f51-204d09c7cbe3.png?1562917810")
-                    ),
-                1
-            ),
-            CardCollectionEntry(
-                MTGCard.getEmptyCard()
-                    .copy(
-                        name = "Big dude guy",
-                        collector_number = "311",
-                        image_uris = ImageURIs("https://cards.scryfall.io/png/front/c/6/c60ea64d-0209-4ca4-bee6-f9eb63784c9e.png?1562936877")
-                    ),
-                2
-            ),
-            CardCollectionEntry(
-                MTGCard.getEmptyCard()
-                    .copy(
-                        name = "Blue Eyes White dragon",
-                        collector_number = "21",
-                        image_uris = ImageURIs("https://cards.scryfall.io/png/front/0/8/089e12c0-e60f-4b60-a2eb-b6c1d088ac50.png?1562896733")
-                    ),
-                3
-            ),
-            CardCollectionEntry(
-                MTGCard.getEmptyCard()
-                    .copy(
-                        name = "Whatever card",
-                        collector_number = "1",
-                        image_uris = ImageURIs("https://cards.scryfall.io/png/front/7/2/721f76bb-3296-4ed0-8f51-204d09c7cbe3.png?1562917810")
-                    ),
-                2
-            )
-        )
+    val db = Firebase.firestore
+    val itemsCollection = db.collection("collection-" + (Firebase.auth.currentUser?.uid ?: ""))
+    val collectionCards = remember { mutableStateListOf<CardCollectionEntry>() }
+
+    DisposableEffect(itemsCollection) {
+        val listenerRegistration: ListenerRegistration = itemsCollection.addSnapshotListener { snapshot, e ->
+            if (e != null) {
+                // Handle errors
+                return@addSnapshotListener
+            }
+
+            if (snapshot != null) {
+                for (dc in snapshot.documentChanges) {
+                    if (dc.type == DocumentChange.Type.ADDED) {
+                        val item = dc.document.toObject(CardCollectionEntry::class.java)
+                        collectionCards.add(item)
+
+                    }
+                }
+            }
+        }
+
+        onDispose { listenerRegistration.remove() }
     }
+
     val collectionViewToggle = remember { mutableStateOf(false) }
     Scaffold(
         topBar = {
