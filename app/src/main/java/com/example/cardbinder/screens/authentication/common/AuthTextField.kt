@@ -119,7 +119,8 @@ fun AuthTextField(
             text = invalidText,
             color = Color.Red
         )
-        if (checkMatching && !checkPasswordsMatching(matchValue, matchValue2)) Text(
+        if (checkMatching && !checkPasswordsMatching(matchValue, matchValue2))
+            Text(
             text = "Values Are Not Matching",
             color = Color.Red
         )
@@ -132,7 +133,8 @@ fun checkLoginInputsAndNavigateToMain(
     password: String,
     auth: FirebaseAuth,
     coroutineScope: CoroutineScope,
-    processingCredentialsBool: MutableState<Boolean>
+    processingCredentialsBool: MutableState<Boolean>,
+    authenticationFailedBool: MutableState<Boolean>
 ) {
     processingCredentialsBool.value = true
     if (checkEmailValidity(email) && checkPasswordValidity(password))
@@ -145,12 +147,14 @@ fun checkLoginInputsAndNavigateToMain(
                         }
                     }
                 } else {
+                    authenticationFailedBool.value = true
                     processingCredentialsBool.value = false
                     Log.d("LOGIN FAILED", task.exception?.message.toString())
                 }
             }
         }
     else {
+        authenticationFailedBool.value = true
         processingCredentialsBool.value = false
         Log.d("LOGIN FAILED", "Email or password invalid")
     }
@@ -162,25 +166,32 @@ fun checkRegisterInputsAndNavigateToMain(
     password: String,
     repeatedPassword: String,
     auth: FirebaseAuth,
-    coroutineScope: CoroutineScope
+    coroutineScope: CoroutineScope,
+    processingCredentialsBool: MutableState<Boolean>,
+    authenticationFailedBool: MutableState<Boolean>
 ) {
+    processingCredentialsBool.value = true
+    authenticationFailedBool.value = false
     if (checkEmailValidity(email) && checkPasswordValidity(password) && password == repeatedPassword)
         coroutineScope.launch {
             auth.createUserWithEmailAndPassword(email, password).addOnCompleteListener { task ->
                 if (task.isSuccessful) {
-                    if (auth.currentUser != null) {
-                        Log.d("REGISTER SUCCESS", "LOGGED IN")
-                    }
                     navController.navigate(route = "search/" + false) {
                         popUpTo(NavigationRoutes.LogIn.route) {
                             inclusive = true
                         }
                     }
                 } else {
+                    authenticationFailedBool.value = true
+                    processingCredentialsBool.value = false
                     Log.d("REGISTER FAILED", task.exception?.message.toString())
                 }
             }
-        } else Log.d("REGISTER FAILED", "Email or password invalid or passwords dont match")
+        } else {
+        authenticationFailedBool.value = true
+        processingCredentialsBool.value = false
+        Log.d("REGISTER FAILED", "Email or password invalid or passwords dont match")
+    }
 }
 
 fun checkEmailValidity(email: String): Boolean = Patterns.EMAIL_ADDRESS.matcher(email).matches()

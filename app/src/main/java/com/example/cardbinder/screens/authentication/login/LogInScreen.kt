@@ -15,6 +15,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.cardbinder.screens.authentication.common.AuthTextField
@@ -35,7 +36,8 @@ fun LogInScreen(navController: NavController) {
         val auth = Firebase.auth
         val coroutineScope = rememberCoroutineScope()
         val processingCredentials = remember { mutableStateOf(false) }
-        if(processingCredentials.value){
+        val authenticationFailed = remember { mutableStateOf(false) }
+        if (processingCredentials.value) {
             LoadingScreen()
         } else {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
@@ -61,10 +63,14 @@ fun LogInScreen(navController: NavController) {
                             password = passwordText.value,
                             auth = auth,
                             coroutineScope = coroutineScope,
-                            processingCredentialsBool = processingCredentials
+                            processingCredentialsBool = processingCredentials,
+                            authenticationFailedBool = authenticationFailed
                         )
                     }, invalidText = "Password complexity too low"
                 )
+                if (authenticationFailed.value) {
+                    Text(text = "Authentication failed", color = Color.Red)
+                }
                 Button(
                     onClick = {
                         checkLoginInputsAndNavigateToMain(
@@ -73,7 +79,8 @@ fun LogInScreen(navController: NavController) {
                             password = passwordText.value,
                             auth = auth,
                             coroutineScope = coroutineScope,
-                            processingCredentialsBool = processingCredentials
+                            processingCredentialsBool = processingCredentials,
+                            authenticationFailedBool = authenticationFailed
                         )
                     },
                     modifier = Modifier.shadow(10.dp, shape = RoundedCornerShape(5.dp))
@@ -94,6 +101,6 @@ fun LogInScreen(navController: NavController) {
             }
         }
 
-        
+
     }
 }

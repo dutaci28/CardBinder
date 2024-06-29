@@ -14,12 +14,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.cardbinder.screens.authentication.common.AuthTextField
 import com.example.cardbinder.screens.authentication.common.checkEmailValidity
 import com.example.cardbinder.screens.authentication.common.checkPasswordValidity
 import com.example.cardbinder.screens.authentication.common.checkRegisterInputsAndNavigateToMain
+import com.example.cardbinder.screens.loading.LoadingScreen
 import com.example.cardbinder.screens.navigation.NavigationRoutes
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
@@ -34,71 +36,84 @@ fun RegisterScreen(navController: NavController) {
         val focusRequester2 = remember { FocusRequester() }
         val auth = Firebase.auth
         val coroutineScope = rememberCoroutineScope()
+        val processingCredentials = remember { mutableStateOf(false) }
+        val authenticationFailed = remember { mutableStateOf(false) }
 
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            AuthTextField(
-                text = emailText,
-                placeholder = "Email",
-                checkValidityFunction = ::checkEmailValidity,
-                hideCharacters = false,
-                hasNext = true,
-                onNext = { focusRequester.requestFocus() },
-                invalidText = "Invalid Email Address"
-            )
-            AuthTextField(
-                text = passwordText,
-                placeholder = "Password",
-                checkValidityFunction = ::checkPasswordValidity,
-                hideCharacters = true,
-                hasNext = true,
-                focusRequester = focusRequester,
-                onNext = { focusRequester2.requestFocus() },
-                invalidText = "Password Complexity Too Low",
-            )
-            AuthTextField(
-                text = repeatPasswordText,
-                placeholder = "Repeat Password",
-                checkValidityFunction = ::checkPasswordValidity,
-                hideCharacters = true,
-                focusRequester = focusRequester2,
-                onGo = {
-                    checkRegisterInputsAndNavigateToMain(
-                        navController = navController,
-                        email = emailText.value,
-                        password = passwordText.value,
-                        repeatedPassword = repeatPasswordText.value,
-                        auth = auth,
-                        coroutineScope = coroutineScope
-                    )
-                },
-                invalidText = "Password Complexity Too Low",
-                checkMatching = true,
-                matchValue = passwordText.value,
-                matchValue2 = repeatPasswordText.value
-            )
-            Button(
-                onClick = {
-                    checkRegisterInputsAndNavigateToMain(
-                        navController = navController,
-                        email = emailText.value,
-                        password = passwordText.value,
-                        repeatedPassword = repeatPasswordText.value,
-                        auth = auth,
-                        coroutineScope = coroutineScope
-                    )
-                },
-                modifier = Modifier.shadow(10.dp, shape = RoundedCornerShape(5.dp))
-            ) { Text(text = "Register") }
-            Button(
-                onClick = {
-                    navController.navigate(route = NavigationRoutes.LogIn.route) {
-                        popUpTo(NavigationRoutes.Register.route) {
-                            inclusive = true
+        if (processingCredentials.value) {
+            LoadingScreen()
+        } else {
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                AuthTextField(
+                    text = emailText,
+                    placeholder = "Email",
+                    checkValidityFunction = ::checkEmailValidity,
+                    hideCharacters = false,
+                    hasNext = true,
+                    onNext = { focusRequester.requestFocus() },
+                    invalidText = "Invalid Email Address"
+                )
+                AuthTextField(
+                    text = passwordText,
+                    placeholder = "Password",
+                    checkValidityFunction = ::checkPasswordValidity,
+                    hideCharacters = true,
+                    hasNext = true,
+                    focusRequester = focusRequester,
+                    onNext = { focusRequester2.requestFocus() },
+                    invalidText = "Password Complexity Too Low",
+                )
+                AuthTextField(
+                    text = repeatPasswordText,
+                    placeholder = "Repeat Password",
+                    checkValidityFunction = ::checkPasswordValidity,
+                    hideCharacters = true,
+                    focusRequester = focusRequester2,
+                    onGo = {
+                        checkRegisterInputsAndNavigateToMain(
+                            navController = navController,
+                            email = emailText.value,
+                            password = passwordText.value,
+                            repeatedPassword = repeatPasswordText.value,
+                            auth = auth,
+                            coroutineScope = coroutineScope,
+                            processingCredentialsBool = processingCredentials,
+                            authenticationFailedBool = authenticationFailed
+                        )
+                    },
+                    invalidText = "Password Complexity Too Low",
+                    checkMatching = true,
+                    matchValue = passwordText.value,
+                    matchValue2 = repeatPasswordText.value
+                )
+                if (authenticationFailed.value) {
+                    Text(text = "Authentication failed", color = Color.Red)
+                }
+                Button(
+                    onClick = {
+                        checkRegisterInputsAndNavigateToMain(
+                            navController = navController,
+                            email = emailText.value,
+                            password = passwordText.value,
+                            repeatedPassword = repeatPasswordText.value,
+                            auth = auth,
+                            coroutineScope = coroutineScope,
+                            processingCredentialsBool = processingCredentials,
+                            authenticationFailedBool = authenticationFailed
+                        )
+                    },
+                    modifier = Modifier.shadow(10.dp, shape = RoundedCornerShape(5.dp))
+                ) { Text(text = "Register") }
+                Button(
+                    onClick = {
+                        navController.navigate(route = NavigationRoutes.LogIn.route) {
+                            popUpTo(NavigationRoutes.Register.route) {
+                                inclusive = true
+                            }
                         }
-                    }
-                },
-                modifier = Modifier.shadow(10.dp, shape = RoundedCornerShape(5.dp))
-            ) { Text(text = "Go back to Log In") }
+                    },
+                    modifier = Modifier.shadow(10.dp, shape = RoundedCornerShape(5.dp))
+                ) { Text(text = "Go back to Log In") }
+            }
         }
     }
 }
