@@ -60,7 +60,7 @@ fun MainScreen(window: Window, mainScreenViewModel: MainScreenViewModel = hiltVi
     }
 
     val auth = Firebase.auth
-    var startRoute by remember{ mutableStateOf(NavigationRoutes.SplashScreen.route) }
+    var startRoute by remember { mutableStateOf(NavigationRoutes.SplashScreen.route) }
     DisposableEffect(auth) {
         val listener = FirebaseAuth.AuthStateListener { authState ->
             val userLoggedIn = authState.currentUser != null
@@ -97,7 +97,10 @@ fun MainScreen(window: Window, mainScreenViewModel: MainScreenViewModel = hiltVi
                         RegisterScreen(navController = navController)
                     }
                     composable(route = NavigationRoutes.Collection.route) {
-                        CollectionScreen(navController = navController)
+                        CollectionScreen(
+                            navController = navController,
+                            animatedVisibilityScope = this
+                        )
                     }
                     composable(route = NavigationRoutes.Search.route, arguments = listOf(
                         navArgument(name = NAV_ARGUMENT_SHOULD_FOCUS_SEARCH) {

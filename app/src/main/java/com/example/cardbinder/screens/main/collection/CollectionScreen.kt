@@ -1,5 +1,8 @@
 package com.example.cardbinder.screens.main.collection
 
+import androidx.compose.animation.AnimatedVisibilityScope
+import androidx.compose.animation.ExperimentalSharedTransitionApi
+import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -53,10 +56,12 @@ import com.google.firebase.firestore.ListenerRegistration
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 
+@OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
-fun CollectionScreen(
+fun SharedTransitionScope.CollectionScreen(
     collectionViewModel: CollectionViewModel = hiltViewModel(),
-    navController: NavController
+    navController: NavController,
+    animatedVisibilityScope: AnimatedVisibilityScope
 ) {
     val db = Firebase.firestore
     val itemsCollection = db.collection("collection-" + (Firebase.auth.currentUser?.email ?: ""))
@@ -103,7 +108,11 @@ fun CollectionScreen(
                     if (collectionViewToggle.value) {
                         CollectionCardList(collectionCards = collectionCards)
                     } else {
-                        CardPager(collectionCards = collectionCards)
+                        CardPager(
+                            collectionCards = collectionCards,
+                            navController = navController,
+                            animatedVisibilityScope = animatedVisibilityScope
+                        )
                     }
                 }
             }
@@ -129,9 +138,13 @@ fun CollectionCardListItem(cardCollectionEntry: CardCollectionEntry) {
     }
 }
 
-@OptIn(ExperimentalFoundationApi::class)
+@OptIn(ExperimentalFoundationApi::class, ExperimentalSharedTransitionApi::class)
 @Composable
-fun CardPager(collectionCards: List<CardCollectionEntry>) {
+fun SharedTransitionScope.CardPager(
+    collectionCards: List<CardCollectionEntry>,
+    navController: NavController,
+    animatedVisibilityScope: AnimatedVisibilityScope
+) {
     val pagerState = rememberPagerState(pageCount = { collectionCards.size })
     val arrowVisibilityList = remember { mutableStateListOf(1f, 1f) }
     val currentEntry = remember {
@@ -204,8 +217,15 @@ fun CardPager(collectionCards: List<CardCollectionEntry>) {
                         scaleY = imageSizeScale
                     }
                     .clickable {
-                        //TODO REDIRECT TO INDIVIDUAL CARD VIEW PAGE
+                        navController.navigate(route = "individualCard/" + collectionCards[index].card.id)
                     }
+                    .sharedElement(
+                        state = rememberSharedContentState(key = "image${collectionCards[index].card.id}"),
+                        animatedVisibilityScope = animatedVisibilityScope,
+                        boundsTransform = { _, _ ->
+                            tween(durationMillis = 300)
+                        }
+                    )
             )
         }
     }
