@@ -15,7 +15,6 @@ fun DecksScreen(
     navController: NavController
 ) {
     val auth = Firebase.auth
-
     Button(onClick = {
         auth.signOut()
         navController.navigate(route = NavigationRoutes.LogIn.route) {

@@ -1,5 +1,6 @@
 package com.example.cardbinder.screens.main.individualCard
 
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.ExperimentalSharedTransitionApi
@@ -20,7 +21,10 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
@@ -48,9 +52,15 @@ import androidx.paging.compose.collectAsLazyPagingItems
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.example.cardbinder.R
+import com.example.cardbinder.model.CardCollectionEntry
 import com.example.cardbinder.model.MTGCard
 import com.example.cardbinder.model.Ruling
 import com.example.cardbinder.screens.navigation.NavigationRoutes
+import com.google.firebase.Firebase
+import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.auth.auth
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.firestore
 
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
@@ -80,50 +90,95 @@ fun SharedTransitionScope.IndividualCardScreen(
             rulingsList = rulings.itemSnapshotList.items
         }
     }
-    Scaffold(topBar = {
-        IndividualCardTopBar(navController)
-    }, content = { innerPadding ->
-        val scrollState = rememberScrollState()
-        Column(
-            modifier = Modifier
-                .padding(
-                    top = innerPadding.calculateTopPadding(),
-                    bottom = innerPadding.calculateBottomPadding()
+    val auth = Firebase.auth
+    val db = Firebase.firestore
+    var isAddSuccesful by remember { mutableStateOf(false) }
+    Scaffold(
+        topBar = { IndividualCardTopBar(navController) },
+        floatingActionButton = {
+            FloatingActionButton(onClick = {
+                if (auth.currentUser != null) {
+                    if (card.name.isNotEmpty()) {
+                        addItemToCurrentUserCollection(
+                            currentUser = auth.currentUser!!,
+                            db = db,
+                            cardCollectionEntry = CardCollectionEntry(card, 1),
+                            onSuccessListener = { isAddSuccesful = true }
+                        )
+                    } else {
+                        Log.d("CARDS", "Tried to add empty card to DB")
+                    }
+                } else {
+                    navController.navigate(NavigationRoutes.LogIn.route) {
+                        popUpTo(NavigationRoutes.LogIn.route) {
+                            inclusive = true
+                        }
+                    }
+                }
+            }) {
+                if (isAddSuccesful) Icon(
+                    imageVector = Icons.Default.Check,
+                    contentDescription = "Add"
+                ) else Icon(imageVector = Icons.Default.Add, contentDescription = "Add")
+            }
+        },
+        content = { innerPadding ->
+            val scrollState = rememberScrollState()
+            Column(
+                modifier = Modifier
+                    .padding(
+                        top = innerPadding.calculateTopPadding(),
+                        bottom = innerPadding.calculateBottomPadding()
+                    )
+                    .verticalScroll(scrollState)
+                    .background(Color.White)
+            ) {
+                MTGCardBigImage(
+                    card = card,
+                    cardWidthDp = calculateMaxWidth(),
+                    animatedVisibilityScope = animatedVisibilityScope
                 )
-                .verticalScroll(scrollState)
-                .background(Color.White)
-        ) {
-            MTGCardBigImage(
-                card = card,
-                cardWidthDp = calculateMaxWidth(),
-                animatedVisibilityScope = animatedVisibilityScope
-            )
-            Text(
-                text = "Illustrated by ${card.artist}",
-                fontSize = 10.sp,
-                color = Color.Gray.copy(alpha = 0.8f),
-                modifier = Modifier.padding(horizontal = 10.dp)
-            )
-            Text(
-                text = card.name,
-                fontSize = 32.sp,
-                fontWeight = FontWeight.SemiBold,
-                modifier = Modifier.padding(horizontal = 20.dp)
-            )
-            Text(
-                text = card.set_name + " #" + card.collector_number,
-                fontSize = 16.sp,
-                color = Color.Gray, modifier = Modifier.padding(horizontal = 20.dp)
-            )
-            LegalitiesBox(card = card)
-            CardPrintingsBox(
-                navController = navController,
-                printingsList = cardPrintingsList,
-                currentCard = card
-            )
-            RulingsBox(rulingsList = rulingsList)
-        }
-    })
+                Text(
+                    text = "Illustrated by ${card.artist}",
+                    fontSize = 10.sp,
+                    color = Color.Gray.copy(alpha = 0.8f),
+                    modifier = Modifier.padding(horizontal = 10.dp)
+                )
+                Text(
+                    text = card.name,
+                    fontSize = 32.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    modifier = Modifier.padding(horizontal = 20.dp)
+                )
+                Text(
+                    text = card.set_name + " #" + card.collector_number,
+                    fontSize = 16.sp,
+                    color = Color.Gray, modifier = Modifier.padding(horizontal = 20.dp)
+                )
+                LegalitiesBox(card = card)
+                CardPrintingsBox(
+                    navController = navController,
+                    printingsList = cardPrintingsList,
+                    currentCard = card
+                )
+                RulingsBox(rulingsList = rulingsList)
+            }
+        })
+}
+
+fun addItemToCurrentUserCollection(
+    currentUser: FirebaseUser,
+    db: FirebaseFirestore,
+    cardCollectionEntry: CardCollectionEntry,
+    onSuccessListener: () -> Unit = {}
+) {
+    val itemsCollection = db.collection("collection-${currentUser.uid}")
+    itemsCollection.add(cardCollectionEntry).addOnSuccessListener { documentReference ->
+        Log.d("Firestore", "DocumentSnapshot added with ID: ${documentReference.id}")
+        onSuccessListener()
+    }.addOnFailureListener { e ->
+        Log.w("Firestore", "Error adding document", e)
+    }
 }
 
 @Composable
