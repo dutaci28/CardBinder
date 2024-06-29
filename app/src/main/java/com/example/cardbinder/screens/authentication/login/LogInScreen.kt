@@ -21,7 +21,6 @@ import androidx.navigation.NavController
 import com.example.cardbinder.screens.authentication.common.AuthTextField
 import com.example.cardbinder.screens.authentication.common.checkEmailValidity
 import com.example.cardbinder.screens.authentication.common.checkLoginInputsAndNavigateToMain
-import com.example.cardbinder.screens.authentication.common.checkPasswordValidity
 import com.example.cardbinder.screens.navigation.NavigationRoutes
 import com.example.cardbinder.screens.loading.LoadingScreen
 import com.google.firebase.Firebase
@@ -53,7 +52,6 @@ fun LogInScreen(navController: NavController) {
                 AuthTextField(
                     text = passwordText,
                     placeholder = "Password",
-                    checkValidityFunction = ::checkPasswordValidity,
                     hideCharacters = true,
                     focusRequester = focusRequester,
                     onGo = {
@@ -66,7 +64,7 @@ fun LogInScreen(navController: NavController) {
                             processingCredentialsBool = processingCredentials,
                             authenticationFailedBool = authenticationFailed
                         )
-                    }, invalidText = "Password complexity too low"
+                    }
                 )
                 if (authenticationFailed.value) {
                     Text(text = "Authentication failed", color = Color.Red)

@@ -42,7 +42,7 @@ import kotlinx.coroutines.launch
 fun AuthTextField(
     text: MutableState<String>,
     placeholder: String,
-    checkValidityFunction: (String) -> Boolean,
+    checkValidityFunction: (String) -> Boolean = { true },
     checkMatching: Boolean = false,
     matchValue: String = "",
     matchValue2: String = "",
@@ -51,7 +51,7 @@ fun AuthTextField(
     hasNext: Boolean = false,
     onNext: () -> Unit = {},
     onGo: () -> Unit = {},
-    invalidText: String
+    invalidText: String = ""
 ) {
     var isTextValid by remember { mutableStateOf(true) }
     OutlinedTextField(
@@ -121,9 +121,9 @@ fun AuthTextField(
         )
         if (checkMatching && !checkPasswordsMatching(matchValue, matchValue2))
             Text(
-            text = "Values Are Not Matching",
-            color = Color.Red
-        )
+                text = "Values Are Not Matching",
+                color = Color.Red
+            )
     }
 }
 
