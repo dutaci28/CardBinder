@@ -36,6 +36,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
@@ -92,31 +93,40 @@ fun SharedTransitionScope.IndividualCardScreen(
     }
     val auth = Firebase.auth
     val db = Firebase.firestore
-    var isAddSuccesful by remember { mutableStateOf(false) }
+    var isAddSuccessful by remember { mutableStateOf(false) }
+    var isButtonDisabled by remember { mutableStateOf(false) }
+    val alpha = if (isButtonDisabled) 0.8f else 1f
     Scaffold(
         topBar = { IndividualCardTopBar(navController) },
         floatingActionButton = {
-            FloatingActionButton(onClick = {
-                if (auth.currentUser != null) {
-                    if (card.name.isNotEmpty()) {
-                        addItemToCurrentUserCollection(
-                            currentUser = auth.currentUser!!,
-                            db = db,
-                            cardCollectionEntry = CardCollectionEntry(card, 1),
-                            onSuccessListener = { isAddSuccesful = true }
-                        )
+            FloatingActionButton(
+                onClick = {
+                    if (isButtonDisabled) {
                     } else {
-                        Log.d("CARDS", "Tried to add empty card to DB")
-                    }
-                } else {
-                    navController.navigate(NavigationRoutes.LogIn.route) {
-                        popUpTo(NavigationRoutes.LogIn.route) {
-                            inclusive = true
+                        isButtonDisabled = true
+                        if (auth.currentUser != null) {
+                            if (card.name.isNotEmpty()) {
+                                addItemToCurrentUserCollection(
+                                    currentUser = auth.currentUser!!,
+                                    db = db,
+                                    cardCollectionEntry = CardCollectionEntry(card, 1),
+                                    onSuccessListener = { isAddSuccessful = true }
+                                )
+                            } else {
+                                Log.d("CARDS", "Tried to add empty card to DB")
+                            }
+                        } else {
+                            navController.navigate(NavigationRoutes.LogIn.route) {
+                                popUpTo(NavigationRoutes.LogIn.route) {
+                                    inclusive = true
+                                }
+                            }
                         }
                     }
-                }
-            }) {
-                if (isAddSuccesful) Icon(
+                },
+                modifier = Modifier.alpha(alpha)
+            ) {
+                if (isAddSuccessful) Icon(
                     imageVector = Icons.Default.Check,
                     contentDescription = "Add"
                 ) else Icon(imageVector = Icons.Default.Add, contentDescription = "Add")
