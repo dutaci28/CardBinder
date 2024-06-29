@@ -37,11 +37,14 @@ import androidx.compose.ui.draw.BlurredEdgeTreatment
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.blur
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -90,7 +93,7 @@ fun SharedTransitionScope.CollectionScreen(
     val collectionViewToggle = remember { mutableStateOf(false) }
 
     if (collectionCards.isEmpty())
-        Text(text = "Looks like your collection is empty!")
+        EmptyCollection(navController = navController)
     else
         Scaffold(
             topBar = {
@@ -117,6 +120,38 @@ fun SharedTransitionScope.CollectionScreen(
                 }
             }
         )
+}
+
+@Composable
+fun EmptyCollection(navController: NavController) {
+    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Text(
+                text = "Looks like your collection is empty!",
+                color = Color.Gray,
+                fontSize = 24.sp,
+                fontStyle = FontStyle.Italic,
+                style = TextStyle(
+                    shadow = Shadow(
+                        color = Color.Gray, blurRadius = 4f
+                    ),
+                ),
+            )
+            IconButton(
+                onClick = { navController.navigate(route = "search/" + true) },
+                modifier = Modifier.padding(top = 10.dp)
+            )
+            {
+                Icon(
+                    imageVector = ImageVector.vectorResource(id = R.drawable.plus),
+                    contentDescription = "Add Card Icon",
+                    modifier = Modifier
+                        .height(45.dp)
+                        .width(45.dp)
+                )
+            }
+        }
+    }
 }
 
 @Composable
