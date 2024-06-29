@@ -7,7 +7,7 @@ sealed class NavigationRoutes(
     val route: String,
     val title: String
 ) {
-    data object SplashScreen : NavigationRoutes(
+    data object LoadingScreen : NavigationRoutes(
         route = "splashScreen",
         title = "SplashScreen"
     )

@@ -52,7 +52,7 @@ fun MainScreen(window: Window, mainScreenViewModel: MainScreenViewModel = hiltVi
     val getRandomCard = mainScreenViewModel.getRandomCard.collectAsLazyPagingItems()
 
     showBottomBar = when (navBackStackEntry?.destination?.route) {
-        NavigationRoutes.SplashScreen.route -> false
+        NavigationRoutes.LoadingScreen.route -> false
         NavigationRoutes.LogIn.route -> false
         NavigationRoutes.Register.route -> false
         NavigationRoutes.IndividualCard.route -> false
@@ -60,7 +60,7 @@ fun MainScreen(window: Window, mainScreenViewModel: MainScreenViewModel = hiltVi
     }
 
     val auth = Firebase.auth
-    var startRoute by remember { mutableStateOf(NavigationRoutes.SplashScreen.route) }
+    var startRoute by remember { mutableStateOf(NavigationRoutes.LoadingScreen.route) }
     DisposableEffect(auth) {
         val listener = FirebaseAuth.AuthStateListener { authState ->
             val userLoggedIn = authState.currentUser != null
@@ -87,7 +87,7 @@ fun MainScreen(window: Window, mainScreenViewModel: MainScreenViewModel = hiltVi
                     navController = navController,
                     startDestination = startRoute
                 ) {
-                    composable(route = NavigationRoutes.SplashScreen.route) {
+                    composable(route = NavigationRoutes.LoadingScreen.route) {
                         LoadingScreen()
                     }
                     composable(route = NavigationRoutes.LogIn.route) {
