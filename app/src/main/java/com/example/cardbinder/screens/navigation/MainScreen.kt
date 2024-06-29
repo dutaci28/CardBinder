@@ -10,9 +10,11 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -33,9 +35,12 @@ import com.example.cardbinder.screens.main.collection.CollectionScreen
 import com.example.cardbinder.screens.main.decks.DecksScreen
 import com.example.cardbinder.screens.main.individualCard.IndividualCardScreen
 import com.example.cardbinder.screens.main.search.SearchScreen
-import com.example.cardbinder.screens.splash.SplashScreen
+import com.example.cardbinder.screens.loading.LoadingScreen
 import com.example.cardbinder.util.Constants.Companion.NAV_ARGUMENT_CARD_ID
 import com.example.cardbinder.util.Constants.Companion.NAV_ARGUMENT_SHOULD_FOCUS_SEARCH
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
 
 @OptIn(ExperimentalSharedTransitionApi::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -54,6 +59,21 @@ fun MainScreen(window: Window, mainScreenViewModel: MainScreenViewModel = hiltVi
         else -> true
     }
 
+    val auth = Firebase.auth
+    var startRoute by remember{ mutableStateOf(NavigationRoutes.SplashScreen.route) }
+    DisposableEffect(auth) {
+        val listener = FirebaseAuth.AuthStateListener { authState ->
+            val userLoggedIn = authState.currentUser != null
+            startRoute = if (!userLoggedIn)
+                NavigationRoutes.LogIn.route
+            else
+                "search/" + false
+
+        }
+        auth.addAuthStateListener(listener)
+        onDispose { auth.removeAuthStateListener(listener) }
+    }
+
     UpdateStatusBarColor(color = Color.Black, window = window)
     Scaffold(bottomBar = { if (showBottomBar) BottomNavBar(navController = navController) }) {
         Box(
@@ -65,10 +85,10 @@ fun MainScreen(window: Window, mainScreenViewModel: MainScreenViewModel = hiltVi
             SharedTransitionLayout {
                 NavHost(
                     navController = navController,
-                    startDestination = NavigationRoutes.SplashScreen.route
+                    startDestination = startRoute
                 ) {
                     composable(route = NavigationRoutes.SplashScreen.route) {
-                        SplashScreen(navController = navController)
+                        LoadingScreen()
                     }
                     composable(route = NavigationRoutes.LogIn.route) {
                         LogInScreen(navController = navController)

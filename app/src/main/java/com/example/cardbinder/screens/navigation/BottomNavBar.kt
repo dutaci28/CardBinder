@@ -16,7 +16,6 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavDestination
 import androidx.navigation.NavDestination.Companion.hierarchy
-import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.example.cardbinder.R
@@ -94,12 +93,12 @@ fun RowScope.NavItem(
         onClick = {
             if (screen.route == NavigationRoutes.Search.route)
                 navController.navigate(route = "search/" + false) {
-                    popUpTo(navController.graph.findStartDestination().id)
+                    popUpTo(route = "search/" + false)
                     launchSingleTop = true
                 }
             else
                 navController.navigate(screen.route) {
-                    popUpTo(navController.graph.findStartDestination().id)
+                    popUpTo(route = "search/" + false)
                     launchSingleTop = true
                 }
         }

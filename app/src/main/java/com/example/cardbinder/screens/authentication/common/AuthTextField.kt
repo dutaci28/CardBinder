@@ -131,8 +131,10 @@ fun checkLoginInputsAndNavigateToMain(
     email: String,
     password: String,
     auth: FirebaseAuth,
-    coroutineScope: CoroutineScope
+    coroutineScope: CoroutineScope,
+    processingCredentialsBool: MutableState<Boolean>
 ) {
+    processingCredentialsBool.value = true
     if (checkEmailValidity(email) && checkPasswordValidity(password))
         coroutineScope.launch {
             auth.signInWithEmailAndPassword(email, password).addOnCompleteListener { task ->
@@ -143,11 +145,15 @@ fun checkLoginInputsAndNavigateToMain(
                         }
                     }
                 } else {
+                    processingCredentialsBool.value = false
                     Log.d("LOGIN FAILED", task.exception?.message.toString())
                 }
             }
         }
-    else Log.d("LOGIN FAILED", "Email or password invalid")
+    else {
+        processingCredentialsBool.value = false
+        Log.d("LOGIN FAILED", "Email or password invalid")
+    }
 }
 
 fun checkRegisterInputsAndNavigateToMain(
