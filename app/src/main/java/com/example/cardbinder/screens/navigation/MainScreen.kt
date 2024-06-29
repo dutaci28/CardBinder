@@ -33,6 +33,7 @@ import com.example.cardbinder.screens.main.collection.CollectionScreen
 import com.example.cardbinder.screens.main.decks.DecksScreen
 import com.example.cardbinder.screens.main.individualCard.IndividualCardScreen
 import com.example.cardbinder.screens.main.search.SearchScreen
+import com.example.cardbinder.screens.splash.SplashScreen
 import com.example.cardbinder.util.Constants.Companion.NAV_ARGUMENT_CARD_ID
 import com.example.cardbinder.util.Constants.Companion.NAV_ARGUMENT_SHOULD_FOCUS_SEARCH
 
@@ -43,19 +44,15 @@ fun MainScreen(window: Window, mainScreenViewModel: MainScreenViewModel = hiltVi
     val navController = rememberNavController()
     var showBottomBar by rememberSaveable { mutableStateOf(true) }
     val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val getRandomCard = mainScreenViewModel.getRandomCard.collectAsLazyPagingItems()
 
     showBottomBar = when (navBackStackEntry?.destination?.route) {
-        NavigationRoutes.IndividualCard.route -> false
+        NavigationRoutes.SplashScreen.route -> false
         NavigationRoutes.LogIn.route -> false
         NavigationRoutes.Register.route -> false
+        NavigationRoutes.IndividualCard.route -> false
         else -> true
     }
-
-    //TODO add preference provider logic for staying logged in
-    val isLoggedIn = false
-    val startDestination =
-        if (isLoggedIn) NavigationRoutes.Search.route else NavigationRoutes.LogIn.route
-    val getRandomCard = mainScreenViewModel.getRandomCard.collectAsLazyPagingItems()
 
     UpdateStatusBarColor(color = Color.Black, window = window)
     Scaffold(bottomBar = { if (showBottomBar) BottomNavBar(navController = navController) }) {
@@ -68,8 +65,11 @@ fun MainScreen(window: Window, mainScreenViewModel: MainScreenViewModel = hiltVi
             SharedTransitionLayout {
                 NavHost(
                     navController = navController,
-                    startDestination = startDestination
+                    startDestination = NavigationRoutes.SplashScreen.route
                 ) {
+                    composable(route = NavigationRoutes.SplashScreen.route) {
+                        SplashScreen(navController = navController)
+                    }
                     composable(route = NavigationRoutes.LogIn.route) {
                         LogInScreen(navController = navController)
                     }

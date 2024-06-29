@@ -25,6 +25,8 @@ fun DecksScreen(
     val auth = Firebase.auth
     val coroutineScope = rememberCoroutineScope()
     var userLoggedIn by remember { mutableStateOf(auth.currentUser != null) }
+    var buttonClicked by remember { mutableStateOf(false) }
+
     DisposableEffect(auth) {
         val listener = FirebaseAuth.AuthStateListener { authState ->
             userLoggedIn = authState.currentUser != null
@@ -40,10 +42,14 @@ fun DecksScreen(
         onDispose { auth.removeAuthStateListener(listener) }
     }
     Button(onClick = {
+        buttonClicked = !buttonClicked
         coroutineScope.launch {
             auth.signOut()
         }
     }) {
-        Text(text = "Log Out")
+        if (buttonClicked)
+            Text(text = "...")
+        else
+            Text(text = "Log Out")
     }
 }

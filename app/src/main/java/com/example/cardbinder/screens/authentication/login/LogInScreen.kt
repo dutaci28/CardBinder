@@ -8,9 +8,11 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
@@ -33,7 +35,7 @@ fun LogInScreen(navController: NavController) {
         val focusRequester = remember { FocusRequester() }
         val auth = Firebase.auth
         val coroutineScope = rememberCoroutineScope()
-
+        var buttonClicked by remember { mutableStateOf(false) }
 
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             AuthTextField(
@@ -63,6 +65,8 @@ fun LogInScreen(navController: NavController) {
             )
             Button(
                 onClick = {
+                    buttonClicked = !buttonClicked
+
                     checkLoginInputsAndNavigateToMain(
                         navController = navController,
                         email = emailText.value,
@@ -72,7 +76,13 @@ fun LogInScreen(navController: NavController) {
                     )
                 },
                 modifier = Modifier.shadow(10.dp, shape = RoundedCornerShape(5.dp))
-            ) { Text(text = "Log In") }
+
+            ) {
+                if (buttonClicked)
+                    Text(text = "...")
+                else
+                    Text(text = "Log In")
+            }
             Button(
                 onClick = {
                     navController.navigate(route = NavigationRoutes.Register.route) {
@@ -83,16 +93,6 @@ fun LogInScreen(navController: NavController) {
                 },
                 modifier = Modifier.shadow(10.dp, shape = RoundedCornerShape(5.dp))
             ) { Text(text = "Create an account") }
-            Button(
-                onClick = {
-                    navController.navigate(route = "search/" + false) {
-                        popUpTo(NavigationRoutes.LogIn.route) {
-                            inclusive = true
-                        }
-                    }
-                },
-                modifier = Modifier.shadow(10.dp, shape = RoundedCornerShape(5.dp))
-            ) { Text(text = "Skip") }
         }
     }
 }

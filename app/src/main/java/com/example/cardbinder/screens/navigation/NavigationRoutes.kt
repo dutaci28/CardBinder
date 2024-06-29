@@ -7,6 +7,11 @@ sealed class NavigationRoutes(
     val route: String,
     val title: String
 ) {
+    data object SplashScreen : NavigationRoutes(
+        route = "splashScreen",
+        title = "SplashScreen"
+    )
+
     data object LogIn : NavigationRoutes(
         route = "login",
         title = "LogIn"
