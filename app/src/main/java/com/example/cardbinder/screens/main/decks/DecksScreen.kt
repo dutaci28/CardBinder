@@ -37,6 +37,5 @@ fun DecksScreen(
                 Text(text = "Log Out")
             }
         }
-
     }
 }

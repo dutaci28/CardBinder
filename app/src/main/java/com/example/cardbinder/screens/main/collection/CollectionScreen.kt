@@ -193,8 +193,13 @@ fun SharedTransitionScope.CardPager(
         currentEntry.value = collectionCards[pagerState.currentPage]
         when (pagerState.currentPage) {
             0 -> {
-                arrowVisibilityList[0] = 0f
-                arrowVisibilityList[1] = 1f
+                if (collectionCards.size == 1) {
+                    arrowVisibilityList[0] = 0f
+                    arrowVisibilityList[1] = 0f
+                } else {
+                    arrowVisibilityList[0] = 0f
+                    arrowVisibilityList[1] = 1f
+                }
             }
 
             collectionCards.size - 1 -> {
