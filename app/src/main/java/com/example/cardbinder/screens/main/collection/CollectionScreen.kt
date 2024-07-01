@@ -28,13 +28,11 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.BlurredEdgeTreatment
@@ -57,11 +55,6 @@ import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.example.cardbinder.R
 import com.example.cardbinder.model.CardCollectionEntry
-import com.google.firebase.auth.ktx.auth
-import com.google.firebase.firestore.DocumentChange
-import com.google.firebase.firestore.ListenerRegistration
-import com.google.firebase.firestore.ktx.firestore
-import com.google.firebase.ktx.Firebase
 
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
@@ -70,31 +63,8 @@ fun SharedTransitionScope.CollectionScreen(
     navController: NavController,
     animatedVisibilityScope: AnimatedVisibilityScope
 ) {
-    val db = Firebase.firestore
-    val itemsCollection = db.collection("collection-" + (Firebase.auth.currentUser?.email ?: ""))
-    val collectionCards = remember { mutableStateListOf<CardCollectionEntry>() }
-
-    DisposableEffect(itemsCollection) {
-        val listenerRegistration: ListenerRegistration =
-            itemsCollection.addSnapshotListener { snapshot, e ->
-                if (e != null) {
-                    // Handle errors
-                    return@addSnapshotListener
-                }
-
-                if (snapshot != null) {
-                    for (dc in snapshot.documentChanges) {
-                        if (dc.type == DocumentChange.Type.ADDED) {
-                            val item = dc.document.toObject(CardCollectionEntry::class.java)
-                            collectionCards.add(item)
-                        }
-                    }
-                }
-            }
-
-        onDispose { listenerRegistration.remove() }
-    }
-    val collectionViewToggle = rememberSaveable { mutableStateOf(false) }
+    val collectionCards = collectionViewModel.collectionCards
+    val collectionViewToggle = collectionViewModel.collectionViewToggle
 
     if (collectionCards.isEmpty())
         EmptyCollection(navController = navController)
