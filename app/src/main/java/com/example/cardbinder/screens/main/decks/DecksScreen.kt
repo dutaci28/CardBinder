@@ -11,7 +11,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import com.example.cardbinder.screens.navigation.NavigationRoutes
+import com.example.cardbinder.screens.navigation.Routes
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
 
@@ -29,8 +29,8 @@ fun DecksScreen(
             )
             Button(onClick = {
                 auth.signOut()
-                navController.navigate(route = NavigationRoutes.LogIn.route) {
-                    popUpTo(route = NavigationRoutes.LogIn.route)
+                navController.navigate(route = Routes.LogIn.route) {
+                    popUpTo(route = Routes.LogIn.route)
                     launchSingleTop = true
                 }
             }) {

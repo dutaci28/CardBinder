@@ -52,20 +52,20 @@ fun MainScreen(window: Window, mainScreenViewModel: MainScreenViewModel = hiltVi
     val getRandomCard = mainScreenViewModel.getRandomCard.collectAsLazyPagingItems()
 
     showBottomBar = when (navBackStackEntry?.destination?.route) {
-        NavigationRoutes.LoadingScreen.route -> false
-        NavigationRoutes.LogIn.route -> false
-        NavigationRoutes.Register.route -> false
-        NavigationRoutes.IndividualCard.route -> false
+        Routes.LoadingScreen.route -> false
+        Routes.LogIn.route -> false
+        Routes.Register.route -> false
+        Routes.IndividualCard.route -> false
         else -> true
     }
 
     val auth = Firebase.auth
-    var startRoute by remember { mutableStateOf(NavigationRoutes.LoadingScreen.route) }
+    var startRoute by remember { mutableStateOf(Routes.LoadingScreen.route) }
     DisposableEffect(auth) {
         val listener = FirebaseAuth.AuthStateListener { authState ->
             val userLoggedIn = authState.currentUser != null
             startRoute = if (!userLoggedIn)
-                NavigationRoutes.LogIn.route
+                Routes.LogIn.route
             else
                 "search/" + false
 
@@ -87,22 +87,22 @@ fun MainScreen(window: Window, mainScreenViewModel: MainScreenViewModel = hiltVi
                     navController = navController,
                     startDestination = startRoute
                 ) {
-                    composable(route = NavigationRoutes.LoadingScreen.route) {
+                    composable(route = Routes.LoadingScreen.route) {
                         LoadingScreen()
                     }
-                    composable(route = NavigationRoutes.LogIn.route) {
+                    composable(route = Routes.LogIn.route) {
                         LogInScreen(navController = navController)
                     }
-                    composable(route = NavigationRoutes.Register.route) {
+                    composable(route = Routes.Register.route) {
                         RegisterScreen(navController = navController)
                     }
-                    composable(route = NavigationRoutes.Collection.route) {
+                    composable(route = Routes.Collection.route) {
                         CollectionScreen(
                             navController = navController,
                             animatedVisibilityScope = this
                         )
                     }
-                    composable(route = NavigationRoutes.Search.route, arguments = listOf(
+                    composable(route = Routes.Search.route, arguments = listOf(
                         navArgument(name = NAV_ARGUMENT_SHOULD_FOCUS_SEARCH) {
                             type = NavType.BoolType
                         }
@@ -116,10 +116,10 @@ fun MainScreen(window: Window, mainScreenViewModel: MainScreenViewModel = hiltVi
                             animatedVisibilityScope = this
                         )
                     }
-                    composable(route = NavigationRoutes.Decks.route) {
+                    composable(route = Routes.Decks.route) {
                         DecksScreen(navController = navController)
                     }
-                    composable(route = NavigationRoutes.IndividualCard.route, arguments = listOf(
+                    composable(route = Routes.IndividualCard.route, arguments = listOf(
                         navArgument(name = NAV_ARGUMENT_CARD_ID) { type = NavType.StringType }
                     )) {
                         IndividualCardScreen(

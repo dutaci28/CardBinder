@@ -33,7 +33,7 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.example.cardbinder.screens.navigation.NavigationRoutes
+import com.example.cardbinder.screens.navigation.Routes
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -142,7 +142,7 @@ fun checkLoginInputsAndNavigateToMain(
             auth.signInWithEmailAndPassword(email, password).addOnCompleteListener { task ->
                 if (task.isSuccessful) {
                     navController.navigate(route = "search/" + false) {
-                        popUpTo(NavigationRoutes.LogIn.route) {
+                        popUpTo(Routes.LogIn.route) {
                             inclusive = true
                         }
                     }
@@ -177,7 +177,7 @@ fun checkRegisterInputsAndNavigateToMain(
             auth.createUserWithEmailAndPassword(email, password).addOnCompleteListener { task ->
                 if (task.isSuccessful) {
                     navController.navigate(route = "search/" + false) {
-                        popUpTo(NavigationRoutes.LogIn.route) {
+                        popUpTo(Routes.LogIn.route) {
                             inclusive = true
                         }
                     }

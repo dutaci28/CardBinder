@@ -23,9 +23,9 @@ import com.example.cardbinder.R
 @Composable
 fun BottomNavBar(navController: NavHostController) {
     val screens = listOf(
-        NavigationRoutes.Collection,
-        NavigationRoutes.Search,
-        NavigationRoutes.Decks,
+        Routes.Collection,
+        Routes.Search,
+        Routes.Decks,
     )
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry?.destination
@@ -49,7 +49,7 @@ fun BottomNavBar(navController: NavHostController) {
 
 @Composable
 fun RowScope.NavItem(
-    screen: NavigationRoutes,
+    screen: Routes,
     currentDestination: NavDestination?,
     navController: NavHostController
 ) {
@@ -63,7 +63,7 @@ fun RowScope.NavItem(
         },
         icon = {
             when (screen.route) {
-                NavigationRoutes.Collection.route -> {
+                Routes.Collection.route -> {
                     Icon(
                         imageVector = ImageVector.vectorResource(R.drawable.collection),
                         contentDescription = "Navigation Icon",
@@ -71,7 +71,7 @@ fun RowScope.NavItem(
                     )
                 }
 
-                NavigationRoutes.Search.route -> {
+                Routes.Search.route -> {
                     Icon(
                         imageVector = ImageVector.vectorResource(R.drawable.search),
                         contentDescription = "Navigation Icon",
@@ -79,7 +79,7 @@ fun RowScope.NavItem(
                     )
                 }
 
-                NavigationRoutes.Decks.route -> {
+                Routes.Decks.route -> {
                     Icon(
                         imageVector = ImageVector.vectorResource(R.drawable.decks),
                         contentDescription = "Navigation Icon",
@@ -91,7 +91,7 @@ fun RowScope.NavItem(
         },
         selected = currentDestination?.hierarchy?.any { it.route == screen.route } == true,
         onClick = {
-            if (screen.route == NavigationRoutes.Search.route)
+            if (screen.route == Routes.Search.route)
                 navController.navigate(route = "search/" + false) {
                     popUpTo(route = "search/" + false)
                     launchSingleTop = true

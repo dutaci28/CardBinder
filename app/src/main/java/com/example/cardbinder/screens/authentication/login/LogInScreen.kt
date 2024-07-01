@@ -8,34 +8,30 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.cardbinder.screens.authentication.common.AuthTextField
 import com.example.cardbinder.screens.authentication.common.checkEmailValidity
 import com.example.cardbinder.screens.authentication.common.checkLoginInputsAndNavigateToMain
-import com.example.cardbinder.screens.navigation.NavigationRoutes
+import com.example.cardbinder.screens.navigation.Routes
 import com.example.cardbinder.screens.loading.LoadingScreen
-import com.google.firebase.Firebase
-import com.google.firebase.auth.auth
 
 @Composable
-fun LogInScreen(navController: NavController) {
+fun LogInScreen(navController: NavController, viewModel: LogInViewModel = hiltViewModel()) {
+    val emailText = viewModel.emailText
+    val passwordText = viewModel.passwordText
+    val focusRequester = viewModel.focusRequester
+    val auth = viewModel.auth
+    val coroutineScope = viewModel.coroutineScope
+    val processingCredentials = viewModel.processingCredentials
+    val authenticationFailed = viewModel.authenticationFailed
+
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-        val emailText = remember { mutableStateOf("") }
-        val passwordText = remember { mutableStateOf("") }
-        val focusRequester = remember { FocusRequester() }
-        val auth = Firebase.auth
-        val coroutineScope = rememberCoroutineScope()
-        val processingCredentials = remember { mutableStateOf(false) }
-        val authenticationFailed = remember { mutableStateOf(false) }
         if (processingCredentials.value) {
             LoadingScreen()
         } else {
@@ -88,8 +84,8 @@ fun LogInScreen(navController: NavController) {
                 }
                 Button(
                     onClick = {
-                        navController.navigate(route = NavigationRoutes.Register.route) {
-                            popUpTo(NavigationRoutes.LogIn.route) {
+                        navController.navigate(route = Routes.Register.route) {
+                            popUpTo(Routes.LogIn.route) {
                                 inclusive = true
                             }
                         }

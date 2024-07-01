@@ -56,7 +56,7 @@ import com.example.cardbinder.R
 import com.example.cardbinder.model.CardCollectionEntry
 import com.example.cardbinder.model.MTGCard
 import com.example.cardbinder.model.Ruling
-import com.example.cardbinder.screens.navigation.NavigationRoutes
+import com.example.cardbinder.screens.navigation.Routes
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.firestore.FirebaseFirestore
 
@@ -114,8 +114,8 @@ fun SharedTransitionScope.IndividualCardScreen(
                                 Log.d("CARDS", "Tried to add empty card to DB")
                             }
                         } else {
-                            navController.navigate(NavigationRoutes.LogIn.route) {
-                                popUpTo(NavigationRoutes.LogIn.route) {
+                            navController.navigate(Routes.LogIn.route) {
+                                popUpTo(Routes.LogIn.route) {
                                     inclusive = true
                                 }
                             }
@@ -341,7 +341,7 @@ fun IndividualCardTopBar(navController: NavController) {
         IconButton(
             onClick = {
                 navController.navigate(route = "search/" + false) {
-                    popUpTo(NavigationRoutes.Search.route) {
+                    popUpTo(Routes.Search.route) {
                         inclusive = true
                     }
                 }

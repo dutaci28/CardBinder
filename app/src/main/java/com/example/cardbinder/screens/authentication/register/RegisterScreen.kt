@@ -7,38 +7,33 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.cardbinder.screens.authentication.common.AuthTextField
 import com.example.cardbinder.screens.authentication.common.checkEmailValidity
 import com.example.cardbinder.screens.authentication.common.checkPasswordValidity
 import com.example.cardbinder.screens.authentication.common.checkRegisterInputsAndNavigateToMain
 import com.example.cardbinder.screens.loading.LoadingScreen
-import com.example.cardbinder.screens.navigation.NavigationRoutes
-import com.google.firebase.Firebase
-import com.google.firebase.auth.auth
+import com.example.cardbinder.screens.navigation.Routes
 
 @Composable
-fun RegisterScreen(navController: NavController) {
-    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-        val emailText = remember { mutableStateOf("") }
-        val passwordText = remember { mutableStateOf("") }
-        val repeatPasswordText = remember { mutableStateOf("") }
-        val focusRequester = remember { FocusRequester() }
-        val focusRequester2 = remember { FocusRequester() }
-        val auth = Firebase.auth
-        val coroutineScope = rememberCoroutineScope()
-        val processingCredentials = remember { mutableStateOf(false) }
-        val authenticationFailed = remember { mutableStateOf(false) }
+fun RegisterScreen(navController: NavController, viewModel: RegisterViewModel = hiltViewModel()) {
+    val emailText = viewModel.emailText
+    val passwordText = viewModel.passwordText
+    val repeatPasswordText = viewModel.repeatPasswordText
+    val focusRequester = viewModel.focusRequester
+    val focusRequester2 = viewModel.focusRequester2
+    val auth = viewModel.auth
+    val coroutineScope = viewModel.coroutineScope
+    val processingCredentials = viewModel.processingCredentials
+    val authenticationFailed = viewModel.authenticationFailed
 
+    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
         if (processingCredentials.value) {
             LoadingScreen()
         } else {
@@ -105,8 +100,8 @@ fun RegisterScreen(navController: NavController) {
                 ) { Text(text = "Register") }
                 Button(
                     onClick = {
-                        navController.navigate(route = NavigationRoutes.LogIn.route) {
-                            popUpTo(NavigationRoutes.Register.route) {
+                        navController.navigate(route = Routes.LogIn.route) {
+                            popUpTo(Routes.Register.route) {
                                 inclusive = true
                             }
                         }

@@ -3,41 +3,41 @@ package com.example.cardbinder.screens.navigation
 import com.example.cardbinder.util.Constants.Companion.NAV_ARGUMENT_CARD_ID
 import com.example.cardbinder.util.Constants.Companion.NAV_ARGUMENT_SHOULD_FOCUS_SEARCH
 
-sealed class NavigationRoutes(
+sealed class Routes(
     val route: String,
     val title: String
 ) {
-    data object LoadingScreen : NavigationRoutes(
+    data object LoadingScreen : Routes(
         route = "splashScreen",
         title = "SplashScreen"
     )
 
-    data object LogIn : NavigationRoutes(
+    data object LogIn : Routes(
         route = "login",
         title = "LogIn"
     )
 
-    data object Register : NavigationRoutes(
+    data object Register : Routes(
         route = "register",
         title = "Register"
     )
 
-    data object Collection : NavigationRoutes(
+    data object Collection : Routes(
         route = "collection",
         title = "Collection"
     )
 
-    data object Search : NavigationRoutes(
+    data object Search : Routes(
         route = "search/{$NAV_ARGUMENT_SHOULD_FOCUS_SEARCH}",
         title = "Search"
     )
 
-    data object Decks : NavigationRoutes(
+    data object Decks : Routes(
         route = "decks",
         title = "Decks"
     )
 
-    data object IndividualCard : NavigationRoutes(
+    data object IndividualCard : Routes(
         route = "individualCard/{$NAV_ARGUMENT_CARD_ID}",
         title = "IndividualCard"
     )
