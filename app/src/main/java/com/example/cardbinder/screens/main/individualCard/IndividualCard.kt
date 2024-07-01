@@ -57,45 +57,47 @@ import com.example.cardbinder.model.CardCollectionEntry
 import com.example.cardbinder.model.MTGCard
 import com.example.cardbinder.model.Ruling
 import com.example.cardbinder.screens.navigation.NavigationRoutes
-import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseUser
-import com.google.firebase.auth.auth
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.firestore
 
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
 fun SharedTransitionScope.IndividualCardScreen(
     navController: NavController,
     cardId: String,
-    individualCardViewModel: IndividualCardViewModel = hiltViewModel(),
+    viewModel: IndividualCardViewModel = hiltViewModel(),
     animatedVisibilityScope: AnimatedVisibilityScope
 ) {
-    individualCardViewModel.getCardById(id = cardId)
-    val searchedCards = individualCardViewModel.searchedCards.collectAsLazyPagingItems()
-    var card = MTGCard.getEmptyCard()
-    var cardPrintingsList: List<MTGCard> = listOf()
-    var rulingsList: List<Ruling> = listOf()
-    if (searchedCards.itemSnapshotList.isNotEmpty()) {
-        card = searchedCards.itemSnapshotList[0]!!
+    val auth = viewModel.auth
+    val db = viewModel.db
+    viewModel.getCardById(id = cardId)
+    var isAddSuccessful by remember{mutableStateOf(false)}
+    var isButtonDisabled by remember{mutableStateOf(false)}
+    var card = viewModel.card
+    var cardPrintingsList = viewModel.cardPrintingsList
+    var rulingsList = viewModel.rulingsList
+    val searchedCards = viewModel.searchedCards.collectAsLazyPagingItems().itemSnapshotList
+
+
+    if (searchedCards.isNotEmpty()) {
+        card = searchedCards[0]!!
         cardPrintingsList = listOf()
         rulingsList = listOf()
-        individualCardViewModel.getCardPrintings(q = card.oracle_id)
-        val cardPrintings = individualCardViewModel.cardPrintings.collectAsLazyPagingItems()
+        viewModel.getCardPrintings(q = card.oracle_id)
+        val cardPrintings = viewModel.cardPrintings.collectAsLazyPagingItems()
         if (cardPrintings.itemSnapshotList.isNotEmpty()) {
             cardPrintingsList = cardPrintings.itemSnapshotList.items
         }
-        individualCardViewModel.getRulingsByCardId(id = card.id)
-        val rulings = individualCardViewModel.rulings.collectAsLazyPagingItems()
+        viewModel.getRulingsByCardId(id = card.id)
+        val rulings = viewModel.rulings.collectAsLazyPagingItems()
         if (rulings.itemSnapshotList.isNotEmpty()) {
             rulingsList = rulings.itemSnapshotList.items
         }
     }
-    val auth = Firebase.auth
-    val db = Firebase.firestore
-    var isAddSuccessful by remember { mutableStateOf(false) }
-    var isButtonDisabled by remember { mutableStateOf(false) }
+
+
     val alpha = if (isButtonDisabled) 0.8f else 1f
+
     Scaffold(
         topBar = { IndividualCardTopBar(navController) },
         floatingActionButton = {

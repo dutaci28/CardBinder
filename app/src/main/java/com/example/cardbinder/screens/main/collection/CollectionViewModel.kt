@@ -18,10 +18,13 @@ import javax.inject.Inject
 @HiltViewModel
 class CollectionViewModel @Inject constructor() : ViewModel() {
 
-    val collectionCards = mutableStateListOf<CardCollectionEntry>()
+    private val _collectionCards = mutableStateListOf<CardCollectionEntry>()
+    val collectionCards = _collectionCards
+    private val _collectionViewToggle = mutableStateOf(false)
+    val collectionViewToggle = _collectionViewToggle
+
     private val db = Firebase.firestore
     private val itemsCollection = db.collection("collection-" + (Firebase.auth.currentUser?.email ?: ""))
-    val collectionViewToggle = mutableStateOf(false)
     private var listener = ListenerRegistration {}
 
     init {
@@ -37,11 +40,11 @@ class CollectionViewModel @Inject constructor() : ViewModel() {
                 }
 
                 if (snapshot != null) {
-                    collectionCards.clear()
+                    _collectionCards.clear()
                     for (dc in snapshot.documentChanges) {
                         if (dc.type == DocumentChange.Type.ADDED) {
                             val item = dc.document.toObject(CardCollectionEntry::class.java)
-                            collectionCards.add(item)
+                            _collectionCards.add(item)
                         }
                     }
                 }

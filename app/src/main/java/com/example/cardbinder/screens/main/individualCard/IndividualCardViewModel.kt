@@ -7,6 +7,9 @@ import androidx.paging.cachedIn
 import com.example.cardbinder.data.repository.Repository
 import com.example.cardbinder.model.MTGCard
 import com.example.cardbinder.model.Ruling
+import com.google.firebase.Firebase
+import com.google.firebase.auth.auth
+import com.google.firebase.firestore.firestore
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
@@ -14,9 +17,19 @@ import javax.inject.Inject
 
 @HiltViewModel
 class IndividualCardViewModel @Inject constructor(repository: Repository) : ViewModel() {
+    val auth = Firebase.auth
+    val db = Firebase.firestore
     private val repo = repository
     private val _searchedCards = MutableStateFlow<PagingData<MTGCard>>(PagingData.empty())
     val searchedCards = _searchedCards
+    private val _cardPrintings = MutableStateFlow<PagingData<MTGCard>>(PagingData.empty())
+    val cardPrintings = _cardPrintings
+    private val _rulings = MutableStateFlow<PagingData<Ruling>>(PagingData.empty())
+    val rulings = _rulings
+    var card = MTGCard.getEmptyCard()
+    var cardPrintingsList: List<MTGCard> = listOf()
+    var rulingsList: List<Ruling> = listOf()
+
     fun getCardById(id: String) {
         viewModelScope.launch {
             repo.getCardById(id).cachedIn(viewModelScope).collect {
@@ -25,8 +38,6 @@ class IndividualCardViewModel @Inject constructor(repository: Repository) : View
         }
     }
 
-    private val _cardPrintings = MutableStateFlow<PagingData<MTGCard>>(PagingData.empty())
-    val cardPrintings = _cardPrintings
     fun getCardPrintings(q: String) {
         viewModelScope.launch {
             repo.getCardPrintings(q).cachedIn(viewModelScope).collect {
@@ -35,8 +46,6 @@ class IndividualCardViewModel @Inject constructor(repository: Repository) : View
         }
     }
 
-    private val _rulings = MutableStateFlow<PagingData<Ruling>>(PagingData.empty())
-    val rulings = _rulings
     fun getRulingsByCardId(id: String) {
         viewModelScope.launch {
             repo.getRulingsByCardId(id = id).cachedIn(viewModelScope).collect {

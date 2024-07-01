@@ -59,12 +59,12 @@ import com.example.cardbinder.model.CardCollectionEntry
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
 fun SharedTransitionScope.CollectionScreen(
-    collectionViewModel: CollectionViewModel = hiltViewModel(),
+    viewModel: CollectionViewModel = hiltViewModel(),
     navController: NavController,
     animatedVisibilityScope: AnimatedVisibilityScope
 ) {
-    val collectionCards = collectionViewModel.collectionCards
-    val collectionViewToggle = collectionViewModel.collectionViewToggle
+    val collectionCards = viewModel.collectionCards
+    val collectionViewToggle = viewModel.collectionViewToggle
 
     if (collectionCards.isEmpty())
         EmptyCollection(navController = navController)
