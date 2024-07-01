@@ -1,0 +1,144 @@
+package com.dutaci28.cardbinder.screens.navigation
+
+import android.annotation.SuppressLint
+import android.view.Window
+import androidx.compose.animation.ExperimentalSharedTransitionApi
+import androidx.compose.animation.SharedTransitionLayout
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.material3.Scaffold
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.platform.LocalView
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavType
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
+import androidx.paging.compose.collectAsLazyPagingItems
+import com.dutaci28.cardbinder.screens.authentication.LogInScreen
+import com.dutaci28.cardbinder.screens.authentication.RegisterScreen
+import com.dutaci28.cardbinder.screens.content.collection.CollectionScreen
+import com.dutaci28.cardbinder.screens.content.decks.DecksScreen
+import com.dutaci28.cardbinder.screens.content.individualCard.IndividualCardScreen
+import com.dutaci28.cardbinder.screens.content.search.SearchScreen
+import com.dutaci28.cardbinder.util.Constants.Companion.NAV_ARGUMENT_CARD_ID
+import com.dutaci28.cardbinder.util.Constants.Companion.NAV_ARGUMENT_SHOULD_FOCUS_SEARCH
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
+
+@OptIn(ExperimentalSharedTransitionApi::class)
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
+@Composable
+fun MainScreen(window: Window, mainScreenViewModel: MainScreenViewModel = hiltViewModel()) {
+    val navController = rememberNavController()
+    var showBottomBar by rememberSaveable { mutableStateOf(true) }
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val getRandomCard = mainScreenViewModel.getRandomCard.collectAsLazyPagingItems()
+
+    showBottomBar = when (navBackStackEntry?.destination?.route) {
+        Routes.LoadingScreen.route -> false
+        Routes.LogIn.route -> false
+        Routes.Register.route -> false
+        Routes.IndividualCard.route -> false
+        else -> true
+    }
+
+    val auth = Firebase.auth
+    var startRoute by remember { mutableStateOf(Routes.LoadingScreen.route) }
+    DisposableEffect(auth) {
+        val listener = FirebaseAuth.AuthStateListener { authState ->
+            val userLoggedIn = authState.currentUser != null
+            startRoute = if (!userLoggedIn)
+                Routes.LogIn.route
+            else
+                "search/" + false
+
+        }
+        auth.addAuthStateListener(listener)
+        onDispose { auth.removeAuthStateListener(listener) }
+    }
+
+    UpdateStatusBarColor(color = Color.Black, window = window)
+    Scaffold(bottomBar = { if (showBottomBar) BottomNavBar(navController = navController) }) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .statusBarsPadding()
+                .background(Color.White)
+        ) {
+            SharedTransitionLayout {
+                NavHost(
+                    navController = navController,
+                    startDestination = startRoute
+                ) {
+                    composable(route = Routes.LoadingScreen.route) {
+                        LoadingScreen()
+                    }
+                    composable(route = Routes.LogIn.route) {
+                        LogInScreen(navController = navController)
+                    }
+                    composable(route = Routes.Register.route) {
+                        RegisterScreen(navController = navController)
+                    }
+                    composable(route = Routes.Collection.route) {
+                        CollectionScreen(
+                            navController = navController,
+                            animatedVisibilityScope = this
+                        )
+                    }
+                    composable(route = Routes.Search.route, arguments = listOf(
+                        navArgument(name = NAV_ARGUMENT_SHOULD_FOCUS_SEARCH) {
+                            type = NavType.BoolType
+                        }
+                    )) {
+                        SearchScreen(
+                            navController = navController,
+                            shouldFocus = it.arguments?.getBoolean(
+                                NAV_ARGUMENT_SHOULD_FOCUS_SEARCH
+                            ).toString().toBoolean(),
+                            randomCardData = getRandomCard,
+                            animatedVisibilityScope = this
+                        )
+                    }
+                    composable(route = Routes.Decks.route) {
+                        DecksScreen(navController = navController)
+                    }
+                    composable(route = Routes.IndividualCard.route, arguments = listOf(
+                        navArgument(name = NAV_ARGUMENT_CARD_ID) { type = NavType.StringType }
+                    )) {
+                        IndividualCardScreen(
+                            navController = navController,
+                            cardId = it.arguments?.getString(NAV_ARGUMENT_CARD_ID).toString(),
+                            animatedVisibilityScope = this
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun UpdateStatusBarColor(color: Color, window: Window) {
+    val view = LocalView.current
+    SideEffect {
+        view.context.apply {
+            window.statusBarColor = color.toArgb()
+        }
+    }
+}

@@ -8,11 +8,11 @@ plugins {
 }
 
 android {
-    namespace = "com.example.cardbinder"
+    namespace = "com.dutaci28.cardbinder"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.example.cardbinder"
+        applicationId = "com.dutaci28.cardbinder"
         minSdk = 26
         targetSdk = 34
         versionCode = 1
