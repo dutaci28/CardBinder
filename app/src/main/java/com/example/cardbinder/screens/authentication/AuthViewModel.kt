@@ -19,21 +19,20 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.auth.auth
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class AuthViewModel @Inject constructor() : ViewModel() {
-    val emailText = mutableStateOf("")
-    val passwordText = mutableStateOf("")
+    val email = mutableStateOf("")
+    val password = mutableStateOf("")
     val focusRequester = FocusRequester()
     val auth = Firebase.auth
     val coroutineScope = viewModelScope
-    val processingCredentials = mutableStateOf(false)
-    val authenticationFailed = mutableStateOf(false)
+    val isProcessingCredentials = mutableStateOf(false)
+    val isAuthenticationFailed = mutableStateOf(false)
 
-    val repeatPasswordText =  mutableStateOf("")
+    val repeatPassword = mutableStateOf("")
     val focusRequester2 = FocusRequester()
 
     fun authenticateWithGoogle(
@@ -85,14 +84,13 @@ class AuthViewModel @Inject constructor() : ViewModel() {
         password: String,
         repeatedPassword: String,
         auth: FirebaseAuth,
-        coroutineScope: CoroutineScope,
-        processingCredentialsBool: MutableState<Boolean>,
-        authenticationFailedBool: MutableState<Boolean>
+        isProcessingCredentials: MutableState<Boolean>,
+        isAuthenticationFailed: MutableState<Boolean>
     ) {
-        processingCredentialsBool.value = true
-        authenticationFailedBool.value = false
+        isProcessingCredentials.value = true
+        isAuthenticationFailed.value = false
         if (checkEmailValidity(email) && checkPasswordValidity(password) && password == repeatedPassword)
-            coroutineScope.launch {
+            viewModelScope.launch {
                 auth.createUserWithEmailAndPassword(email, password).addOnCompleteListener { task ->
                     if (task.isSuccessful) {
                         navController.navigate(route = "search/" + false) {
@@ -101,17 +99,15 @@ class AuthViewModel @Inject constructor() : ViewModel() {
                             }
                         }
                     } else {
-                        authenticationFailedBool.value = true
-                        processingCredentialsBool.value = false
+                        isAuthenticationFailed.value = true
+                        isProcessingCredentials.value = false
                         Log.d("REGISTER FAILED", task.exception?.message.toString())
                     }
                 }
             } else {
-            authenticationFailedBool.value = true
-            processingCredentialsBool.value = false
+            isAuthenticationFailed.value = true
+            isProcessingCredentials.value = false
             Log.d("REGISTER FAILED", "Email or password invalid or passwords dont match")
         }
     }
-
-
 }

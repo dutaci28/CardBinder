@@ -1,118 +1,77 @@
 package com.example.cardbinder.screens.authentication
 
-
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Button
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import com.example.cardbinder.R
-import com.example.cardbinder.screens.navigation.Routes
 import com.example.cardbinder.screens.navigation.LoadingScreen
 
 @Composable
 fun LogInScreen(navController: NavController, viewModel: AuthViewModel = hiltViewModel()) {
-    val emailText = viewModel.emailText
-    val passwordText = viewModel.passwordText
+    val email = viewModel.email
+    val password = viewModel.password
     val focusRequester = viewModel.focusRequester
-    val auth = viewModel.auth
     val coroutineScope = viewModel.coroutineScope
-    val processingCredentials = viewModel.processingCredentials
-    val authenticationFailed = viewModel.authenticationFailed
+    val isProcessingCredentials = viewModel.isProcessingCredentials
+    val isAuthenticationFailed = viewModel.isAuthenticationFailed
+    val auth = viewModel.auth
     val context = LocalContext.current
 
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-        if (processingCredentials.value) {
+        if (isProcessingCredentials.value) {
             LoadingScreen()
         } else {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 AuthTextField(
-                    text = emailText,
+                    text = email,
                     placeholder = "Email",
                     checkValidityFunction = ::checkEmailValidity,
-                    hideCharacters = false,
+                    isHideCharacters = false,
                     hasNext = true,
                     onNext = { focusRequester.requestFocus() },
                     invalidText = "Invalid Email Address"
                 )
                 AuthTextField(
-                    text = passwordText,
+                    text = password,
                     placeholder = "Password",
-                    hideCharacters = true,
+                    isHideCharacters = true,
                     focusRequester = focusRequester,
                     onGo = {
                         checkLoginInputsAndNavigateToMain(
                             navController = navController,
-                            email = emailText.value,
-                            password = passwordText.value,
+                            email = email.value,
+                            password = password.value,
                             auth = auth,
                             coroutineScope = coroutineScope,
-                            processingCredentialsBool = processingCredentials,
-                            authenticationFailedBool = authenticationFailed
+                            isProcessingCredentials = isProcessingCredentials,
+                            isAuthenticationFailed = isAuthenticationFailed
                         )
                     }
                 )
-                if (authenticationFailed.value) {
-                    Text(text = "Authentication failed", color = Color.Red)
-                }
-                Button(
-                    onClick = {
-                        checkLoginInputsAndNavigateToMain(
-                            navController = navController,
-                            email = emailText.value,
-                            password = passwordText.value,
-                            auth = auth,
-                            coroutineScope = coroutineScope,
-                            processingCredentialsBool = processingCredentials,
-                            authenticationFailedBool = authenticationFailed
-                        )
-                    },
-                    modifier = Modifier.shadow(10.dp, shape = RoundedCornerShape(5.dp))
-
-                ) {
-                    Text(text = "Log In")
-                }
-                Button(
-                    onClick = {
-                        navController.navigate(route = Routes.Register.route) {
-                            popUpTo(Routes.LogIn.route) {
-                                inclusive = true
-                            }
-                        }
-                    },
-                    modifier = Modifier.shadow(10.dp, shape = RoundedCornerShape(5.dp))
-                ) { Text(text = "Create an account") }
-                IconButton(
-                    onClick = {
-                        viewModel.authenticateWithGoogle(
-                            context = context,
-                            navController = navController,
-                            processingCredentialsBool = processingCredentials,
-                            authenticationFailedBool = authenticationFailed
-                        )
-                    }) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.google_logo),
-                        contentDescription = "Sign in with Google",
-                        tint = Color.Unspecified
-                    )
-                }
+                AuthFailedText(authenticationFailedBool = isAuthenticationFailed)
+                LogInButton(
+                    navController = navController,
+                    email = email,
+                    password = password,
+                    auth = auth,
+                    coroutineScope = coroutineScope,
+                    isProcessingCredentials = isProcessingCredentials,
+                    isAuthenticationFailed = isAuthenticationFailed
+                )
+                CreateAccountButton(navController = navController)
+                SignInWithGoogleButton(
+                    viewModel = viewModel,
+                    context = context,
+                    navController = navController,
+                    isProcessingCredentials = isProcessingCredentials,
+                    isAuthenticationFailed = isAuthenticationFailed
+                )
             }
         }
-
-
     }
 }

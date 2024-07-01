@@ -3,51 +3,43 @@ package com.example.cardbinder.screens.authentication
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Button
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.cardbinder.screens.navigation.LoadingScreen
-import com.example.cardbinder.screens.navigation.Routes
 
 @Composable
 fun RegisterScreen(navController: NavController, viewModel: AuthViewModel = hiltViewModel()) {
-    val emailText = viewModel.emailText
-    val passwordText = viewModel.passwordText
-    val repeatPasswordText = viewModel.repeatPasswordText
+    val email = viewModel.email
+    val password = viewModel.password
+    val repeatPasswordText = viewModel.repeatPassword
     val focusRequester = viewModel.focusRequester
     val focusRequester2 = viewModel.focusRequester2
     val auth = viewModel.auth
-    val coroutineScope = viewModel.coroutineScope
-    val processingCredentials = viewModel.processingCredentials
-    val authenticationFailed = viewModel.authenticationFailed
+    val isProcessingCredentials = viewModel.isProcessingCredentials
+    val isAuthenticationFailed = viewModel.isAuthenticationFailed
 
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-        if (processingCredentials.value) {
+        if (isProcessingCredentials.value) {
             LoadingScreen()
         } else {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 AuthTextField(
-                    text = emailText,
+                    text = email,
                     placeholder = "Email",
                     checkValidityFunction = ::checkEmailValidity,
-                    hideCharacters = false,
+                    isHideCharacters = false,
                     hasNext = true,
                     onNext = { focusRequester.requestFocus() },
                     invalidText = "Invalid Email Address"
                 )
                 AuthTextField(
-                    text = passwordText,
+                    text = password,
                     placeholder = "Password",
                     checkValidityFunction = ::checkPasswordValidity,
-                    hideCharacters = true,
+                    isHideCharacters = true,
                     hasNext = true,
                     focusRequester = focusRequester,
                     onNext = { focusRequester2.requestFocus() },
@@ -57,53 +49,36 @@ fun RegisterScreen(navController: NavController, viewModel: AuthViewModel = hilt
                     text = repeatPasswordText,
                     placeholder = "Repeat Password",
                     checkValidityFunction = ::checkPasswordValidity,
-                    hideCharacters = true,
+                    isHideCharacters = true,
                     focusRequester = focusRequester2,
                     onGo = {
                         viewModel.checkRegisterInputsAndNavigateToMain(
                             navController = navController,
-                            email = emailText.value,
-                            password = passwordText.value,
+                            email = email.value,
+                            password = password.value,
                             repeatedPassword = repeatPasswordText.value,
                             auth = auth,
-                            coroutineScope = coroutineScope,
-                            processingCredentialsBool = processingCredentials,
-                            authenticationFailedBool = authenticationFailed
+                            isProcessingCredentials = isProcessingCredentials,
+                            isAuthenticationFailed = isAuthenticationFailed
                         )
                     },
                     invalidText = "Password Complexity Too Low",
                     checkMatching = true,
-                    matchValue = passwordText.value,
+                    matchValue = password.value,
                     matchValue2 = repeatPasswordText.value
                 )
-                if (authenticationFailed.value) {
-                    Text(text = "Authentication failed", color = Color.Red)
-                }
-                Button(
-                    onClick = {
-                        viewModel.checkRegisterInputsAndNavigateToMain(
-                            navController = navController,
-                            email = emailText.value,
-                            password = passwordText.value,
-                            repeatedPassword = repeatPasswordText.value,
-                            auth = auth,
-                            coroutineScope = coroutineScope,
-                            processingCredentialsBool = processingCredentials,
-                            authenticationFailedBool = authenticationFailed
-                        )
-                    },
-                    modifier = Modifier.shadow(10.dp, shape = RoundedCornerShape(5.dp))
-                ) { Text(text = "Register") }
-                Button(
-                    onClick = {
-                        navController.navigate(route = Routes.LogIn.route) {
-                            popUpTo(Routes.Register.route) {
-                                inclusive = true
-                            }
-                        }
-                    },
-                    modifier = Modifier.shadow(10.dp, shape = RoundedCornerShape(5.dp))
-                ) { Text(text = "Go back to Log In") }
+                AuthFailedText(authenticationFailedBool = isAuthenticationFailed)
+                RegisterButton(
+                    viewModel = viewModel,
+                    navController = navController,
+                    email = email,
+                    password = password,
+                    repeatPasswordText = repeatPasswordText,
+                    auth = auth,
+                    isProcessingCredentials = isProcessingCredentials,
+                    isAuthenticationFailed = isAuthenticationFailed
+                )
+                BackToLogInButton(navController = navController)
             }
         }
     }
