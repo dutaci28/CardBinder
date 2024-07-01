@@ -19,7 +19,7 @@ import com.example.cardbinder.screens.authentication.common.AuthTextField
 import com.example.cardbinder.screens.authentication.common.checkEmailValidity
 import com.example.cardbinder.screens.authentication.common.checkLoginInputsAndNavigateToMain
 import com.example.cardbinder.screens.navigation.Routes
-import com.example.cardbinder.screens.loading.LoadingScreen
+import com.example.cardbinder.screens.navigation.LoadingScreen
 
 @Composable
 fun LogInScreen(navController: NavController, viewModel: LogInViewModel = hiltViewModel()) {

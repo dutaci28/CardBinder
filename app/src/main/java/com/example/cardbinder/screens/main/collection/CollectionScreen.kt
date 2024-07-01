@@ -22,6 +22,8 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
@@ -85,7 +87,8 @@ fun SharedTransitionScope.CollectionScreen(
                     if (collectionViewToggle.value) {
                         CollectionCardList(
                             collectionCards = collectionCards,
-                            navController = navController
+                            navController = navController,
+                            viewModel = viewModel
                         )
                     } else {
                         CardPager(
@@ -132,16 +135,28 @@ fun EmptyCollection(navController: NavController) {
 }
 
 @Composable
-fun CollectionCardList(collectionCards: List<CardCollectionEntry>, navController: NavController) {
+fun CollectionCardList(
+    collectionCards: List<CardCollectionEntry>,
+    navController: NavController,
+    viewModel: CollectionViewModel
+) {
     Column(modifier = Modifier.fillMaxSize()) {
         collectionCards.forEach {
-            CollectionCardListItem(cardCollectionEntry = it, navController = navController)
+            CollectionCardListItem(
+                cardCollectionEntry = it,
+                navController = navController,
+                viewModel = viewModel
+            )
         }
     }
 }
 
 @Composable
-fun CollectionCardListItem(cardCollectionEntry: CardCollectionEntry, navController: NavController) {
+fun CollectionCardListItem(
+    cardCollectionEntry: CardCollectionEntry,
+    navController: NavController,
+    viewModel: CollectionViewModel
+) {
     Surface(
         shape = RoundedCornerShape(8.dp),
         border = BorderStroke(1.dp, Color.Gray),
@@ -151,7 +166,12 @@ fun CollectionCardListItem(cardCollectionEntry: CardCollectionEntry, navControll
                 navController.navigate(route = "individualCard/" + cardCollectionEntry.card.id)
             }
     ) {
-        Row(Modifier.fillMaxWidth()) {
+
+        Row(
+            Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
             Text(
                 text = cardCollectionEntry.amount.toString() + "x",
                 modifier = Modifier.padding(5.dp)
@@ -162,6 +182,17 @@ fun CollectionCardListItem(cardCollectionEntry: CardCollectionEntry, navControll
                 color = Color.Gray,
                 modifier = Modifier.padding(5.dp)
             )
+            IconButton(
+                onClick = {
+                    viewModel.deleteCardFromCollection(cardCollectionEntry.card.id)
+                }
+            )
+            {
+                Icon(
+                    imageVector = Icons.Default.Close,
+                    contentDescription = "Delete Icon",
+                )
+            }
 
         }
     }

@@ -18,7 +18,7 @@ import com.example.cardbinder.screens.authentication.common.AuthTextField
 import com.example.cardbinder.screens.authentication.common.checkEmailValidity
 import com.example.cardbinder.screens.authentication.common.checkPasswordValidity
 import com.example.cardbinder.screens.authentication.common.checkRegisterInputsAndNavigateToMain
-import com.example.cardbinder.screens.loading.LoadingScreen
+import com.example.cardbinder.screens.navigation.LoadingScreen
 import com.example.cardbinder.screens.navigation.Routes
 
 @Composable

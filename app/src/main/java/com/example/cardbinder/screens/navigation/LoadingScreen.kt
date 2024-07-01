@@ -1,4 +1,4 @@
-package com.example.cardbinder.screens.loading
+package com.example.cardbinder.screens.navigation
 
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat

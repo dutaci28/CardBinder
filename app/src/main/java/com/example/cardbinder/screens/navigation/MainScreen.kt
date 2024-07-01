@@ -35,7 +35,6 @@ import com.example.cardbinder.screens.main.collection.CollectionScreen
 import com.example.cardbinder.screens.main.decks.DecksScreen
 import com.example.cardbinder.screens.main.individualCard.IndividualCardScreen
 import com.example.cardbinder.screens.main.search.SearchScreen
-import com.example.cardbinder.screens.loading.LoadingScreen
 import com.example.cardbinder.util.Constants.Companion.NAV_ARGUMENT_CARD_ID
 import com.example.cardbinder.util.Constants.Companion.NAV_ARGUMENT_SHOULD_FOCUS_SEARCH
 import com.google.firebase.auth.FirebaseAuth

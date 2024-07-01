@@ -1,5 +1,6 @@
 package com.example.cardbinder.screens.main.collection
 
+import android.util.Log
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
@@ -7,6 +8,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.cardbinder.model.CardCollectionEntry
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.DocumentChange
+import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.ListenerRegistration
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
@@ -24,7 +26,8 @@ class CollectionViewModel @Inject constructor() : ViewModel() {
     val collectionViewToggle = _collectionViewToggle
 
     private val db = Firebase.firestore
-    private val itemsCollection = db.collection("collection-" + (Firebase.auth.currentUser?.email ?: ""))
+    private val itemsCollection =
+        db.collection("collection-" + (Firebase.auth.currentUser?.email ?: ""))
     private var listener = ListenerRegistration {}
 
     init {
@@ -40,11 +43,19 @@ class CollectionViewModel @Inject constructor() : ViewModel() {
                 }
 
                 if (snapshot != null) {
-                    _collectionCards.clear()
                     for (dc in snapshot.documentChanges) {
-                        if (dc.type == DocumentChange.Type.ADDED) {
-                            val item = dc.document.toObject(CardCollectionEntry::class.java)
-                            _collectionCards.add(item)
+                        when (dc.type) {
+                            DocumentChange.Type.ADDED -> {
+                                val item = dc.document.toObject(CardCollectionEntry::class.java)
+                                _collectionCards.add(item)
+                            }
+
+                            DocumentChange.Type.REMOVED -> {
+                                val item = dc.document.toObject(CardCollectionEntry::class.java)
+                                _collectionCards.remove(item)
+                            }
+
+                            else -> {}
                         }
                     }
                 }
@@ -55,6 +66,28 @@ class CollectionViewModel @Inject constructor() : ViewModel() {
     override fun onCleared() {
         super.onCleared()
         viewModelScope.cancel()
+    }
+
+    fun deleteCardFromCollection(id: String) {
+        val query = itemsCollection.whereEqualTo("card.id", id)
+        query.get().addOnSuccessListener {
+            for (document in it) {
+                val documentRef = document.reference
+                deleteDocument(documentRef)
+            }
+        }.addOnFailureListener { exception ->
+            Log.w("CARDS", "Error getting documents: ", exception)
+        }
+    }
+
+    fun deleteDocument(documentRef: DocumentReference) {
+        documentRef.delete()
+            .addOnSuccessListener {
+                Log.d("CARDS", "Document successfully deleted!")
+            }
+            .addOnFailureListener { e ->
+                Log.w("CARDS", "Error deleting document", e)
+            }
     }
 
 }
