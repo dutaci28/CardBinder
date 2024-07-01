@@ -1,6 +1,7 @@
 package com.example.cardbinder.screens.main.search
 
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.ui.focus.FocusRequester
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
@@ -17,6 +18,7 @@ class SearchViewModel @Inject constructor(
     repository: Repository
 ) : ViewModel() {
     private val repo = repository
+    val focusRequester = FocusRequester()
     private val _searchQuery = mutableStateOf("")
     val searchQuery = _searchQuery
     private val _searchedCards = MutableStateFlow<PagingData<MTGCard>>(PagingData.empty())

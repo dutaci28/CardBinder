@@ -23,7 +23,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
@@ -47,24 +46,24 @@ import com.example.cardbinder.model.MTGCard
 @Composable
 fun SharedTransitionScope.SearchScreen(
     navController: NavController,
-    searchViewModel: SearchViewModel = hiltViewModel(),
+    viewModel: SearchViewModel = hiltViewModel(),
     shouldFocus: Boolean,
     randomCardData: LazyPagingItems<MTGCard>,
     animatedVisibilityScope: AnimatedVisibilityScope
 ) {
-    val searchQuery by searchViewModel.searchQuery
-    val searchedCards = searchViewModel.searchedCards.collectAsLazyPagingItems()
-    val focusRequester = remember { FocusRequester() }
+    val searchQuery by viewModel.searchQuery
+    val searchedCards = viewModel.searchedCards.collectAsLazyPagingItems()
+    val focusRequester = viewModel.focusRequester
 
     Scaffold(
         topBar = {
             SearchScreenTopBar(
                 text = searchQuery,
                 onTextChange = {
-                    searchViewModel.updateSearchQuery(query = it)
+                    viewModel.updateSearchQuery(query = it)
                 },
                 onSearchClicked = {
-                    searchViewModel.searchCardsByName(name = it)
+                    viewModel.searchCardsByName(name = it)
                 },
                 shouldFocus = shouldFocus,
                 focusRequester = focusRequester

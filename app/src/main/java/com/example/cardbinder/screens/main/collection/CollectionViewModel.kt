@@ -51,6 +51,7 @@ class CollectionViewModel @Inject constructor() : ViewModel() {
             }
     }
 
+
     override fun onCleared() {
         super.onCleared()
         viewModelScope.cancel()
