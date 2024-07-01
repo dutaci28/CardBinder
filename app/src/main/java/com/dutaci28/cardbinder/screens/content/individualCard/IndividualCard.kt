@@ -1,5 +1,6 @@
 package com.dutaci28.cardbinder.screens.content.individualCard
 
+import android.annotation.SuppressLint
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.compose.animation.AnimatedVisibilityScope
@@ -44,6 +45,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -365,6 +367,7 @@ fun IndividualCardTopBar(navController: NavController) {
     }
 }
 
+@SuppressLint("CoroutineCreationDuringComposition")
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
 fun SharedTransitionScope.MTGCardBigImage(
@@ -375,12 +378,14 @@ fun SharedTransitionScope.MTGCardBigImage(
     val isCardFlippable = remember { mutableStateOf(false) }
     isCardFlippable.value = card.layout == "transform" || card.layout == "modal_dfc"
     val isCardFlipped = remember { mutableStateOf(false) }
-    val imageUrl = remember { mutableStateOf(card.faces[0].image_uris.png) }
+    val imageUrl = remember { mutableStateOf("") }
+    val rotationYAxisAngle by animateFloatAsState(
+        targetValue = if (isCardFlipped.value) 180f else 0f,
+        animationSpec = tween(durationMillis = 500)
+    )
     if (isCardFlippable.value) {
-        if (isCardFlipped.value)
-            imageUrl.value = card.faces[1].image_uris.png
-        else
-            imageUrl.value = card.faces[0].image_uris.png
+        if (rotationYAxisAngle > 90f && rotationYAxisAngle < 270f) imageUrl.value =
+            card.faces[1].image_uris.png else imageUrl.value = card.faces[0].image_uris.png
     } else {
         imageUrl.value = card.image_uris.png
     }
@@ -405,11 +410,16 @@ fun SharedTransitionScope.MTGCardBigImage(
                         tween(durationMillis = 300)
                     }
                 )
+                .graphicsLayer {
+                    rotationY = rotationYAxisAngle
+                    cameraDistance = 12f * density
+                    scaleX = if (rotationYAxisAngle > 90f && rotationYAxisAngle < 270f) -1f else 1f
+                }
         )
         if (isCardFlippable.value) {
-            val rotateDegrees = remember { mutableFloatStateOf(0f) }
-            val angle = animateFloatAsState(
-                targetValue = rotateDegrees.floatValue ,
+            val angle = remember { mutableFloatStateOf(0f) }
+            val tiltAngle = animateFloatAsState(
+                targetValue = angle.floatValue,
                 animationSpec = tween(durationMillis = 100)
             )
             Box(
@@ -422,7 +432,7 @@ fun SharedTransitionScope.MTGCardBigImage(
                 IconButton(
                     onClick = {
                         isCardFlipped.value = !isCardFlipped.value
-                        rotateDegrees.floatValue += 180f
+                        angle.floatValue += 180f
                     },
                     modifier = Modifier
                         .size(100.dp)
@@ -433,7 +443,7 @@ fun SharedTransitionScope.MTGCardBigImage(
                         contentDescription = "Refresh icon",
                         modifier = Modifier
                             .fillMaxSize()
-                            .rotate(angle.value),
+                            .rotate(tiltAngle.value),
                         tint = Color.White.copy(alpha = 0.6f)
                     )
                 }
