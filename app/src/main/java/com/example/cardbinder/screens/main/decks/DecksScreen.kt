@@ -9,30 +9,28 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import com.example.cardbinder.screens.navigation.Routes
-import com.google.firebase.Firebase
-import com.google.firebase.auth.auth
 
 @Composable
 fun DecksScreen(
-    decksViewModel: DecksViewModel = hiltViewModel(),
+    viewModel: DecksViewModel = hiltViewModel(),
     navController: NavController
 ) {
-    val auth = Firebase.auth
+    val auth = viewModel.auth
+    val context = LocalContext.current
+
+
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Text(
                 text = "WIP",
                 color = Color.Red
             )
+            auth.currentUser?.email?.let { Text(text = it) }
             Button(onClick = {
-                auth.signOut()
-                navController.navigate(route = Routes.LogIn.route) {
-                    popUpTo(route = Routes.LogIn.route)
-                    launchSingleTop = true
-                }
+                viewModel.signOut(navController, context)
             }) {
                 Text(text = "Log Out")
             }

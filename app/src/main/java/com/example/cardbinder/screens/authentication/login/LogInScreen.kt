@@ -6,15 +6,20 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.example.cardbinder.R
 import com.example.cardbinder.screens.authentication.common.AuthTextField
 import com.example.cardbinder.screens.authentication.common.checkEmailValidity
 import com.example.cardbinder.screens.authentication.common.checkLoginInputsAndNavigateToMain
@@ -30,6 +35,7 @@ fun LogInScreen(navController: NavController, viewModel: LogInViewModel = hiltVi
     val coroutineScope = viewModel.coroutineScope
     val processingCredentials = viewModel.processingCredentials
     val authenticationFailed = viewModel.authenticationFailed
+    val context = LocalContext.current
 
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
         if (processingCredentials.value) {
@@ -92,6 +98,21 @@ fun LogInScreen(navController: NavController, viewModel: LogInViewModel = hiltVi
                     },
                     modifier = Modifier.shadow(10.dp, shape = RoundedCornerShape(5.dp))
                 ) { Text(text = "Create an account") }
+                IconButton(
+                    onClick = {
+                        viewModel.authenticateWithGoogle(
+                            context = context,
+                            navController = navController,
+                            processingCredentialsBool = processingCredentials,
+                            authenticationFailedBool = authenticationFailed
+                        )
+                    }) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.google_logo),
+                        contentDescription = "Sign in with Google",
+                        tint = Color.Unspecified
+                    )
+                }
             }
         }
 
