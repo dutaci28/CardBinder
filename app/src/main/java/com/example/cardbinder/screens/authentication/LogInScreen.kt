@@ -1,4 +1,4 @@
-package com.example.cardbinder.screens.authentication.login
+package com.example.cardbinder.screens.authentication
 
 
 import androidx.compose.foundation.layout.Box
@@ -20,14 +20,11 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.cardbinder.R
-import com.example.cardbinder.screens.authentication.common.AuthTextField
-import com.example.cardbinder.screens.authentication.common.checkEmailValidity
-import com.example.cardbinder.screens.authentication.common.checkLoginInputsAndNavigateToMain
 import com.example.cardbinder.screens.navigation.Routes
 import com.example.cardbinder.screens.navigation.LoadingScreen
 
 @Composable
-fun LogInScreen(navController: NavController, viewModel: LogInViewModel = hiltViewModel()) {
+fun LogInScreen(navController: NavController, viewModel: AuthViewModel = hiltViewModel()) {
     val emailText = viewModel.emailText
     val passwordText = viewModel.passwordText
     val focusRequester = viewModel.focusRequester

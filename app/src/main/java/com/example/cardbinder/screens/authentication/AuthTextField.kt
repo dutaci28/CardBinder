@@ -1,4 +1,4 @@
-package com.example.cardbinder.screens.authentication.common
+package com.example.cardbinder.screens.authentication
 
 import android.util.Log
 import android.util.Patterns
@@ -157,40 +157,6 @@ fun checkLoginInputsAndNavigateToMain(
         authenticationFailedBool.value = true
         processingCredentialsBool.value = false
         Log.d("LOGIN FAILED", "Email or password invalid")
-    }
-}
-
-fun checkRegisterInputsAndNavigateToMain(
-    navController: NavController,
-    email: String,
-    password: String,
-    repeatedPassword: String,
-    auth: FirebaseAuth,
-    coroutineScope: CoroutineScope,
-    processingCredentialsBool: MutableState<Boolean>,
-    authenticationFailedBool: MutableState<Boolean>
-) {
-    processingCredentialsBool.value = true
-    authenticationFailedBool.value = false
-    if (checkEmailValidity(email) && checkPasswordValidity(password) && password == repeatedPassword)
-        coroutineScope.launch {
-            auth.createUserWithEmailAndPassword(email, password).addOnCompleteListener { task ->
-                if (task.isSuccessful) {
-                    navController.navigate(route = "search/" + false) {
-                        popUpTo(Routes.LogIn.route) {
-                            inclusive = true
-                        }
-                    }
-                } else {
-                    authenticationFailedBool.value = true
-                    processingCredentialsBool.value = false
-                    Log.d("REGISTER FAILED", task.exception?.message.toString())
-                }
-            }
-        } else {
-        authenticationFailedBool.value = true
-        processingCredentialsBool.value = false
-        Log.d("REGISTER FAILED", "Email or password invalid or passwords dont match")
     }
 }
 

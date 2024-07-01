@@ -1,4 +1,4 @@
-package com.example.cardbinder.screens.authentication.login
+package com.example.cardbinder.screens.authentication
 
 import android.content.Context
 import android.util.Log
@@ -15,14 +15,16 @@ import com.example.cardbinder.screens.navigation.Routes
 import com.google.android.libraries.identity.googleid.GetGoogleIdOption
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import com.google.firebase.Firebase
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.auth.auth
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class LogInViewModel @Inject constructor() : ViewModel() {
+class AuthViewModel @Inject constructor() : ViewModel() {
     val emailText = mutableStateOf("")
     val passwordText = mutableStateOf("")
     val focusRequester = FocusRequester()
@@ -30,6 +32,9 @@ class LogInViewModel @Inject constructor() : ViewModel() {
     val coroutineScope = viewModelScope
     val processingCredentials = mutableStateOf(false)
     val authenticationFailed = mutableStateOf(false)
+
+    val repeatPasswordText =  mutableStateOf("")
+    val focusRequester2 = FocusRequester()
 
     fun authenticateWithGoogle(
         context: Context,
@@ -73,4 +78,40 @@ class LogInViewModel @Inject constructor() : ViewModel() {
             }
         }
     }
+
+    fun checkRegisterInputsAndNavigateToMain(
+        navController: NavController,
+        email: String,
+        password: String,
+        repeatedPassword: String,
+        auth: FirebaseAuth,
+        coroutineScope: CoroutineScope,
+        processingCredentialsBool: MutableState<Boolean>,
+        authenticationFailedBool: MutableState<Boolean>
+    ) {
+        processingCredentialsBool.value = true
+        authenticationFailedBool.value = false
+        if (checkEmailValidity(email) && checkPasswordValidity(password) && password == repeatedPassword)
+            coroutineScope.launch {
+                auth.createUserWithEmailAndPassword(email, password).addOnCompleteListener { task ->
+                    if (task.isSuccessful) {
+                        navController.navigate(route = "search/" + false) {
+                            popUpTo(Routes.LogIn.route) {
+                                inclusive = true
+                            }
+                        }
+                    } else {
+                        authenticationFailedBool.value = true
+                        processingCredentialsBool.value = false
+                        Log.d("REGISTER FAILED", task.exception?.message.toString())
+                    }
+                }
+            } else {
+            authenticationFailedBool.value = true
+            processingCredentialsBool.value = false
+            Log.d("REGISTER FAILED", "Email or password invalid or passwords dont match")
+        }
+    }
+
+
 }

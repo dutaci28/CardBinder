@@ -29,8 +29,8 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import androidx.paging.compose.collectAsLazyPagingItems
-import com.example.cardbinder.screens.authentication.login.LogInScreen
-import com.example.cardbinder.screens.authentication.register.RegisterScreen
+import com.example.cardbinder.screens.authentication.LogInScreen
+import com.example.cardbinder.screens.authentication.RegisterScreen
 import com.example.cardbinder.screens.main.collection.CollectionScreen
 import com.example.cardbinder.screens.main.decks.DecksScreen
 import com.example.cardbinder.screens.main.individualCard.IndividualCardScreen

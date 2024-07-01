@@ -1,4 +1,4 @@
-package com.example.cardbinder.screens.authentication.register
+package com.example.cardbinder.screens.authentication
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -14,15 +14,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import com.example.cardbinder.screens.authentication.common.AuthTextField
-import com.example.cardbinder.screens.authentication.common.checkEmailValidity
-import com.example.cardbinder.screens.authentication.common.checkPasswordValidity
-import com.example.cardbinder.screens.authentication.common.checkRegisterInputsAndNavigateToMain
 import com.example.cardbinder.screens.navigation.LoadingScreen
 import com.example.cardbinder.screens.navigation.Routes
 
 @Composable
-fun RegisterScreen(navController: NavController, viewModel: RegisterViewModel = hiltViewModel()) {
+fun RegisterScreen(navController: NavController, viewModel: AuthViewModel = hiltViewModel()) {
     val emailText = viewModel.emailText
     val passwordText = viewModel.passwordText
     val repeatPasswordText = viewModel.repeatPasswordText
@@ -64,7 +60,7 @@ fun RegisterScreen(navController: NavController, viewModel: RegisterViewModel = 
                     hideCharacters = true,
                     focusRequester = focusRequester2,
                     onGo = {
-                        checkRegisterInputsAndNavigateToMain(
+                        viewModel.checkRegisterInputsAndNavigateToMain(
                             navController = navController,
                             email = emailText.value,
                             password = passwordText.value,
@@ -85,7 +81,7 @@ fun RegisterScreen(navController: NavController, viewModel: RegisterViewModel = 
                 }
                 Button(
                     onClick = {
-                        checkRegisterInputsAndNavigateToMain(
+                        viewModel.checkRegisterInputsAndNavigateToMain(
                             navController = navController,
                             email = emailText.value,
                             password = passwordText.value,
