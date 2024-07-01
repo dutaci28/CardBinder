@@ -34,6 +34,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.BlurredEdgeTreatment
@@ -93,7 +94,7 @@ fun SharedTransitionScope.CollectionScreen(
 
         onDispose { listenerRegistration.remove() }
     }
-    val collectionViewToggle = remember { mutableStateOf(false) }
+    val collectionViewToggle = rememberSaveable { mutableStateOf(false) }
 
     if (collectionCards.isEmpty())
         EmptyCollection(navController = navController)
