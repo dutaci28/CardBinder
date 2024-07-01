@@ -71,13 +71,13 @@ fun SharedTransitionScope.IndividualCardScreen(
     val auth = viewModel.auth
     val db = viewModel.db
     viewModel.getCardById(id = cardId)
-    var isAddSuccessful by remember{mutableStateOf(false)}
-    var isButtonDisabled by remember{mutableStateOf(false)}
+    var isAddSuccessful by remember { mutableStateOf(false) }
+    var isButtonDisabled by remember { mutableStateOf(false) }
+    val alpha = if (isButtonDisabled) 0.8f else 1f
     var card = viewModel.card
     var cardPrintingsList = viewModel.cardPrintingsList
     var rulingsList = viewModel.rulingsList
     val searchedCards = viewModel.searchedCards.collectAsLazyPagingItems().itemSnapshotList
-
 
     if (searchedCards.isNotEmpty()) {
         card = searchedCards[0]!!
@@ -95,16 +95,12 @@ fun SharedTransitionScope.IndividualCardScreen(
         }
     }
 
-
-    val alpha = if (isButtonDisabled) 0.8f else 1f
-
     Scaffold(
         topBar = { IndividualCardTopBar(navController) },
         floatingActionButton = {
             FloatingActionButton(
                 onClick = {
-                    if (isButtonDisabled) {
-                    } else {
+                    if (!isButtonDisabled) {
                         isButtonDisabled = true
                         if (auth.currentUser != null) {
                             if (card.name.isNotEmpty()) {
