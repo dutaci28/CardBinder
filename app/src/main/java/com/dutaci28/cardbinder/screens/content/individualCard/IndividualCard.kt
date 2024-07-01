@@ -5,6 +5,7 @@ import androidx.activity.ComponentActivity
 import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionScope
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -34,12 +35,14 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
@@ -404,6 +407,11 @@ fun SharedTransitionScope.MTGCardBigImage(
                 )
         )
         if (isCardFlippable.value) {
+            val rotateDegrees = remember { mutableFloatStateOf(0f) }
+            val angle = animateFloatAsState(
+                targetValue = rotateDegrees.floatValue ,
+                animationSpec = tween(durationMillis = 100)
+            )
             Box(
                 modifier = Modifier
                     .fillMaxSize()
@@ -412,7 +420,10 @@ fun SharedTransitionScope.MTGCardBigImage(
                 contentAlignment = Alignment.BottomEnd
             ) {
                 IconButton(
-                    onClick = { isCardFlipped.value = !isCardFlipped.value },
+                    onClick = {
+                        isCardFlipped.value = !isCardFlipped.value
+                        rotateDegrees.floatValue += 180f
+                    },
                     modifier = Modifier
                         .size(100.dp)
                         .background(color = Color.Gray.copy(alpha = 0.3f), shape = CircleShape)
@@ -420,7 +431,9 @@ fun SharedTransitionScope.MTGCardBigImage(
                     Icon(
                         imageVector = Icons.Default.Refresh,
                         contentDescription = "Refresh icon",
-                        modifier = Modifier.fillMaxSize(),
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .rotate(angle.value),
                         tint = Color.White.copy(alpha = 0.6f)
                     )
                 }
