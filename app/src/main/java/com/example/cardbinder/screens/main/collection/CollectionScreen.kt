@@ -5,6 +5,7 @@ import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -20,9 +21,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -109,7 +112,10 @@ fun SharedTransitionScope.CollectionScreen(
                         .padding(top = innerPadding.calculateTopPadding(), bottom = 140.dp)
                 ) {
                     if (collectionViewToggle.value) {
-                        CollectionCardList(collectionCards = collectionCards)
+                        CollectionCardList(
+                            collectionCards = collectionCards,
+                            navController = navController
+                        )
                     } else {
                         CardPager(
                             collectionCards = collectionCards,
@@ -155,21 +161,38 @@ fun EmptyCollection(navController: NavController) {
 }
 
 @Composable
-fun CollectionCardList(collectionCards: List<CardCollectionEntry>) {
+fun CollectionCardList(collectionCards: List<CardCollectionEntry>, navController: NavController) {
     Column(modifier = Modifier.fillMaxSize()) {
         collectionCards.forEach {
-            CollectionCardListItem(cardCollectionEntry = it)
+            CollectionCardListItem(cardCollectionEntry = it, navController = navController)
         }
     }
 }
 
 @Composable
-fun CollectionCardListItem(cardCollectionEntry: CardCollectionEntry) {
-    Row(Modifier.fillMaxWidth()) {
-        Text(text = cardCollectionEntry.amount.toString() + "x")
-        Text(text = cardCollectionEntry.card.name)
-        Text(text = "#" + cardCollectionEntry.card.collector_number, color = Color.Gray)
+fun CollectionCardListItem(cardCollectionEntry: CardCollectionEntry, navController: NavController) {
+    Surface(
+        shape = RoundedCornerShape(8.dp),
+        border = BorderStroke(1.dp, Color.Gray),
+        modifier = Modifier
+            .padding(horizontal = 20.dp, vertical = 5.dp)
+            .clickable {
+                navController.navigate(route = "individualCard/" + cardCollectionEntry.card.id)
+            }
+    ) {
+        Row(Modifier.fillMaxWidth()) {
+            Text(
+                text = cardCollectionEntry.amount.toString() + "x",
+                modifier = Modifier.padding(5.dp)
+            )
+            Text(text = cardCollectionEntry.card.name, modifier = Modifier.padding(5.dp))
+            Text(
+                text = "#" + cardCollectionEntry.card.collector_number,
+                color = Color.Gray,
+                modifier = Modifier.padding(5.dp)
+            )
 
+        }
     }
 }
 
