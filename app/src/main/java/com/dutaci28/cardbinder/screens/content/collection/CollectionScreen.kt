@@ -19,6 +19,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -140,10 +142,12 @@ fun CollectionCardList(
     navController: NavController,
     viewModel: CollectionViewModel
 ) {
-    Column(modifier = Modifier.fillMaxSize()) {
-        collectionCards.forEach {
+    LazyColumn(
+        modifier = Modifier.fillMaxSize()
+    ) {
+        items(items = collectionCards) { card ->
             CollectionCardListItem(
-                cardCollectionEntry = it,
+                cardCollectionEntry = card,
                 navController = navController,
                 viewModel = viewModel
             )
