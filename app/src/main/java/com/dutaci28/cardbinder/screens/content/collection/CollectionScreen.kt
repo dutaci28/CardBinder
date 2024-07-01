@@ -52,6 +52,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -181,7 +182,14 @@ fun CollectionCardListItem(
                 text = cardCollectionEntry.amount.toString() + "x",
                 modifier = Modifier.padding(5.dp)
             )
-            Text(text = cardCollectionEntry.card.name, modifier = Modifier.padding(5.dp))
+            Text(
+                text = cardCollectionEntry.card.name,
+                modifier = Modifier
+                    .padding(5.dp)
+                    .width(200.dp),
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
             Text(
                 text = "#" + cardCollectionEntry.card.collector_number,
                 color = Color.Gray,

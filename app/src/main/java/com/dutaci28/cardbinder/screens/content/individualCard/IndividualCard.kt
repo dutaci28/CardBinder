@@ -17,13 +17,16 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -51,7 +54,6 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.paging.compose.collectAsLazyPagingItems
 import coil.compose.AsyncImage
-import coil.request.ImageRequest
 import com.dutaci28.cardbinder.R
 import com.dutaci28.cardbinder.model.CardCollectionEntry
 import com.dutaci28.cardbinder.model.MTGCard
@@ -70,7 +72,7 @@ fun SharedTransitionScope.IndividualCardScreen(
 ) {
     val auth = viewModel.auth
     val db = viewModel.db
-    viewModel.getCardById(id = cardId)
+    viewModel.retrieveCardById(id = cardId)
     var isAddSuccessful by remember { mutableStateOf(false) }
     var isButtonDisabled by remember { mutableStateOf(false) }
     val alpha = if (isButtonDisabled) 0.8f else 1f
@@ -367,8 +369,19 @@ fun SharedTransitionScope.MTGCardBigImage(
     cardWidthDp: Dp,
     animatedVisibilityScope: AnimatedVisibilityScope
 ) {
-    val imageSource =
-        if (card.layout == "transform" || card.layout == "modal_dfc") card.faces[0].image_uris.png else card.image_uris.png
+    val isCardFlippable = remember { mutableStateOf(false) }
+    isCardFlippable.value = card.layout == "transform" || card.layout == "modal_dfc"
+    val isCardFlipped = remember { mutableStateOf(false) }
+    val imageUrl = remember { mutableStateOf(card.faces[0].image_uris.png) }
+    if (isCardFlippable.value) {
+        if (isCardFlipped.value)
+            imageUrl.value = card.faces[1].image_uris.png
+        else
+            imageUrl.value = card.faces[0].image_uris.png
+    } else {
+        imageUrl.value = card.image_uris.png
+    }
+
     Box(
         modifier = Modifier
             .width(cardWidthDp)
@@ -376,11 +389,7 @@ fun SharedTransitionScope.MTGCardBigImage(
         contentAlignment = Alignment.Center
     ) {
         AsyncImage(
-            model = ImageRequest.Builder(LocalContext.current)
-                .data(imageSource)
-                .placeholderMemoryCacheKey("image${card.id}") //  same key as shared element key
-                .memoryCacheKey("image${card.id}") // same key as shared element key
-                .build(),
+            model = imageUrl.value,
             contentDescription = "Card Image",
             contentScale = ContentScale.Fit,
             modifier = Modifier
@@ -394,5 +403,28 @@ fun SharedTransitionScope.MTGCardBigImage(
                     }
                 )
         )
+        if (isCardFlippable.value) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Color.Unspecified)
+                    .padding(20.dp),
+                contentAlignment = Alignment.BottomEnd
+            ) {
+                IconButton(
+                    onClick = { isCardFlipped.value = !isCardFlipped.value },
+                    modifier = Modifier
+                        .size(100.dp)
+                        .background(color = Color.Gray.copy(alpha = 0.3f), shape = CircleShape)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Refresh,
+                        contentDescription = "Refresh icon",
+                        modifier = Modifier.fillMaxSize(),
+                        tint = Color.White.copy(alpha = 0.6f)
+                    )
+                }
+            }
+        }
     }
 }

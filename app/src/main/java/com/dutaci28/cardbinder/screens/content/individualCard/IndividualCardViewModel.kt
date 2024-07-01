@@ -30,7 +30,7 @@ class IndividualCardViewModel @Inject constructor(repository: Repository) : View
     var cardPrintingsList: List<MTGCard> = listOf()
     var rulingsList: List<Ruling> = listOf()
 
-    fun getCardById(id: String) {
+    fun retrieveCardById(id: String) {
         viewModelScope.launch {
             repo.getCardById(id).cachedIn(viewModelScope).collect {
                 _searchedCards.value = it
