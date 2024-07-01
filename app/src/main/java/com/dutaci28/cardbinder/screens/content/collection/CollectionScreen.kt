@@ -256,7 +256,11 @@ fun SharedTransitionScope.CardPager(
             targetValue = if (pageOffset != 0.0f) 0.9f else 1f,
             animationSpec = tween(100)
         )
-        val imageRotation by animateFloatAsState(
+        val rotationYAxisAngle by animateFloatAsState(
+            targetValue = if (pageOffset > 0.1f) 50f else if (pageOffset < -0.1f) -50f else 0f,
+            animationSpec = tween(500)
+        )
+        val rotationAngle by animateFloatAsState(
             targetValue = if (pageOffset > 0.1f) -3f else if (pageOffset < -0.1f) 3f else 0f,
             animationSpec = tween(300)
         )
@@ -308,7 +312,10 @@ fun SharedTransitionScope.CardPager(
                             tween(durationMillis = 300)
                         }
                     )
-                    .rotate(imageRotation)
+                    .graphicsLayer {
+                        rotationY = rotationYAxisAngle * pageOffset
+                        cameraDistance = 12f * density
+                    }.rotate(rotationAngle)
             )
         }
     }
