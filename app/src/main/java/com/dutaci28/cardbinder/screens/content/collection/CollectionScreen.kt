@@ -42,6 +42,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.BlurredEdgeTreatment
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.blur
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.graphics.graphicsLayer
@@ -244,8 +245,12 @@ fun SharedTransitionScope.CardPager(
         val pageOffset =
             pagerState.currentPage - index + pagerState.currentPageOffsetFraction
         val imageSizeScale by animateFloatAsState(
-            targetValue = if (pageOffset != 0.0f) 0.75f else 1f,
-            animationSpec = tween(300)
+            targetValue = if (pageOffset != 0.0f) 0.9f else 1f,
+            animationSpec = tween(100)
+        )
+        val imageRotation by animateFloatAsState(
+            targetValue = if (pageOffset > 0.1f) -3f else if (pageOffset < -0.1f) 3f else 0f,
+            animationSpec = tween(500)
         )
         val imageSource =
             if (collectionCards[index].card.layout == "transform" || collectionCards[index].card.layout == "modal_dfc")
@@ -295,6 +300,7 @@ fun SharedTransitionScope.CardPager(
                             tween(durationMillis = 300)
                         }
                     )
+                    .rotate(imageRotation)
             )
         }
     }
