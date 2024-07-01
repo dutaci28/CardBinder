@@ -1,5 +1,9 @@
 package com.dutaci28.cardbinder.screens.navigation
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Icon
@@ -21,7 +25,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import com.dutaci28.cardbinder.R
 
 @Composable
-fun BottomNavBar(navController: NavHostController) {
+fun BottomNavBar(showBottomBar: Boolean, navController: NavHostController) {
     val screens = listOf(
         Routes.Collection,
         Routes.Search,
@@ -29,20 +33,26 @@ fun BottomNavBar(navController: NavHostController) {
     )
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry?.destination
-    NavigationBar(
-        modifier = Modifier
-            .graphicsLayer {
-                shadowElevation = 50.dp.toPx()
-            }
-            .padding(top = 10.dp),
-        containerColor = Color.White.copy(alpha = 0.9f)
+    AnimatedVisibility(
+        visible = showBottomBar,
+        enter = slideInVertically(initialOffsetY = { it }, animationSpec = tween(300)),
+        exit = slideOutVertically(targetOffsetY = { it }, animationSpec = tween(300))
     ) {
-        screens.forEach { screen ->
-            NavItem(
-                screen = screen,
-                currentDestination = currentDestination,
-                navController = navController
-            )
+        NavigationBar(
+            modifier = Modifier
+                .graphicsLayer {
+                    shadowElevation = 50.dp.toPx()
+                }
+                .padding(top = 10.dp),
+            containerColor = Color.White.copy(alpha = 0.9f)
+        ) {
+            screens.forEach { screen ->
+                NavItem(
+                    screen = screen,
+                    currentDestination = currentDestination,
+                    navController = navController
+                )
+            }
         }
     }
 }

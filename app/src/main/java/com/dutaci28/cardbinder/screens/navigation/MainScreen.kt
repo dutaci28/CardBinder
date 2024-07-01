@@ -10,13 +10,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
@@ -37,18 +32,16 @@ import com.dutaci28.cardbinder.screens.content.individualCard.IndividualCardScre
 import com.dutaci28.cardbinder.screens.content.search.SearchScreen
 import com.dutaci28.cardbinder.util.Constants.Companion.NAV_ARGUMENT_CARD_ID
 import com.dutaci28.cardbinder.util.Constants.Companion.NAV_ARGUMENT_SHOULD_FOCUS_SEARCH
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.ktx.auth
-import com.google.firebase.ktx.Firebase
 
 @OptIn(ExperimentalSharedTransitionApi::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun MainScreen(window: Window, mainScreenViewModel: MainScreenViewModel = hiltViewModel()) {
+fun MainScreen(window: Window, viewModel: MainScreenViewModel = hiltViewModel()) {
     val navController = rememberNavController()
-    var showBottomBar by rememberSaveable { mutableStateOf(true) }
     val navBackStackEntry by navController.currentBackStackEntryAsState()
-    val getRandomCard = mainScreenViewModel.getRandomCard.collectAsLazyPagingItems()
+    val getRandomCard = viewModel.getRandomCard.collectAsLazyPagingItems()
+    var showBottomBar = viewModel.showBottomBar
+    val startRoute = viewModel.startRoute
 
     showBottomBar = when (navBackStackEntry?.destination?.route) {
         Routes.LoadingScreen.route -> false
@@ -58,23 +51,8 @@ fun MainScreen(window: Window, mainScreenViewModel: MainScreenViewModel = hiltVi
         else -> true
     }
 
-    val auth = Firebase.auth
-    var startRoute by remember { mutableStateOf(Routes.LoadingScreen.route) }
-    DisposableEffect(auth) {
-        val listener = FirebaseAuth.AuthStateListener { authState ->
-            val userLoggedIn = authState.currentUser != null
-            startRoute = if (!userLoggedIn)
-                Routes.LogIn.route
-            else
-                "search/" + false
-
-        }
-        auth.addAuthStateListener(listener)
-        onDispose { auth.removeAuthStateListener(listener) }
-    }
-
     UpdateStatusBarColor(color = Color.Black, window = window)
-    Scaffold(bottomBar = { if (showBottomBar) BottomNavBar(navController = navController) }) {
+    Scaffold(bottomBar = { BottomNavBar(showBottomBar = showBottomBar,navController = navController) }) {
         Box(
             modifier = Modifier
                 .fillMaxSize()

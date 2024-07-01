@@ -250,7 +250,7 @@ fun SharedTransitionScope.CardPager(
         )
         val imageRotation by animateFloatAsState(
             targetValue = if (pageOffset > 0.1f) -3f else if (pageOffset < -0.1f) 3f else 0f,
-            animationSpec = tween(500)
+            animationSpec = tween(300)
         )
         val imageSource =
             if (collectionCards[index].card.layout == "transform" || collectionCards[index].card.layout == "modal_dfc")
