@@ -63,6 +63,7 @@ import coil.request.ImageRequest
 import com.dutaci28.cardbinder.R
 import com.dutaci28.cardbinder.model.CardCollectionEntry
 import com.dutaci28.cardbinder.screens.navigation.LoadingScreen
+import com.dutaci28.cardbinder.screens.navigation.Routes
 import kotlin.math.absoluteValue
 
 @OptIn(ExperimentalSharedTransitionApi::class)
@@ -125,7 +126,7 @@ fun EmptyCollection(navController: NavController) {
                 ),
             )
             IconButton(
-                onClick = { navController.navigate(route = "search/" + true) },
+                onClick = { navController.navigate(route = Routes.Search.selectedRoute) },
                 modifier = Modifier.padding(top = 10.dp)
             )
             {
@@ -321,12 +322,13 @@ fun SharedTransitionScope.CardPager(
                     }
                     .rotate(rotationAngle)
             )
-            when(painter.state){
+            when (painter.state) {
                 AsyncImagePainter.State.Empty -> {}
                 is AsyncImagePainter.State.Error -> {}
                 is AsyncImagePainter.State.Loading -> {
                     LoadingScreen()
                 }
+
                 is AsyncImagePainter.State.Success -> {}
             }
         }
@@ -376,7 +378,7 @@ fun CollectionScreenTopBar(
             .background(Color.White)
     ) {
         IconButton(
-            onClick = { navController.navigate(route = "search/" + true) },
+            onClick = { navController.navigate(route = Routes.Search.selectedRoute) },
             modifier = Modifier.padding(10.dp)
         )
         {

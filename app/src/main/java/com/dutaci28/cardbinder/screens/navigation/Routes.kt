@@ -5,21 +5,20 @@ import com.dutaci28.cardbinder.util.Constants.Companion.NAV_ARGUMENT_SHOULD_FOCU
 
 sealed class Routes(
     val route: String,
-    val title: String
+    val defaultRoute:String = "",
+    val selectedRoute:String = "",
+    val title: String = ""
 ) {
     data object LoadingScreen : Routes(
-        route = "splashScreen",
-        title = "SplashScreen"
+        route = "splashScreen"
     )
 
     data object LogIn : Routes(
-        route = "login",
-        title = "LogIn"
+        route = "login"
     )
 
     data object Register : Routes(
-        route = "register",
-        title = "Register"
+        route = "register"
     )
 
     data object Collection : Routes(
@@ -29,6 +28,8 @@ sealed class Routes(
 
     data object Search : Routes(
         route = "search/{$NAV_ARGUMENT_SHOULD_FOCUS_SEARCH}",
+        defaultRoute = "search/false",
+        selectedRoute = "search/true",
         title = "Search"
     )
 
@@ -38,7 +39,6 @@ sealed class Routes(
     )
 
     data object IndividualCard : Routes(
-        route = "individualCard/{$NAV_ARGUMENT_CARD_ID}",
-        title = "IndividualCard"
+        route = "individualCard/{$NAV_ARGUMENT_CARD_ID}"
     )
 }

@@ -24,22 +24,23 @@ import javax.inject.Inject
 
 @HiltViewModel
 class AuthViewModel @Inject constructor() : ViewModel() {
-    val email = mutableStateOf("")
-    val password = mutableStateOf("")
-    val focusRequester = FocusRequester()
     val auth = Firebase.auth
     val coroutineScope = viewModelScope
+
+    val email = mutableStateOf("")
+    val password = mutableStateOf("")
+    val repeatPassword = mutableStateOf("")
     val isProcessingCredentials = mutableStateOf(false)
     val isAuthenticationFailed = mutableStateOf(false)
 
-    val repeatPassword = mutableStateOf("")
+    val focusRequester = FocusRequester()
     val focusRequester2 = FocusRequester()
 
     fun authenticateWithGoogle(
         context: Context,
         navController: NavController,
-        processingCredentialsBool: MutableState<Boolean>,
-        authenticationFailedBool: MutableState<Boolean>
+        isProcessingCredentials: MutableState<Boolean>,
+        isAuthenticationFailed: MutableState<Boolean>
     ) {
         //TODO ADD NONCE
         val credentialManager = CredentialManager.create(context)
@@ -58,20 +59,20 @@ class AuthViewModel @Inject constructor() : ViewModel() {
                 val firebaseCredential = GoogleAuthProvider.getCredential(googleIdToken, null)
                 auth.signInWithCredential(firebaseCredential).addOnCompleteListener { task ->
                     if (task.isSuccessful) {
-                        navController.navigate(route = "search/" + false) {
+                        navController.navigate(route = Routes.Search.defaultRoute) {
                             popUpTo(Routes.LogIn.route) {
                                 inclusive = true
                             }
                         }
                     } else {
-                        authenticationFailedBool.value = true
-                        processingCredentialsBool.value = false
+                        isAuthenticationFailed.value = true
+                        isProcessingCredentials.value = false
                         Log.d("LOGIN FAILED", task.exception?.message.toString())
                     }
                 }
             } catch (e: Exception) {
-                authenticationFailedBool.value = true
-                processingCredentialsBool.value = false
+                isAuthenticationFailed.value = true
+                isProcessingCredentials.value = false
                 Log.d("LOGIN FAILED", e.message.toString())
                 e.printStackTrace()
             }
@@ -82,18 +83,18 @@ class AuthViewModel @Inject constructor() : ViewModel() {
         navController: NavController,
         email: String,
         password: String,
-        repeatedPassword: String,
+        passwordRepeated: String,
         auth: FirebaseAuth,
         isProcessingCredentials: MutableState<Boolean>,
         isAuthenticationFailed: MutableState<Boolean>
     ) {
         isProcessingCredentials.value = true
         isAuthenticationFailed.value = false
-        if (checkEmailValidity(email) && checkPasswordValidity(password) && password == repeatedPassword)
+        if (checkEmailValidity(email) && checkPasswordValidity(password) && password == passwordRepeated)
             viewModelScope.launch {
                 auth.createUserWithEmailAndPassword(email, password).addOnCompleteListener { task ->
                     if (task.isSuccessful) {
-                        navController.navigate(route = "search/" + false) {
+                        navController.navigate(route = Routes.Search.defaultRoute) {
                             popUpTo(Routes.LogIn.route) {
                                 inclusive = true
                             }
@@ -107,7 +108,7 @@ class AuthViewModel @Inject constructor() : ViewModel() {
             } else {
             isAuthenticationFailed.value = true
             isProcessingCredentials.value = false
-            Log.d("REGISTER FAILED", "Email or password invalid or passwords dont match")
+            Log.d("REGISTER FAILED", "Email or password invalid or passwords don't match")
         }
     }
 }

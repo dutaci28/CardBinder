@@ -12,6 +12,9 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
@@ -63,8 +66,9 @@ fun RowScope.NavItem(
     currentDestination: NavDestination?,
     navController: NavHostController
 ) {
-    val selected = currentDestination?.hierarchy?.any { it.route == screen.route } == true
-    val iconTint = if (!selected) Color.Gray else Color.Black
+    var selected by remember { mutableStateOf(false) }
+    selected = currentDestination?.hierarchy?.any { it.route == screen.route } == true
+    val iconTint = if (!selected) Color.Gray.copy(alpha = 0.6f) else Color.Black
     NavigationBarItem(
         label = {
             if (selected) {
@@ -99,16 +103,16 @@ fun RowScope.NavItem(
             }
 
         },
-        selected = currentDestination?.hierarchy?.any { it.route == screen.route } == true,
+        selected = selected,
         onClick = {
             if (screen.route == Routes.Search.route)
-                navController.navigate(route = "search/" + false) {
-                    popUpTo(route = "search/" + false)
+                navController.navigate(route = Routes.Search.defaultRoute) {
+                    popUpTo(route = Routes.Search.defaultRoute)
                     launchSingleTop = true
                 }
             else
                 navController.navigate(screen.route) {
-                    popUpTo(route = "search/" + false)
+                    popUpTo(route = Routes.Search.defaultRoute)
                     launchSingleTop = true
                 }
         }

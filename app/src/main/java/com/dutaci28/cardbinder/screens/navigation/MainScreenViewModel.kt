@@ -23,7 +23,7 @@ class MainScreenViewModel @Inject constructor(
     val getRandomCard = repo.getRandomCard()
     var startRoute by mutableStateOf(Routes.LoadingScreen.route)
     var showBottomBar by mutableStateOf(true)
-    lateinit var listener: AuthStateListener
+    private lateinit var listener: AuthStateListener
 
     init {
         authStateListener()
@@ -35,8 +35,7 @@ class MainScreenViewModel @Inject constructor(
             startRoute = if (!userLoggedIn)
                 Routes.LogIn.route
             else
-                "search/" + false
-
+                Routes.Search.defaultRoute
         }
         auth.addAuthStateListener(listener)
     }
@@ -46,5 +45,4 @@ class MainScreenViewModel @Inject constructor(
         auth.removeAuthStateListener(listener)
         viewModelScope.cancel()
     }
-
 }

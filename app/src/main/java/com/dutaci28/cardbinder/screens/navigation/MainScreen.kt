@@ -52,7 +52,10 @@ fun MainScreen(window: Window, viewModel: MainScreenViewModel = hiltViewModel())
     }
 
     UpdateStatusBarColor(color = Color.Black, window = window)
-    Scaffold(bottomBar = { BottomNavBar(showBottomBar = showBottomBar,navController = navController) }) {
+
+    Scaffold(bottomBar = {
+        BottomNavBar(showBottomBar = showBottomBar, navController = navController)
+    }) {
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -60,10 +63,7 @@ fun MainScreen(window: Window, viewModel: MainScreenViewModel = hiltViewModel())
                 .background(Color.White)
         ) {
             SharedTransitionLayout {
-                NavHost(
-                    navController = navController,
-                    startDestination = startRoute
-                ) {
+                NavHost(navController = navController, startDestination = startRoute) {
                     composable(route = Routes.LoadingScreen.route) {
                         LoadingScreen()
                     }
@@ -114,9 +114,5 @@ fun MainScreen(window: Window, viewModel: MainScreenViewModel = hiltViewModel())
 @Composable
 fun UpdateStatusBarColor(color: Color, window: Window) {
     val view = LocalView.current
-    SideEffect {
-        view.context.apply {
-            window.statusBarColor = color.toArgb()
-        }
-    }
+    SideEffect { view.context.apply { window.statusBarColor = color.toArgb() } }
 }

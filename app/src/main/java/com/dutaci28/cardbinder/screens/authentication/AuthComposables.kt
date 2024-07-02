@@ -62,7 +62,7 @@ fun RegisterButton(
                 navController = navController,
                 email = email.value,
                 password = password.value,
-                repeatedPassword = repeatPasswordText.value,
+                passwordRepeated = repeatPasswordText.value,
                 auth = auth,
                 isProcessingCredentials = isProcessingCredentials,
                 isAuthenticationFailed = isAuthenticationFailed
@@ -145,8 +145,8 @@ fun SignInWithGoogleButton(
             viewModel.authenticateWithGoogle(
                 context = context,
                 navController = navController,
-                processingCredentialsBool = isProcessingCredentials,
-                authenticationFailedBool = isAuthenticationFailed
+                isProcessingCredentials = isProcessingCredentials,
+                isAuthenticationFailed = isAuthenticationFailed
             )
         },
         colors = ButtonColors(
@@ -279,7 +279,7 @@ fun checkLoginInputsAndNavigateToMain(
         coroutineScope.launch {
             auth.signInWithEmailAndPassword(email, password).addOnCompleteListener { task ->
                 if (task.isSuccessful) {
-                    navController.navigate(route = "search/" + false) {
+                    navController.navigate(Routes.Search.defaultRoute) {
                         popUpTo(Routes.LogIn.route) {
                             inclusive = true
                         }
