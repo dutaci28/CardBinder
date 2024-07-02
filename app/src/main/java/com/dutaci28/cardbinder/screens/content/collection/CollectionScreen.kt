@@ -61,6 +61,7 @@ import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.dutaci28.cardbinder.R
 import com.dutaci28.cardbinder.model.CardCollectionEntry
+import kotlin.math.absoluteValue
 
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
@@ -254,15 +255,15 @@ fun SharedTransitionScope.CardPager(
             pagerState.currentPage - index + pagerState.currentPageOffsetFraction
         val imageSizeScale by animateFloatAsState(
             targetValue = if (pageOffset != 0.0f) 0.9f else 1f,
-            animationSpec = tween(100)
+            animationSpec = tween(300)
         )
         val rotationYAxisAngle by animateFloatAsState(
-            targetValue = if (pageOffset > 0.1f) 50f else if (pageOffset < -0.1f) -50f else 0f,
-            animationSpec = tween(500)
+            targetValue = if (pageOffset > 0.01f) 70f else if (pageOffset < -0.01f) -70f else 0f,
+            animationSpec = tween(300)
         )
         val rotationAngle by animateFloatAsState(
-            targetValue = if (pageOffset > 0.1f) -3f else if (pageOffset < -0.1f) 3f else 0f,
-            animationSpec = tween(300)
+            targetValue = if (pageOffset > 0.01f) -3f else if (pageOffset < -0.01f) 3f else 0f,
+            animationSpec = tween(100)
         )
         val imageSource =
             if (collectionCards[index].card.layout == "transform" || collectionCards[index].card.layout == "modal_dfc")
@@ -313,7 +314,7 @@ fun SharedTransitionScope.CardPager(
                         }
                     )
                     .graphicsLayer {
-                        rotationY = rotationYAxisAngle * pageOffset
+                        rotationY = rotationYAxisAngle * pageOffset.absoluteValue
                         cameraDistance = 12f * density
                     }.rotate(rotationAngle)
             )

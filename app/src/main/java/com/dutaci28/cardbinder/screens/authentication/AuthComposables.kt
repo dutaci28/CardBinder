@@ -172,7 +172,7 @@ fun SignInWithGoogleButton(
 @Composable
 fun AuthFailedText(authenticationFailedBool: MutableState<Boolean>) {
     if (authenticationFailedBool.value) {
-        Text(text = "Authentication failed", color = Color.Red)
+        Text(text = "Authentication failed, try again.", color = Color.Red)
     }
 }
 
