@@ -55,9 +55,8 @@ fun SharedTransitionScope.RandomCardWithBackground(
 ) {
     val randomMTGCardItems by remember { mutableStateOf(randomCard) }
     Surface(modifier = Modifier.fillMaxSize()) {
-        val displayCard: MTGCard
         if (randomMTGCardItems.itemCount != 0) {
-            displayCard = randomMTGCardItems.itemSnapshotList[0]!!
+            val displayCard = randomMTGCardItems.itemSnapshotList[0]!!
             SingleRandomCard(
                 navController = navController,
                 card = displayCard,
