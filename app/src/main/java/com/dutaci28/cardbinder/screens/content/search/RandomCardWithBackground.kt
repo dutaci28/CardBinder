@@ -40,9 +40,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.paging.compose.LazyPagingItems
+import coil.compose.AsyncImagePainter
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.dutaci28.cardbinder.model.MTGCard
+import com.dutaci28.cardbinder.screens.navigation.LoadingScreen
 
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
@@ -150,6 +152,14 @@ fun SharedTransitionScope.SingleRandomCard(
                         }
                     )
             )
+            when(painter.state){
+                AsyncImagePainter.State.Empty -> {}
+                is AsyncImagePainter.State.Error -> {}
+                is AsyncImagePainter.State.Loading -> {
+                    LoadingScreen()
+                }
+                is AsyncImagePainter.State.Success -> {}
+            }
         }
     }
 }

@@ -29,7 +29,7 @@ fun LoadingScreen() {
         contentAlignment = Alignment.Center
     ) {
         RotatingImage(
-            imageResId = R.drawable.tsp_96_basal_sliver,
+            imageResId = R.drawable.mir_205_afiya_grove,
             modifier = Modifier.size(64.dp)
         )
     }

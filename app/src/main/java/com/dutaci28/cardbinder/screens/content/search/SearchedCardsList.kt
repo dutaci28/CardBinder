@@ -5,6 +5,7 @@ import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.height
@@ -25,9 +26,11 @@ import androidx.navigation.NavController
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.itemContentType
 import androidx.paging.compose.itemKey
-import coil.compose.AsyncImage
+import coil.compose.AsyncImagePainter
+import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.dutaci28.cardbinder.model.MTGCard
+import com.dutaci28.cardbinder.screens.navigation.LoadingScreen
 
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
@@ -92,7 +95,6 @@ fun SharedTransitionScope.MTGCardItem(
     paddingModifier: Modifier,
     animatedVisibilityScope: AnimatedVisibilityScope
 ) {
-    //TODO DE MODIFICAT INCAT SA AFISEZE SI SPATELE CARTILOR CU DOUA FETE
     val imageSource =
         if (mtgCard.layout == "transform" || mtgCard.layout == "modal_dfc") mtgCard.faces[0].image_uris.png else mtgCard.image_uris.png
 
@@ -106,13 +108,16 @@ fun SharedTransitionScope.MTGCardItem(
             .width(200.dp),
         contentAlignment = Alignment.Center
     ) {
-        AsyncImage(
-            model = ImageRequest.Builder(LocalContext.current)
-                .data(imageSource)
-                .crossfade(200)
-                .placeholderMemoryCacheKey("image${mtgCard.id}") //  same key as shared element key
-                .memoryCacheKey("image${mtgCard.id}") // same key as shared element key
-                .build(),
+        val painter =
+            rememberAsyncImagePainter(
+                ImageRequest.Builder(LocalContext.current).data(
+                    data = imageSource
+                ).apply(block = fun ImageRequest.Builder.() {
+                    crossfade(true)
+                }).build()
+            )
+        Image(
+            painter = painter,
             contentDescription = "Card Image",
             contentScale = ContentScale.Fit,
             modifier = Modifier
@@ -125,5 +130,13 @@ fun SharedTransitionScope.MTGCardItem(
                     }
                 )
         )
+        when(painter.state){
+            AsyncImagePainter.State.Empty -> {}
+            is AsyncImagePainter.State.Error -> {}
+            is AsyncImagePainter.State.Loading -> {
+                LoadingScreen()
+            }
+            is AsyncImagePainter.State.Success -> {}
+        }
     }
 }

@@ -57,10 +57,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import coil.compose.AsyncImagePainter
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.dutaci28.cardbinder.R
 import com.dutaci28.cardbinder.model.CardCollectionEntry
+import com.dutaci28.cardbinder.screens.navigation.LoadingScreen
 import kotlin.math.absoluteValue
 
 @OptIn(ExperimentalSharedTransitionApi::class)
@@ -254,16 +256,16 @@ fun SharedTransitionScope.CardPager(
         val pageOffset =
             pagerState.currentPage - index + pagerState.currentPageOffsetFraction
         val imageSizeScale by animateFloatAsState(
-            targetValue = if (pageOffset != 0.0f) 0.9f else 1f,
+            targetValue = if (pageOffset != 0.0f) 1.1f else 1f,
             animationSpec = tween(300)
         )
         val rotationYAxisAngle by animateFloatAsState(
-            targetValue = if (pageOffset > 0.01f) 70f else if (pageOffset < -0.01f) -70f else 0f,
+            targetValue = if (pageOffset > 0.01f) -100f else if (pageOffset < -0.01f) 100f else 0f,
             animationSpec = tween(300)
         )
         val rotationAngle by animateFloatAsState(
             targetValue = if (pageOffset > 0.01f) -3f else if (pageOffset < -0.01f) 3f else 0f,
-            animationSpec = tween(100)
+            animationSpec = tween(500)
         )
         val imageSource =
             if (collectionCards[index].card.layout == "transform" || collectionCards[index].card.layout == "modal_dfc")
@@ -316,8 +318,17 @@ fun SharedTransitionScope.CardPager(
                     .graphicsLayer {
                         rotationY = rotationYAxisAngle * pageOffset.absoluteValue
                         cameraDistance = 12f * density
-                    }.rotate(rotationAngle)
+                    }
+                    .rotate(rotationAngle)
             )
+            when(painter.state){
+                AsyncImagePainter.State.Empty -> {}
+                is AsyncImagePainter.State.Error -> {}
+                is AsyncImagePainter.State.Loading -> {
+                    LoadingScreen()
+                }
+                is AsyncImagePainter.State.Success -> {}
+            }
         }
     }
     Row(
