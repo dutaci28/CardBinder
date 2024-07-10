@@ -68,22 +68,23 @@ class CollectionViewModel @Inject constructor() : ViewModel() {
         viewModelScope.cancel()
     }
 
-    fun deleteCardFromCollection(id: String) {
+    fun deleteCardFromCollection(id: String, onSuccess: () -> Unit = {}) {
         val query = itemsCollection.whereEqualTo("card.id", id)
         query.get().addOnSuccessListener {
             for (document in it) {
                 val documentRef = document.reference
-                deleteDocument(documentRef)
+                deleteDocument(documentRef, onSuccess)
             }
         }.addOnFailureListener { exception ->
             Log.w("CARDS", "Error getting documents: ", exception)
         }
     }
 
-    fun deleteDocument(documentRef: DocumentReference) {
+    private fun deleteDocument(documentRef: DocumentReference, onSuccess: () -> Unit = {}) {
         documentRef.delete()
             .addOnSuccessListener {
                 Log.d("CARDS", "Document successfully deleted!")
+                onSuccess()
             }
             .addOnFailureListener { e ->
                 Log.w("CARDS", "Error deleting document", e)

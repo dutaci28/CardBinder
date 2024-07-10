@@ -23,18 +23,22 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -51,10 +55,13 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.DialogProperties
+import androidx.core.text.isDigitsOnly
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.paging.compose.collectAsLazyPagingItems
@@ -64,6 +71,7 @@ import com.dutaci28.cardbinder.model.CardCollectionEntry
 import com.dutaci28.cardbinder.model.MTGCard
 import com.dutaci28.cardbinder.model.Ruling
 import com.dutaci28.cardbinder.screens.navigation.Routes
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.firestore.FirebaseFirestore
 
@@ -78,9 +86,8 @@ fun SharedTransitionScope.IndividualCardScreen(
     val auth = viewModel.auth
     val db = viewModel.db
     viewModel.retrieveCardById(id = cardId)
-    var isAddSuccessful by remember { mutableStateOf(false) }
-    var isButtonDisabled by remember { mutableStateOf(false) }
-    val alpha = if (isButtonDisabled) 0.8f else 1f
+    val isShowDialog = remember { mutableStateOf(false) }
+    val alpha = if (isShowDialog.value) 0.8f else 1f
     var card = viewModel.card
     var cardPrintingsList = viewModel.cardPrintingsList
     var rulingsList = viewModel.rulingsList
@@ -107,78 +114,146 @@ fun SharedTransitionScope.IndividualCardScreen(
         floatingActionButton = {
             FloatingActionButton(
                 onClick = {
-                    if (!isButtonDisabled) {
-                        isButtonDisabled = true
-                        if (auth.currentUser != null) {
-                            if (card.name.isNotEmpty()) {
-                                addItemToCurrentUserCollection(
-                                    currentUser = auth.currentUser!!,
-                                    db = db,
-                                    cardCollectionEntry = CardCollectionEntry(card, 1),
-                                    onSuccessListener = { isAddSuccessful = true }
-                                )
-                            } else {
-                                Log.d("CARDS", "Tried to add empty card to DB")
-                            }
-                        } else {
-                            navController.navigate(Routes.LogIn.route) {
-                                popUpTo(Routes.LogIn.route) {
-                                    inclusive = true
-                                }
-                            }
-                        }
+                    if (!isShowDialog.value) {
+                        isShowDialog.value = true
                     }
                 },
                 modifier = Modifier.alpha(alpha)
             ) {
-                if (isAddSuccessful) Icon(
-                    imageVector = Icons.Default.Check,
-                    contentDescription = "Add"
-                ) else Icon(imageVector = Icons.Default.Add, contentDescription = "Add")
+                Icon(imageVector = Icons.Default.Add, contentDescription = "Add")
             }
         },
         content = { innerPadding ->
-            val scrollState = rememberScrollState()
-            Column(
-                modifier = Modifier
-                    .padding(
-                        top = innerPadding.calculateTopPadding(),
-                        bottom = innerPadding.calculateBottomPadding()
+            Box(modifier = Modifier.fillMaxSize()) {
+                val scrollState = rememberScrollState()
+                Column(
+                    modifier = Modifier
+                        .padding(
+                            top = innerPadding.calculateTopPadding(),
+                            bottom = innerPadding.calculateBottomPadding()
+                        )
+                        .verticalScroll(scrollState)
+                        .background(Color.White)
+                ) {
+                    MTGCardBigImage(
+                        card = card,
+                        cardWidthDp = calculateMaxWidth(),
+                        animatedVisibilityScope = animatedVisibilityScope
                     )
-                    .verticalScroll(scrollState)
-                    .background(Color.White)
-            ) {
-                MTGCardBigImage(
-                    card = card,
-                    cardWidthDp = calculateMaxWidth(),
-                    animatedVisibilityScope = animatedVisibilityScope
-                )
-                Text(
-                    text = "Illustrated by ${card.artist}",
-                    fontSize = 10.sp,
-                    color = Color.Gray.copy(alpha = 0.8f),
-                    modifier = Modifier.padding(horizontal = 10.dp)
-                )
-                Text(
-                    text = card.name,
-                    fontSize = 32.sp,
-                    fontWeight = FontWeight.SemiBold,
-                    modifier = Modifier.padding(horizontal = 20.dp)
-                )
-                Text(
-                    text = card.set_name + " #" + card.collector_number,
-                    fontSize = 16.sp,
-                    color = Color.Gray, modifier = Modifier.padding(horizontal = 20.dp)
-                )
-                LegalitiesBox(card = card)
-                CardPrintingsBox(
-                    navController = navController,
-                    printingsList = cardPrintingsList,
-                    currentCard = card
-                )
-                RulingsBox(rulingsList = rulingsList)
+                    Text(
+                        text = "Illustrated by ${card.artist}",
+                        fontSize = 10.sp,
+                        color = Color.Gray.copy(alpha = 0.8f),
+                        modifier = Modifier.padding(horizontal = 10.dp)
+                    )
+                    Text(
+                        text = card.name,
+                        fontSize = 32.sp,
+                        fontWeight = FontWeight.SemiBold,
+                        modifier = Modifier.padding(horizontal = 20.dp)
+                    )
+                    Text(
+                        text = card.set_name + " #" + card.collector_number,
+                        fontSize = 16.sp,
+                        color = Color.Gray, modifier = Modifier.padding(horizontal = 20.dp)
+                    )
+                    LegalitiesBox(card = card)
+                    CardPrintingsBox(
+                        navController = navController,
+                        printingsList = cardPrintingsList,
+                        currentCard = card
+                    )
+                    RulingsBox(rulingsList = rulingsList)
+                }
+
+                if (isShowDialog.value) {
+                    ShowAmountDialog(
+                        isShowDialog = isShowDialog,
+                        auth = auth,
+                        db = db,
+                        card = card,
+                        navController = navController
+                    )
+                }
             }
         })
+}
+
+@Composable
+fun ShowAmountDialog(
+    isShowDialog: MutableState<Boolean>,
+    auth: FirebaseAuth,
+    db: FirebaseFirestore,
+    card: MTGCard,
+    navController: NavController
+) {
+    val amount = remember {
+        mutableStateOf("1")
+    }
+    AlertDialog(
+        title = {
+            Text(text = "Select amount")
+        },
+        text = {
+            TextField(
+                value = amount.value,
+                onValueChange = { text ->
+                    if (text.isNotEmpty())
+                        if (text.isDigitsOnly()) amount.value = if (text.toInt() < 1) "1" else text
+                },
+                keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
+                singleLine = true
+            )
+        },
+        onDismissRequest = {
+            isShowDialog.value = false
+        },
+        confirmButton = {
+            TextButton(
+                onClick = {
+                    if (auth.currentUser != null) {
+                        if (card.name.isNotEmpty()) {
+                            addItemToCurrentUserCollection(
+                                currentUser = auth.currentUser!!,
+                                db = db,
+                                cardCollectionEntry = CardCollectionEntry(
+                                    card,
+                                    amount.value.toInt()
+                                ),
+                                onSuccessListener = {
+                                    navController.navigate(Routes.Collection.route) {
+                                        popUpTo(Routes.Search.route) {
+                                            inclusive = true
+                                        }
+                                    }
+                                }
+                            )
+                        } else {
+                            Log.d("CARDS", "Tried to add empty card to DB")
+                        }
+                    } else {
+                        navController.navigate(Routes.LogIn.route) {
+                            popUpTo(Routes.LogIn.route) {
+                                inclusive = true
+                            }
+                        }
+                    }
+                }
+            ) {
+                Text("Add to collection")
+            }
+        },
+        dismissButton = {
+            TextButton(
+                onClick = {
+                    isShowDialog.value = false
+                }
+            ) {
+                Text("Dismiss")
+            }
+        },
+        properties = DialogProperties(dismissOnBackPress = true, dismissOnClickOutside = true)
+    )
 }
 
 fun addItemToCurrentUserCollection(
@@ -188,12 +263,34 @@ fun addItemToCurrentUserCollection(
     onSuccessListener: () -> Unit = {}
 ) {
     val itemsCollection = db.collection("collection-${currentUser.email}")
-    itemsCollection.add(cardCollectionEntry).addOnSuccessListener { documentReference ->
-        Log.d("Firestore", "DocumentSnapshot added with ID: ${documentReference.id}")
-        onSuccessListener()
-    }.addOnFailureListener { e ->
-        Log.w("Firestore", "Error adding document", e)
-    }
+    val isAlreadyPresent = mutableStateOf(false)
+    itemsCollection.whereEqualTo("card.id", cardCollectionEntry.card.id).get()
+        .addOnSuccessListener {
+            for (document in it) {
+                isAlreadyPresent.value = true
+                val documentRef = document.reference
+                Log.d("CARDS", "documentRef" + documentRef)
+                val oldAmount = document.data["amount"].toString().toInt()
+                val newAmount = oldAmount + cardCollectionEntry.amount
+                documentRef.update(hashMapOf("amount" to newAmount) as Map<String, Any>)
+                    .addOnSuccessListener {
+                        Log.d("CARDS", "Updated")
+                        onSuccessListener()
+                    }.addOnFailureListener {
+                        Log.d("CARDS", "Failed to update")
+                    }
+            }
+            if(!isAlreadyPresent.value){
+                itemsCollection.add(cardCollectionEntry).addOnSuccessListener { documentReference ->
+                    Log.d("Firestore", "DocumentSnapshot added with ID: ${documentReference.id}")
+                    onSuccessListener()
+                }.addOnFailureListener { e ->
+                    Log.w("Firestore", "Error adding document", e)
+                }
+            }
+        }
+
+
 }
 
 @Composable

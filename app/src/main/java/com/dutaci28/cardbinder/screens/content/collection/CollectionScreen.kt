@@ -1,5 +1,6 @@
 package com.dutaci28.cardbinder.screens.content.collection
 
+import android.util.Log
 import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionScope
@@ -10,6 +11,7 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -26,11 +28,13 @@ import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
@@ -55,6 +59,7 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.DialogProperties
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import coil.compose.AsyncImagePainter
@@ -102,7 +107,8 @@ fun SharedTransitionScope.CollectionScreen(
                         CardPager(
                             collectionCards = collectionCards,
                             navController = navController,
-                            animatedVisibilityScope = animatedVisibilityScope
+                            animatedVisibilityScope = animatedVisibilityScope,
+                            viewModel = viewModel
                         )
                     }
                 }
@@ -218,118 +224,136 @@ fun CollectionCardListItem(
 @OptIn(ExperimentalFoundationApi::class, ExperimentalSharedTransitionApi::class)
 @Composable
 fun SharedTransitionScope.CardPager(
-    collectionCards: List<CardCollectionEntry>,
+    collectionCards: MutableList<CardCollectionEntry>,
     navController: NavController,
-    animatedVisibilityScope: AnimatedVisibilityScope
+    animatedVisibilityScope: AnimatedVisibilityScope,
+    viewModel: CollectionViewModel
 ) {
     val pagerState = rememberPagerState(pageCount = { collectionCards.size })
     val arrowVisibilityList = remember { mutableStateListOf(1f, 1f) }
     val currentEntry = remember {
         mutableStateOf(CardCollectionEntry.getEmptyEntry())
     }
+    val isShowDialog = remember { mutableStateOf(false) }
 
     HorizontalPager(
         state = pagerState,
         modifier = Modifier.fillMaxSize()
     ) { index ->
-        currentEntry.value = collectionCards[pagerState.currentPage]
-        when (pagerState.currentPage) {
-            0 -> {
-                if (collectionCards.size == 1) {
-                    arrowVisibilityList[0] = 0f
+        if (pagerState.currentPage >= collectionCards.size) {
+            Log.d("CARDS", "Index out of bounds")
+        } else {
+            currentEntry.value = collectionCards[pagerState.currentPage]
+            when (pagerState.currentPage) {
+                0 -> {
+                    if (collectionCards.size == 1) {
+                        arrowVisibilityList[0] = 0f
+                        arrowVisibilityList[1] = 0f
+                    } else {
+                        arrowVisibilityList[0] = 0f
+                        arrowVisibilityList[1] = 1f
+                    }
+                }
+
+                collectionCards.size - 1 -> {
+                    arrowVisibilityList[0] = 1f
                     arrowVisibilityList[1] = 0f
-                } else {
-                    arrowVisibilityList[0] = 0f
+                }
+
+                else -> {
+                    arrowVisibilityList[0] = 1f
                     arrowVisibilityList[1] = 1f
                 }
             }
-
-            collectionCards.size - 1 -> {
-                arrowVisibilityList[0] = 1f
-                arrowVisibilityList[1] = 0f
-            }
-
-            else -> {
-                arrowVisibilityList[0] = 1f
-                arrowVisibilityList[1] = 1f
-            }
-        }
-        val pageOffset =
-            pagerState.currentPage - index + pagerState.currentPageOffsetFraction
-        val imageSizeScale by animateFloatAsState(
-            targetValue = if (pageOffset != 0.0f) 1.1f else 1f,
-            animationSpec = tween(300)
-        )
-        val rotationYAxisAngle by animateFloatAsState(
-            targetValue = if (pageOffset > 0.01f) -100f else if (pageOffset < -0.01f) 100f else 0f,
-            animationSpec = tween(300)
-        )
-        val rotationAngle by animateFloatAsState(
-            targetValue = if (pageOffset > 0.01f) -3f else if (pageOffset < -0.01f) 3f else 0f,
-            animationSpec = tween(500)
-        )
-        val imageSource =
-            if (collectionCards[index].card.layout == "transform" || collectionCards[index].card.layout == "modal_dfc")
-                collectionCards[index].card.faces[0].image_uris.png
-            else collectionCards[index].card.image_uris.png
-        val painter =
-            rememberAsyncImagePainter(
-                ImageRequest.Builder(LocalContext.current).data(
-                    data = imageSource
-                ).apply(block = fun ImageRequest.Builder.() {
-                    crossfade(true)
-                }).build()
+            val pageOffset =
+                pagerState.currentPage - index + pagerState.currentPageOffsetFraction
+            val imageSizeScale by animateFloatAsState(
+                targetValue = if (pageOffset != 0.0f) 1.1f else 1f,
+                animationSpec = tween(300)
             )
-        Box(modifier = Modifier.fillMaxSize()) {
-            Image(
-                painter = painter,
-                contentDescription = "Background Card Image",
-                contentScale = ContentScale.Fit,
-                modifier = Modifier
-                    .background(Color.White)
-                    .blur(
-                        radiusX = 10.dp,
-                        radiusY = 10.dp,
-                        edgeTreatment = BlurredEdgeTreatment.Unbounded
-                    )
-                    .alpha(0.3f)
-                    .fillMaxSize()
+            val rotationYAxisAngle by animateFloatAsState(
+                targetValue = if (pageOffset > 0.01f) -100f else if (pageOffset < -0.01f) 100f else 0f,
+                animationSpec = tween(300)
             )
-            Image(
-                painter = painter,
-                contentDescription = "Card Image",
-                contentScale = ContentScale.Fit,
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(50.dp)
-                    .graphicsLayer {
-                        scaleX = imageSizeScale
-                        scaleY = imageSizeScale
-                    }
-                    .clickable {
-                        navController.navigate(route = "individualCard/" + collectionCards[index].card.id)
-                    }
-                    .sharedElement(
-                        state = rememberSharedContentState(key = "image${collectionCards[index].card.id}"),
-                        animatedVisibilityScope = animatedVisibilityScope,
-                        boundsTransform = { _, _ ->
-                            tween(durationMillis = 300)
+            val rotationAngle by animateFloatAsState(
+                targetValue = if (pageOffset > 0.01f) -3f else if (pageOffset < -0.01f) 3f else 0f,
+                animationSpec = tween(500)
+            )
+            val imageSource =
+                if (collectionCards[index].card.layout == "transform" || collectionCards[index].card.layout == "modal_dfc")
+                    collectionCards[index].card.faces[0].image_uris.png
+                else collectionCards[index].card.image_uris.png
+            val painter =
+                rememberAsyncImagePainter(
+                    ImageRequest.Builder(LocalContext.current).data(
+                        data = imageSource
+                    ).apply(block = fun ImageRequest.Builder.() {
+                        crossfade(true)
+                    }).build()
+                )
+            Box(modifier = Modifier.fillMaxSize()) {
+                Image(
+                    painter = painter,
+                    contentDescription = "Background Card Image",
+                    contentScale = ContentScale.Fit,
+                    modifier = Modifier
+                        .background(Color.White)
+                        .blur(
+                            radiusX = 10.dp,
+                            radiusY = 10.dp,
+                            edgeTreatment = BlurredEdgeTreatment.Unbounded
+                        )
+                        .alpha(0.3f)
+                        .fillMaxSize()
+                )
+                Image(
+                    painter = painter,
+                    contentDescription = "Card Image",
+                    contentScale = ContentScale.Fit,
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(50.dp)
+                        .graphicsLayer {
+                            scaleX = imageSizeScale
+                            scaleY = imageSizeScale
                         }
+                        .combinedClickable(
+                            onClick = {
+                                navController.navigate(
+                                    route = "individualCard/" + collectionCards[index].card.id
+                                )
+                            },
+                            onLongClick = { isShowDialog.value = true }
+                        )
+                        .sharedElement(
+                            state = rememberSharedContentState(key = "image${collectionCards[index].card.id}"),
+                            animatedVisibilityScope = animatedVisibilityScope,
+                            boundsTransform = { _, _ ->
+                                tween(durationMillis = 300)
+                            }
+                        )
+                        .graphicsLayer {
+                            rotationY = rotationYAxisAngle * pageOffset.absoluteValue
+                            cameraDistance = 12f * density
+                        }
+                        .rotate(rotationAngle)
+                )
+                if (isShowDialog.value) {
+                    ShowDeleteDialog(
+                        isShowDialog = isShowDialog,
+                        viewModel = viewModel,
+                        cardCollectionEntry = collectionCards[index]
                     )
-                    .graphicsLayer {
-                        rotationY = rotationYAxisAngle * pageOffset.absoluteValue
-                        cameraDistance = 12f * density
-                    }
-                    .rotate(rotationAngle)
-            )
-            when (painter.state) {
-                AsyncImagePainter.State.Empty -> {}
-                is AsyncImagePainter.State.Error -> {}
-                is AsyncImagePainter.State.Loading -> {
-                    LoadingScreen()
                 }
+                when (painter.state) {
+                    AsyncImagePainter.State.Empty -> {}
+                    is AsyncImagePainter.State.Error -> {}
+                    is AsyncImagePainter.State.Loading -> {
+                        LoadingScreen()
+                    }
 
-                is AsyncImagePainter.State.Success -> {}
+                    is AsyncImagePainter.State.Success -> {}
+                }
             }
         }
     }
@@ -362,6 +386,48 @@ fun SharedTransitionScope.CardPager(
             fontSize = 24.sp
         )
     }
+}
+
+@Composable
+fun ShowDeleteDialog(
+    isShowDialog: MutableState<Boolean>,
+    viewModel: CollectionViewModel,
+    cardCollectionEntry: CardCollectionEntry
+) {
+    AlertDialog(
+        title = {
+            Text(text = "Delete")
+        },
+        text = {
+            Text(text = "Delete all copies from collection?")
+        },
+        onDismissRequest = {
+            isShowDialog.value = false
+        },
+        confirmButton = {
+            TextButton(
+                onClick = {
+                    viewModel.deleteCardFromCollection(
+                        cardCollectionEntry.card.id,
+                        onSuccess = {
+                            isShowDialog.value = false
+                        })
+                }
+            ) {
+                Text("Delete")
+            }
+        },
+        dismissButton = {
+            TextButton(
+                onClick = {
+                    isShowDialog.value = false
+                }
+            ) {
+                Text("Dismiss")
+            }
+        },
+        properties = DialogProperties(dismissOnBackPress = true, dismissOnClickOutside = true)
+    )
 }
 
 @Composable
