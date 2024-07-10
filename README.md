@@ -12,4 +12,5 @@ And they can add those cards to their collections.
 ![](https://github.com/dutaci28/CardBinder/blob/master/gifs/collection%20pager.gif)
 
 CardBinder - a Magic: The Gathering collector's app.
+
 Copyright (C) 2024  Catalin Duta
