@@ -1,4 +1,5 @@
   CardBinder - a Magic: The Gathering collector's app.
+  
 Users are greeted with a random card, retrieved from the Scryfall API.
 
 ![](https://github.com/dutaci28/CardBinder/blob/master/gifs/search%20page%20random%20card.gif)
