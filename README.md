@@ -4,7 +4,7 @@ The app is built using Jetpack Compose alongside Kotlin in order to give the bes
   
 A user can log in with either email/password or Google:
 
-![]()
+![](https://github.com/dutaci28/CardBinder/blob/master/gifs/login%20with%20google.gif)
 
 Users are greeted with a random card, retrieved from the Scryfall API.
 
