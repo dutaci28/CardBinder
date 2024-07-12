@@ -48,12 +48,18 @@ fun SharedTransitionScope.SearchScreen(
     navController: NavController,
     viewModel: SearchViewModel = hiltViewModel(),
     shouldFocus: Boolean,
+    searchText: String = "",
     randomCardData: LazyPagingItems<MTGCard>,
     animatedVisibilityScope: AnimatedVisibilityScope
 ) {
     val searchQuery by viewModel.searchQuery
     val searchedCards = viewModel.searchedCards.collectAsLazyPagingItems()
     val focusRequester = viewModel.focusRequester
+
+    if (searchText!="null" && searchText!="EMPTY_VALUE") {
+        viewModel.updateSearchQuery(searchText)
+        viewModel.searchCardsByName(searchText)
+    }
 
     Scaffold(
         topBar = {

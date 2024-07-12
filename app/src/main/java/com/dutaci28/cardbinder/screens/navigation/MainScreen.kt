@@ -31,6 +31,7 @@ import com.dutaci28.cardbinder.screens.content.scan.ScanScreen
 import com.dutaci28.cardbinder.screens.content.individualCard.IndividualCardScreen
 import com.dutaci28.cardbinder.screens.content.search.SearchScreen
 import com.dutaci28.cardbinder.util.Constants.Companion.NAV_ARGUMENT_CARD_ID
+import com.dutaci28.cardbinder.util.Constants.Companion.NAV_ARGUMENT_SEARCH_TEXT
 import com.dutaci28.cardbinder.util.Constants.Companion.NAV_ARGUMENT_SHOULD_FOCUS_SEARCH
 
 @OptIn(ExperimentalSharedTransitionApi::class)
@@ -82,6 +83,9 @@ fun MainScreen(window: Window, viewModel: MainScreenViewModel = hiltViewModel())
                     composable(route = Routes.Search.route, arguments = listOf(
                         navArgument(name = NAV_ARGUMENT_SHOULD_FOCUS_SEARCH) {
                             type = NavType.BoolType
+                        },
+                        navArgument(name = NAV_ARGUMENT_SEARCH_TEXT) {
+                            type = NavType.StringType
                         }
                     )) {
                         SearchScreen(
@@ -89,6 +93,8 @@ fun MainScreen(window: Window, viewModel: MainScreenViewModel = hiltViewModel())
                             shouldFocus = it.arguments?.getBoolean(
                                 NAV_ARGUMENT_SHOULD_FOCUS_SEARCH
                             ).toString().toBoolean(),
+                            searchText = it.arguments?.getString(NAV_ARGUMENT_SEARCH_TEXT)
+                                .toString(),
                             randomCardData = getRandomCard,
                             animatedVisibilityScope = this
                         )

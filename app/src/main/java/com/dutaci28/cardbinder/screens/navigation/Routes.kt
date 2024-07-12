@@ -1,6 +1,7 @@
 package com.dutaci28.cardbinder.screens.navigation
 
 import com.dutaci28.cardbinder.util.Constants.Companion.NAV_ARGUMENT_CARD_ID
+import com.dutaci28.cardbinder.util.Constants.Companion.NAV_ARGUMENT_SEARCH_TEXT
 import com.dutaci28.cardbinder.util.Constants.Companion.NAV_ARGUMENT_SHOULD_FOCUS_SEARCH
 
 sealed class Routes(
@@ -27,9 +28,9 @@ sealed class Routes(
     )
 
     data object Search : Routes(
-        route = "search/{$NAV_ARGUMENT_SHOULD_FOCUS_SEARCH}",
-        defaultRoute = "search/false",
-        selectedRoute = "search/true",
+        route = "search/{$NAV_ARGUMENT_SHOULD_FOCUS_SEARCH}/{$NAV_ARGUMENT_SEARCH_TEXT}",
+        defaultRoute = "search/false/EMPTY_VALUE",
+        selectedRoute = "search/true/EMPTY_VALUE",
         title = "Search"
     )
 

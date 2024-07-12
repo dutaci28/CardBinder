@@ -13,6 +13,7 @@ import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -36,6 +37,7 @@ import androidx.core.content.FileProvider
 import androidx.exifinterface.media.ExifInterface
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.dutaci28.cardbinder.screens.navigation.Routes
 import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.text.Text
 import com.google.mlkit.vision.text.TextRecognition
@@ -60,13 +62,13 @@ fun ScanScreen(
             }) {
                 Text(text = "Log Out")
             }
-            TextRecognitionSection()
+            TextRecognitionSection(navController)
         }
     }
 }
 
 @Composable
-fun TextRecognitionSection() {
+fun TextRecognitionSection(navController: NavController) {
     val context = LocalContext.current
     var imageUri by remember { mutableStateOf<Uri?>(null) }
     var imageBitmap by remember { mutableStateOf<Bitmap?>(null) }
@@ -167,7 +169,13 @@ fun TextRecognitionSection() {
                 modifier = Modifier.size(400.dp)
             )
             runTextRecognition(bitmap, resultingCardName)
-            Text(text = resultingCardName.value)
+            Text(text = resultingCardName.value, modifier = Modifier.clickable {
+                navController.navigate(route = "search/true/${resultingCardName.value}") {
+                    popUpTo(Routes.Register.route) {
+                        inclusive = true
+                    }
+                }
+            })
         }
     }
 }
@@ -182,7 +190,7 @@ private fun processTextRecognitionResult(texts: Text, resultingCardName: Mutable
     for (i in blocks.indices) {
         val lines: List<Text.Line> = blocks[i].lines
         val extractedTextLine: StringBuilder = StringBuilder("")
-        var extractedTextLineBoundingBox = Rect(0,0,0,0)
+        var extractedTextLineBoundingBox = Rect(0, 0, 0, 0)
         for (j in lines.indices) {
             val elements: List<Text.Element> = lines[j].elements
             for (k in elements.indices) {
@@ -190,7 +198,10 @@ private fun processTextRecognitionResult(texts: Text, resultingCardName: Mutable
                 extractedTextLineBoundingBox = elements[k].boundingBox!!
             }
         }
-        Log.d("Cards", "Line $i: $extractedTextLine, coordinates: top: ${extractedTextLineBoundingBox.top} left: ${extractedTextLineBoundingBox.left}")
+        Log.d(
+            "Cards",
+            "Line $i: $extractedTextLine, coordinates: top: ${extractedTextLineBoundingBox.top} left: ${extractedTextLineBoundingBox.left}"
+        )
         if (i == 0) resultingCardName.value = extractedTextLine.toString()
     }
 }
