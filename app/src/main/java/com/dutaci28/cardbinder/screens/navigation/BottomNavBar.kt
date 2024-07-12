@@ -32,7 +32,7 @@ fun BottomNavBar(showBottomBar: Boolean, navController: NavHostController) {
     val screens = listOf(
         Routes.Collection,
         Routes.Search,
-        Routes.Decks,
+        Routes.Scan,
     )
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry?.destination
@@ -93,9 +93,9 @@ fun RowScope.NavItem(
                     )
                 }
 
-                Routes.Decks.route -> {
+                Routes.Scan.route -> {
                     Icon(
-                        imageVector = ImageVector.vectorResource(R.drawable.decks),
+                        imageVector = ImageVector.vectorResource(R.drawable.scan),
                         contentDescription = "Navigation Icon",
                         tint = iconTint
                     )

@@ -33,9 +33,9 @@ sealed class Routes(
         title = "Search"
     )
 
-    data object Decks : Routes(
-        route = "decks",
-        title = "Decks"
+    data object Scan : Routes(
+        route = "scan",
+        title = "Scan"
     )
 
     data object IndividualCard : Routes(

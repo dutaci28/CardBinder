@@ -116,4 +116,7 @@ dependencies {
 
     // Coil
     implementation(libs.coil.compose)
+
+    // Machine Learning
+    implementation(libs.play.services.mlkit.text.recognition)
 }

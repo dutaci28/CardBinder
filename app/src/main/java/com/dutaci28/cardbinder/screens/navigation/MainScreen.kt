@@ -27,7 +27,7 @@ import androidx.paging.compose.collectAsLazyPagingItems
 import com.dutaci28.cardbinder.screens.authentication.LogInScreen
 import com.dutaci28.cardbinder.screens.authentication.RegisterScreen
 import com.dutaci28.cardbinder.screens.content.collection.CollectionScreen
-import com.dutaci28.cardbinder.screens.content.decks.DecksScreen
+import com.dutaci28.cardbinder.screens.content.scan.ScanScreen
 import com.dutaci28.cardbinder.screens.content.individualCard.IndividualCardScreen
 import com.dutaci28.cardbinder.screens.content.search.SearchScreen
 import com.dutaci28.cardbinder.util.Constants.Companion.NAV_ARGUMENT_CARD_ID
@@ -93,8 +93,8 @@ fun MainScreen(window: Window, viewModel: MainScreenViewModel = hiltViewModel())
                             animatedVisibilityScope = this
                         )
                     }
-                    composable(route = Routes.Decks.route) {
-                        DecksScreen(navController = navController)
+                    composable(route = Routes.Scan.route) {
+                        ScanScreen(navController = navController)
                     }
                     composable(route = Routes.IndividualCard.route, arguments = listOf(
                         navArgument(name = NAV_ARGUMENT_CARD_ID) { type = NavType.StringType }

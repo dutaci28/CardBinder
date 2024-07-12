@@ -1,4 +1,4 @@
-package com.dutaci28.cardbinder.screens.content.decks
+package com.dutaci28.cardbinder.screens.content.scan
 
 import android.content.Context
 import androidx.credentials.ClearCredentialStateRequest
@@ -15,7 +15,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class DecksViewModel @Inject constructor(repository: Repository) : ViewModel() {
+class ScanViewModel @Inject constructor(repository: Repository) : ViewModel() {
     val auth = Firebase.auth
 
 
