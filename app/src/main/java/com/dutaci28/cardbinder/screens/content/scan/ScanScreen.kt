@@ -12,26 +12,24 @@ import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.text.font.FontWeight
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.exifinterface.media.ExifInterface
@@ -73,9 +71,7 @@ fun TextRecognitionSection(navController: NavController) {
     var imageUri by remember { mutableStateOf<Uri?>(null) }
     var imageBitmap by remember { mutableStateOf<Bitmap?>(null) }
     val activity = LocalContext.current as? Activity
-    val resultingCardName = remember {
-        mutableStateOf("")
-    }
+    val resultingTextList = remember { mutableStateListOf<String>() }
 
     val takePictureLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.TakePicture()
@@ -101,6 +97,12 @@ fun TextRecognitionSection(navController: NavController) {
                     }
                     rotatedBitmap
                 }
+            }
+            imageBitmap?.let { bitmap ->
+                runTextRecognition(
+                    bitmap = bitmap,
+                    resultingTextList = resultingTextList
+                )
             }
         }
     }
@@ -162,15 +164,10 @@ fun TextRecognitionSection(navController: NavController) {
             Text("Take Picture")
         }
 
-        imageBitmap?.let { bitmap ->
-            Image(
-                bitmap = bitmap.asImageBitmap(),
-                contentDescription = null,
-                modifier = Modifier.size(400.dp)
-            )
-            runTextRecognition(bitmap, resultingCardName)
-            Text(text = resultingCardName.value, modifier = Modifier.clickable {
-                navController.navigate(route = "search/true/${resultingCardName.value}") {
+        Text(text = "Tap the correct name:", fontWeight = FontWeight.Bold)
+        resultingTextList.forEach {
+            Text(text = it, modifier = Modifier.clickable {
+                navController.navigate(route = "search/true/$it") {
                     popUpTo(Routes.Register.route) {
                         inclusive = true
                     }
@@ -181,7 +178,10 @@ fun TextRecognitionSection(navController: NavController) {
 }
 
 
-private fun processTextRecognitionResult(texts: Text, resultingCardName: MutableState<String>) {
+private fun processTextRecognitionResult(
+    texts: Text,
+    resultingTextList: SnapshotStateList<String>
+) {
     val blocks: List<Text.TextBlock> = texts.textBlocks
     if (blocks.isEmpty()) {
         Log.d("CARDS", "No text found")
@@ -198,11 +198,8 @@ private fun processTextRecognitionResult(texts: Text, resultingCardName: Mutable
                 extractedTextLineBoundingBox = elements[k].boundingBox!!
             }
         }
-        Log.d(
-            "Cards",
-            "Line $i: $extractedTextLine, coordinates: top: ${extractedTextLineBoundingBox.top} left: ${extractedTextLineBoundingBox.left}"
-        )
-        if (i == 0) resultingCardName.value = extractedTextLine.toString()
+        if (extractedTextLine.toString().length < 40)
+            resultingTextList.add(extractedTextLine.toString())
     }
 }
 
@@ -215,12 +212,18 @@ fun rotateImage(source: Bitmap, angle: Float): Bitmap {
     )
 }
 
-private fun runTextRecognition(bitmap: Bitmap, resultingCardName: MutableState<String>) {
+private fun runTextRecognition(
+    bitmap: Bitmap,
+    resultingTextList: SnapshotStateList<String>
+) {
     val image = InputImage.fromBitmap(bitmap, 0)
     val recognizer = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS)
     recognizer.process(image)
         .addOnSuccessListener { texts ->
-            processTextRecognitionResult(texts = texts, resultingCardName = resultingCardName)
+            processTextRecognitionResult(
+                texts = texts,
+                resultingTextList = resultingTextList
+            )
         }
         .addOnFailureListener { e ->
             e.printStackTrace()
