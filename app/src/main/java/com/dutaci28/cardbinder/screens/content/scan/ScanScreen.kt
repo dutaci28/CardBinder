@@ -5,34 +5,37 @@ import android.app.Activity
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import android.graphics.Matrix
-import android.graphics.Rect
+import android.graphics.Canvas
+import android.graphics.Paint
 import android.net.Uri
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
-import androidx.exifinterface.media.ExifInterface
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.dutaci28.cardbinder.screens.navigation.Routes
@@ -50,28 +53,31 @@ fun ScanScreen(
 ) {
     val auth = viewModel.auth
     val context = LocalContext.current
+    val outlinedBitmap =
+        remember { mutableStateOf(Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888)) }
 
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Text(text = "WIP", color = Color.Red)
             auth.currentUser?.email?.let { Text(text = it) }
             Button(onClick = {
-                viewModel.signOut(navController, context)
-            }) {
-                Text(text = "Log Out")
-            }
-            TextRecognitionSection(navController)
+                viewModel.signOut(
+                    navController,
+                    context
+                )
+            }) { Text(text = "Log Out") }
+            TextRecognitionSection(outlinedBitmap = outlinedBitmap, navController = navController)
         }
     }
 }
 
 @Composable
-fun TextRecognitionSection(navController: NavController) {
+fun TextRecognitionSection(outlinedBitmap: MutableState<Bitmap>, navController: NavController) {
     val context = LocalContext.current
     var imageUri by remember { mutableStateOf<Uri?>(null) }
     var imageBitmap by remember { mutableStateOf<Bitmap?>(null) }
     val activity = LocalContext.current as? Activity
-    val resultingTextList = remember { mutableStateListOf<String>() }
+    val recognizedText = remember { mutableStateOf<Text?>(null) }
 
     val takePictureLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.TakePicture()
@@ -79,30 +85,33 @@ fun TextRecognitionSection(navController: NavController) {
         if (success) {
             imageBitmap = imageUri?.let { uri ->
                 context.contentResolver.openInputStream(uri)?.use { stream ->
-                    val originalBitmap = BitmapFactory.decodeStream(stream)
-                    val ei = ExifInterface(stream)
-                    val orientation = ei.getAttributeInt(
-                        ExifInterface.TAG_ORIENTATION,
-                        ExifInterface.ORIENTATION_UNDEFINED
-                    )
-                    val rotatedBitmap: Bitmap = when (orientation) {
-                        ExifInterface.ORIENTATION_ROTATE_90 -> rotateImage(originalBitmap, 90f)
-
-                        ExifInterface.ORIENTATION_ROTATE_180 -> rotateImage(originalBitmap, 180f)
-
-                        ExifInterface.ORIENTATION_ROTATE_270 -> rotateImage(originalBitmap, 270f)
-
-                        ExifInterface.ORIENTATION_NORMAL -> originalBitmap
-                        else -> originalBitmap
-                    }
-                    rotatedBitmap
+                    BitmapFactory.decodeStream(stream)
+//                    val originalBitmap = BitmapFactory.decodeStream(stream)
+//                    val ei = ExifInterface(stream)
+//                    val orientation = ei.getAttributeInt(
+//                        ExifInterface.TAG_ORIENTATION,
+//                        ExifInterface.ORIENTATION_UNDEFINED
+//                    )
+//                    val rotatedBitmap: Bitmap = when (orientation) {
+//                        ExifInterface.ORIENTATION_ROTATE_90 -> rotateImage(originalBitmap, 90f)
+//
+//                        ExifInterface.ORIENTATION_ROTATE_180 -> rotateImage(originalBitmap, 180f)
+//
+//                        ExifInterface.ORIENTATION_ROTATE_270 -> rotateImage(originalBitmap, 270f)
+//
+//                        ExifInterface.ORIENTATION_NORMAL -> originalBitmap
+//                        else -> originalBitmap
+//                    }
+//                    rotatedBitmap
                 }
             }
             imageBitmap?.let { bitmap ->
                 runTextRecognition(
                     bitmap = bitmap,
-                    resultingTextList = resultingTextList
+                    recognizedText = recognizedText,
+                    resultingOutlinedBitmap = outlinedBitmap
                 )
+
             }
         }
     }
@@ -163,58 +172,97 @@ fun TextRecognitionSection(navController: NavController) {
         }) {
             Text("Take Picture")
         }
-
-        Text(text = "Tap the correct name:", fontWeight = FontWeight.Bold)
-        resultingTextList.forEach {
-            Text(text = it, modifier = Modifier.clickable {
-                navController.navigate(route = "search/true/$it") {
-                    popUpTo(Routes.Register.route) {
-                        inclusive = true
+        recognizedText.value?.let {
+            Text(
+                text = "Tap the name of the card identified text boxes:",
+                fontWeight = FontWeight.Bold
+            )
+        }
+        Image(
+            bitmap = outlinedBitmap.value.asImageBitmap(),
+            contentDescription = "Image with text outlines",
+            modifier = Modifier
+                .fillMaxSize()
+                .pointerInput(Unit) {
+                    detectTapGestures { offset ->
+                        val scaleX = outlinedBitmap.value.width.toFloat() / size.width
+                        val scaleY = outlinedBitmap.value.height.toFloat() / size.height
+                        val adjustedOffset = Offset(
+                            (offset.x * scaleX),
+                            (offset.y * scaleY)
+                        )
+                        recognizedText.value?.let {
+                            searchTappedText(
+                                it,
+                                adjustedOffset,
+                                navController = navController
+                            )
+                        }
                     }
                 }
-            })
-        }
+
+        )
+
     }
 }
 
+fun searchTappedText(recognizedText: Text, offset: Offset, navController: NavController): String {
+    for (block in recognizedText.textBlocks) {
+        for (line in block.lines) {
+            if (line.boundingBox != null && line.boundingBox!!.contains(
+                    offset.x.toInt(),
+                    offset.y.toInt()
+                )
+            ) {
+                Log.d("CARDS", "Tapped ${line.text}")
+                navController.navigate(route = "search/true/${line.text}") {
+                    popUpTo(Routes.Search.defaultRoute) {
+                        inclusive = true
+                    }
+                }
+            }
+        }
+    }
+    return ""
+}
+
+fun drawOutlinesOnBitmap(bitmap: Bitmap, recognizedText: Text): Bitmap {
+    val outlinedBitmap = bitmap.copy(Bitmap.Config.ARGB_8888, true)
+    val canvas = Canvas(outlinedBitmap)
+    val paint = Paint().apply {
+        color = Color.Red.toArgb()
+        style = Paint.Style.STROKE
+        strokeWidth = 5f
+    }
+
+    for (block in recognizedText.textBlocks) {
+        for (line in block.lines) {
+            canvas.drawRect(line.boundingBox!!, paint)
+        }
+    }
+
+    return outlinedBitmap
+}
 
 private fun processTextRecognitionResult(
     texts: Text,
-    resultingTextList: SnapshotStateList<String>
+    recognizedText: MutableState<Text?>,
+    initialBitmap: Bitmap,
+    resultingOutlinedBitmap: MutableState<Bitmap>
 ) {
     val blocks: List<Text.TextBlock> = texts.textBlocks
     if (blocks.isEmpty()) {
         Log.d("CARDS", "No text found")
         return
     }
-    for (i in blocks.indices) {
-        val lines: List<Text.Line> = blocks[i].lines
-        val extractedTextLine: StringBuilder = StringBuilder("")
-        var extractedTextLineBoundingBox = Rect(0, 0, 0, 0)
-        for (j in lines.indices) {
-            val elements: List<Text.Element> = lines[j].elements
-            for (k in elements.indices) {
-                extractedTextLine.append(elements[k].text + " ")
-                extractedTextLineBoundingBox = elements[k].boundingBox!!
-            }
-        }
-        if (extractedTextLine.toString().length < 40)
-            resultingTextList.add(extractedTextLine.toString())
-    }
-}
-
-fun rotateImage(source: Bitmap, angle: Float): Bitmap {
-    val matrix = Matrix()
-    matrix.postRotate(angle)
-    return Bitmap.createBitmap(
-        source, 0, 0, source.width, source.height,
-        matrix, true
-    )
+    resultingOutlinedBitmap.value = drawOutlinesOnBitmap(initialBitmap, texts)
+    recognizedText.value = texts
 }
 
 private fun runTextRecognition(
     bitmap: Bitmap,
-    resultingTextList: SnapshotStateList<String>
+    recognizedText: MutableState<Text?>,
+    resultingOutlinedBitmap: MutableState<Bitmap>
 ) {
     val image = InputImage.fromBitmap(bitmap, 0)
     val recognizer = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS)
@@ -222,7 +270,9 @@ private fun runTextRecognition(
         .addOnSuccessListener { texts ->
             processTextRecognitionResult(
                 texts = texts,
-                resultingTextList = resultingTextList
+                recognizedText = recognizedText,
+                initialBitmap = bitmap,
+                resultingOutlinedBitmap = resultingOutlinedBitmap
             )
         }
         .addOnFailureListener { e ->
