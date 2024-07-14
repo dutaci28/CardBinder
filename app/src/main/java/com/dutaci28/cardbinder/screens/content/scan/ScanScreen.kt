@@ -2,11 +2,15 @@ package com.dutaci28.cardbinder.screens.content.scan
 
 import android.Manifest
 import android.app.Activity
+import android.content.ContentResolver
+import android.content.Context
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Canvas
+import android.graphics.Matrix
 import android.graphics.Paint
+import android.media.ExifInterface
 import android.net.Uri
 import android.util.Log
 import android.widget.Toast
@@ -17,8 +21,13 @@ import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
@@ -34,16 +43,20 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.DialogProperties
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.dutaci28.cardbinder.screens.navigation.Routes
+import com.google.firebase.auth.FirebaseAuth
 import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.text.Text
 import com.google.mlkit.vision.text.TextRecognition
 import com.google.mlkit.vision.text.latin.TextRecognizerOptions
 import java.io.File
+import java.io.IOException
 
 
 @Composable
@@ -55,24 +68,81 @@ fun ScanScreen(
     val context = LocalContext.current
     val outlinedBitmap =
         remember { mutableStateOf(Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888)) }
+    val scrollState = rememberScrollState()
+    val isShowDialog = remember { mutableStateOf(false) }
 
-    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .verticalScroll(scrollState)
+            .padding(bottom = 140.dp)
+    )
+    {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Text(text = "WIP", color = Color.Red)
-            auth.currentUser?.email?.let { Text(text = it) }
-            Button(onClick = {
-                viewModel.signOut(
-                    navController,
-                    context
-                )
-            }) { Text(text = "Log Out") }
-            TextRecognitionSection(outlinedBitmap = outlinedBitmap, navController = navController)
+            Button(onClick = { isShowDialog.value = true }) { Text(text = "Log Out") }
+            if (isShowDialog.value) ShowAccountDialog(
+                isShowDialog = isShowDialog,
+                viewModel = viewModel,
+                auth = auth,
+                navController = navController,
+                context = context
+            )
+            TextRecognitionSection(
+                outlinedBitmap = outlinedBitmap,
+                navController = navController
+            )
         }
     }
 }
 
 @Composable
-fun TextRecognitionSection(outlinedBitmap: MutableState<Bitmap>, navController: NavController) {
+fun ShowAccountDialog(
+    isShowDialog: MutableState<Boolean>,
+    viewModel: ScanViewModel,
+    auth: FirebaseAuth,
+    navController: NavController,
+    context: Context
+) {
+    AlertDialog(
+        title = {
+            Text(text = "Account")
+        },
+        text = {
+            auth.currentUser?.email?.let { Text(text = "Signed in as: $it") }
+        },
+        onDismissRequest = {
+            isShowDialog.value = false
+        },
+        confirmButton = {
+            TextButton(
+                onClick = {
+                    viewModel.signOut(
+                        navController,
+                        context
+                    )
+                }
+            ) {
+                Text("Log Out")
+            }
+        },
+        dismissButton = {
+            TextButton(
+                onClick = {
+                    isShowDialog.value = false
+                }
+            ) {
+                Text("Dismiss")
+            }
+        },
+        properties = DialogProperties(dismissOnBackPress = true, dismissOnClickOutside = true)
+    )
+}
+
+@Composable
+fun TextRecognitionSection(
+    outlinedBitmap: MutableState<Bitmap>,
+    navController: NavController
+) {
     val context = LocalContext.current
     var imageUri by remember { mutableStateOf<Uri?>(null) }
     var imageBitmap by remember { mutableStateOf<Bitmap?>(null) }
@@ -83,9 +153,7 @@ fun TextRecognitionSection(outlinedBitmap: MutableState<Bitmap>, navController: 
     ) { success ->
         if (success) {
             imageBitmap = imageUri?.let { uri ->
-                context.contentResolver.openInputStream(uri)?.use { stream ->
-                    BitmapFactory.decodeStream(stream)
-                }
+                getCorrectlyOrientedBitmap(context.contentResolver, uri)
             }
             imageBitmap?.let { bitmap ->
                 runTextRecognition(
@@ -154,7 +222,7 @@ fun TextRecognitionSection(outlinedBitmap: MutableState<Bitmap>, navController: 
         }
         recognizedText.value?.let {
             Text(
-                text = "Tap the name of the card identified text boxes:",
+                text = "Tap the box with name of the card:",
                 fontWeight = FontWeight.Bold
             )
         }
@@ -171,6 +239,7 @@ fun TextRecognitionSection(outlinedBitmap: MutableState<Bitmap>, navController: 
                             (offset.x * scaleX),
                             (offset.y * scaleY)
                         )
+                        Log.d("CARDS", "Tapped adjusted ${adjustedOffset.x} ${adjustedOffset.y}")
                         recognizedText.value?.let {
                             searchTappedText(
                                 it,
@@ -186,9 +255,58 @@ fun TextRecognitionSection(outlinedBitmap: MutableState<Bitmap>, navController: 
     }
 }
 
+fun getBitmapFromUri(contentResolver: ContentResolver, uri: Uri): Bitmap? {
+    val inputStream = contentResolver.openInputStream(uri)
+    return BitmapFactory.decodeStream(inputStream)
+}
+
+fun getCorrectlyOrientedBitmap(contentResolver: ContentResolver, uri: Uri): Bitmap? {
+    val bitmap = getBitmapFromUri(contentResolver, uri)
+    if (bitmap != null) {
+        val orientation = getExifOrientation(contentResolver, uri)
+        return correctBitmapOrientation(bitmap, orientation)
+    }
+    return null
+}
+
+fun correctBitmapOrientation(bitmap: Bitmap, orientation: Int): Bitmap {
+    val matrix = Matrix()
+    when (orientation) {
+        ExifInterface.ORIENTATION_ROTATE_90 -> matrix.postRotate(90f)
+        ExifInterface.ORIENTATION_ROTATE_180 -> matrix.postRotate(180f)
+        ExifInterface.ORIENTATION_ROTATE_270 -> matrix.postRotate(270f)
+        ExifInterface.ORIENTATION_FLIP_HORIZONTAL -> matrix.postScale(-1f, 1f)
+        ExifInterface.ORIENTATION_FLIP_VERTICAL -> matrix.postScale(1f, -1f)
+        else -> return bitmap
+    }
+    return Bitmap.createBitmap(bitmap, 0, 0, bitmap.width, bitmap.height, matrix, true)
+}
+
+fun getExifOrientation(contentResolver: ContentResolver, uri: Uri): Int {
+    var orientation = ExifInterface.ORIENTATION_UNDEFINED
+    try {
+        val inputStream = contentResolver.openInputStream(uri)
+        if (inputStream != null) {
+            val exif = ExifInterface(inputStream)
+            orientation = exif.getAttributeInt(
+                ExifInterface.TAG_ORIENTATION,
+                ExifInterface.ORIENTATION_UNDEFINED
+            )
+            inputStream.close()
+        }
+    } catch (e: IOException) {
+        e.printStackTrace()
+    }
+    return orientation
+}
+
 fun searchTappedText(recognizedText: Text, offset: Offset, navController: NavController): String {
     for (block in recognizedText.textBlocks) {
         for (line in block.lines) {
+            Log.d(
+                "CARDS",
+                "Line coords ${line.boundingBox?.top} ${line.boundingBox?.right} ${line.boundingBox?.bottom} ${line.boundingBox?.left}"
+            )
             if (line.boundingBox != null && line.boundingBox!!.contains(
                     offset.x.toInt(),
                     offset.y.toInt()
