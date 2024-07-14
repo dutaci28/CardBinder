@@ -78,7 +78,6 @@ fun TextRecognitionSection(outlinedBitmap: MutableState<Bitmap>, navController: 
     var imageBitmap by remember { mutableStateOf<Bitmap?>(null) }
     val activity = LocalContext.current as? Activity
     val recognizedText = remember { mutableStateOf<Text?>(null) }
-
     val takePictureLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.TakePicture()
     ) { success ->
@@ -86,23 +85,6 @@ fun TextRecognitionSection(outlinedBitmap: MutableState<Bitmap>, navController: 
             imageBitmap = imageUri?.let { uri ->
                 context.contentResolver.openInputStream(uri)?.use { stream ->
                     BitmapFactory.decodeStream(stream)
-//                    val originalBitmap = BitmapFactory.decodeStream(stream)
-//                    val ei = ExifInterface(stream)
-//                    val orientation = ei.getAttributeInt(
-//                        ExifInterface.TAG_ORIENTATION,
-//                        ExifInterface.ORIENTATION_UNDEFINED
-//                    )
-//                    val rotatedBitmap: Bitmap = when (orientation) {
-//                        ExifInterface.ORIENTATION_ROTATE_90 -> rotateImage(originalBitmap, 90f)
-//
-//                        ExifInterface.ORIENTATION_ROTATE_180 -> rotateImage(originalBitmap, 180f)
-//
-//                        ExifInterface.ORIENTATION_ROTATE_270 -> rotateImage(originalBitmap, 270f)
-//
-//                        ExifInterface.ORIENTATION_NORMAL -> originalBitmap
-//                        else -> originalBitmap
-//                    }
-//                    rotatedBitmap
                 }
             }
             imageBitmap?.let { bitmap ->
@@ -111,11 +93,9 @@ fun TextRecognitionSection(outlinedBitmap: MutableState<Bitmap>, navController: 
                     recognizedText = recognizedText,
                     resultingOutlinedBitmap = outlinedBitmap
                 )
-
             }
         }
     }
-
     val requestCameraPermissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestPermission()
     ) { isGranted ->
@@ -170,7 +150,7 @@ fun TextRecognitionSection(outlinedBitmap: MutableState<Bitmap>, navController: 
                 }
             }
         }) {
-            Text("Take Picture")
+            Text("Scan a card")
         }
         recognizedText.value?.let {
             Text(
@@ -232,7 +212,7 @@ fun drawOutlinesOnBitmap(bitmap: Bitmap, recognizedText: Text): Bitmap {
     val paint = Paint().apply {
         color = Color.Red.toArgb()
         style = Paint.Style.STROKE
-        strokeWidth = 5f
+        strokeWidth = 10f
     }
 
     for (block in recognizedText.textBlocks) {
