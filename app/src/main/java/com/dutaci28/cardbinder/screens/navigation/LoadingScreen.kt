@@ -29,7 +29,7 @@ fun LoadingScreen() {
         contentAlignment = Alignment.Center
     ) {
         RotatingImage(
-            imageResId = R.drawable.mir_205_afiya_grove,
+            imageResId = R.drawable.cardbinder_logo,
             modifier = Modifier.size(64.dp)
         )
     }
