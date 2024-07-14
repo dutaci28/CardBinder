@@ -36,4 +36,8 @@ class SearchViewModel @Inject constructor(
             }
         }
     }
+
+    fun clearSearchedCards(){
+        _searchedCards.value = PagingData.empty()
+    }
 }

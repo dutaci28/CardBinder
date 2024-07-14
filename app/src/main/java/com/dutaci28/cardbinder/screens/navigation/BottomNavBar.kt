@@ -6,6 +6,8 @@ import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
@@ -32,7 +34,7 @@ fun BottomNavBar(showBottomBar: Boolean, navController: NavHostController) {
     val screens = listOf(
         Routes.Collection,
         Routes.Search,
-        Routes.Scan,
+        Routes.Account,
     )
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry?.destination
@@ -93,9 +95,9 @@ fun RowScope.NavItem(
                     )
                 }
 
-                Routes.Scan.route -> {
+                Routes.Account.route -> {
                     Icon(
-                        imageVector = ImageVector.vectorResource(R.drawable.scan),
+                        imageVector = Icons.Default.AccountCircle,
                         contentDescription = "Navigation Icon",
                         tint = iconTint
                     )
