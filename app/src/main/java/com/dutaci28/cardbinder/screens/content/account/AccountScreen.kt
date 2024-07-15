@@ -76,13 +76,14 @@ fun ShowAccountDialog(
         confirmButton = {
             TextButton(
                 onClick = {
+                    isShowDialog.value = false
                     viewModel.signOut(
                         navController,
                         context
                     )
                 }
             ) {
-                Text("Log Out")
+                Text("Sign Out")
             }
         },
         dismissButton = {
