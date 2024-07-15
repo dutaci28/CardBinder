@@ -475,7 +475,6 @@ fun CollectionScreenTopBar(
         }
         if (collectionViewToggle.value) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(text = "List view", color = Color.Gray)
                 IconButton(
                     onClick = { collectionViewToggle.value = !collectionViewToggle.value },
                     modifier = Modifier.padding(10.dp)
@@ -492,7 +491,6 @@ fun CollectionScreenTopBar(
             }
         } else {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(text = "Pager view", color = Color.Gray)
                 IconButton(
                     onClick = { collectionViewToggle.value = !collectionViewToggle.value },
                     modifier = Modifier.padding(10.dp)

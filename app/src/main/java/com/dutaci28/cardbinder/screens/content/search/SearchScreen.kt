@@ -198,8 +198,11 @@ fun TextRecognitionScreen(
         ) {
             recognizedText.value?.let {
                 Text(
-                    text = "Tap the box with name of the card:",
+                    text = "Tap the name of the card;",
                     fontWeight = FontWeight.Bold
+                )
+                Text(
+                    text = "It will populate the search bar.",
                 )
             }
             Image(
