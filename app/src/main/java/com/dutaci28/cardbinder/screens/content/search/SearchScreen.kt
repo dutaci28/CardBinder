@@ -190,7 +190,8 @@ fun TextRecognitionScreen(
         modifier = topPaddingModifier
             .fillMaxSize()
             .verticalScroll(scrollState)
-            .padding(bottom = 140.dp)
+            .padding(bottom = 140.dp),
+        contentAlignment = Alignment.Center
     ) {
         Column(
             modifier = Modifier.fillMaxSize(),
