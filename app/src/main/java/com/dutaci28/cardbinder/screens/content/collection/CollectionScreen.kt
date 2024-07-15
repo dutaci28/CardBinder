@@ -33,10 +33,12 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -206,10 +208,6 @@ fun CollectionCardListItem(
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Text(
-                text = cardCollectionEntry.amount.toString() + "x",
-                modifier = Modifier.padding(5.dp)
-            )
-            Text(
                 text = cardCollectionEntry.card.name,
                 modifier = Modifier
                     .padding(5.dp)
@@ -217,6 +215,18 @@ fun CollectionCardListItem(
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
             )
+            if(cardCollectionEntry.standardAmount.toString().toInt() != 0){
+                Text(
+                    text = cardCollectionEntry.standardAmount.toString() + "x Std.",
+                    modifier = Modifier.padding(5.dp)
+                )
+            }
+            if(cardCollectionEntry.foilAmount.toString().toInt() != 0){
+                Text(
+                    text = cardCollectionEntry.foilAmount.toString() + "x Foil",
+                    modifier = Modifier.padding(5.dp)
+                )
+            }
             Text(
                 text = "#" + cardCollectionEntry.card.collector_number,
                 color = Color.Gray,
@@ -397,11 +407,23 @@ fun SharedTransitionScope.CardPager(
         verticalArrangement = Arrangement.Bottom,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text(
-            text = "x ${currentEntry.value.amount}",
-            color = Color.Gray,
-            fontSize = 24.sp
-        )
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            if(currentEntry.value.standardAmount.toString().toInt() != 0) {
+                Text(
+                    text = "No treatment x ${currentEntry.value.standardAmount}",
+                    color = Color.Gray,
+                    fontSize = 24.sp
+                )
+            }
+            Spacer(modifier = Modifier.size(10.dp))
+            if(currentEntry.value.foilAmount.toString().toInt() != 0){
+                Text(
+                    text = "Foil x ${currentEntry.value.foilAmount}",
+                    color = Color.Gray,
+                    fontSize = 24.sp
+                )
+            }
+        }
     }
 }
 

@@ -47,6 +47,7 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -207,20 +208,32 @@ fun ShowAmountDialog(
     val amount = remember {
         mutableStateOf("1")
     }
+    var isChecked by remember { mutableStateOf(false) }
+
     AlertDialog(
         title = {
             Text(text = "Select amount")
         },
         text = {
-            TextField(
-                value = amount.value,
-                onValueChange = { text ->
-                    if (text.isNotEmpty())
-                        if (text.isDigitsOnly()) amount.value = if (text.toInt() < 1) "1" else text
-                },
-                keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
-                singleLine = true
-            )
+            Column {
+                TextField(
+                    value = amount.value,
+                    onValueChange = { text ->
+                        if (text.isNotEmpty())
+                            if (text.isDigitsOnly()) amount.value = if (text.toInt() < 1) "1" else text
+                    },
+                    keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
+                    singleLine = true
+                )
+
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Checkbox(
+                        checked = isChecked,
+                        onCheckedChange = { isChecked = it }
+                    )
+                    Text("Foil", modifier = Modifier.padding(start = 8.dp))
+                }
+            }
         },
         onDismissRequest = {
             isShowDialog.value = false
@@ -230,21 +243,41 @@ fun ShowAmountDialog(
                 onClick = {
                     if (auth.currentUser != null) {
                         if (card.name.isNotEmpty()) {
-                            addItemToCurrentUserCollection(
-                                currentUser = auth.currentUser!!,
-                                db = db,
-                                cardCollectionEntry = CardCollectionEntry(
-                                    card,
-                                    amount.value.toInt()
-                                ),
-                                onSuccessListener = {
-                                    navController.navigate(Routes.Collection.route) {
-                                        popUpTo(Routes.Search.route) {
-                                            inclusive = true
+                            if(isChecked){
+                                addItemToCurrentUserCollection(
+                                    currentUser = auth.currentUser!!,
+                                    db = db,
+                                    cardCollectionEntry = CardCollectionEntry(
+                                        card = card,
+                                        standardAmount = 0,
+                                        foilAmount = amount.value.toInt()
+                                    ),
+                                    onSuccessListener = {
+                                        navController.navigate(Routes.Collection.route) {
+                                            popUpTo(Routes.Search.route) {
+                                                inclusive = true
+                                            }
                                         }
                                     }
-                                }
-                            )
+                                )
+                            } else {
+                                addItemToCurrentUserCollection(
+                                    currentUser = auth.currentUser!!,
+                                    db = db,
+                                    cardCollectionEntry = CardCollectionEntry(
+                                        card = card,
+                                        standardAmount = amount.value.toInt(),
+                                        foilAmount = 0
+                                    ),
+                                    onSuccessListener = {
+                                        navController.navigate(Routes.Collection.route) {
+                                            popUpTo(Routes.Search.route) {
+                                                inclusive = true
+                                            }
+                                        }
+                                    }
+                                )
+                            }
                         } else {
                             Log.d("CARDS", "Tried to add empty card to DB")
                         }
@@ -286,13 +319,21 @@ fun addItemToCurrentUserCollection(
             for (document in it) {
                 isAlreadyPresent.value = true
                 val documentRef = document.reference
-                Log.d("CARDS", "documentRef" + documentRef)
-                val oldAmount = document.data["amount"].toString().toInt()
-                val newAmount = oldAmount + cardCollectionEntry.amount
-                documentRef.update(hashMapOf("amount" to newAmount) as Map<String, Any>)
+                Log.d("CARDS", "documentRef $documentRef")
+                val oldStandardAmount = document.data["standardAmount"].toString().toInt()
+                val oldFoilAmount = document.data["foilAmount"].toString().toInt()
+                val newStandardAmount = oldStandardAmount + cardCollectionEntry.standardAmount
+                val newFoilAmount = oldFoilAmount + cardCollectionEntry.foilAmount
+                documentRef.update(hashMapOf("standardAmount" to newStandardAmount) as Map<String, Any>)
                     .addOnSuccessListener {
                         Log.d("CARDS", "Updated")
-                        onSuccessListener()
+                        documentRef.update(hashMapOf("foilAmount" to newFoilAmount) as Map<String, Any>)
+                            .addOnSuccessListener {
+                                Log.d("CARDS", "Updated")
+                                onSuccessListener()
+                            }.addOnFailureListener {
+                                Log.d("CARDS", "Failed to update")
+                            }
                     }.addOnFailureListener {
                         Log.d("CARDS", "Failed to update")
                     }
