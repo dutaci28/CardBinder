@@ -196,13 +196,18 @@ fun TextRecognitionScreen(
             modifier = Modifier.fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            recognizedText.value?.let {
+            if(recognizedText.value!=null){
                 Text(
                     text = "Tap the name of the card;",
                     fontWeight = FontWeight.Bold
                 )
                 Text(
                     text = "It will populate the search bar.",
+                )
+            } else {
+                Text(
+                    text = "No text was found;",
+                    fontWeight = FontWeight.Bold
                 )
             }
             Image(
