@@ -18,7 +18,7 @@ Or by taking a picture of a card;
 
 ![](https://github.com/dutaci28/CardBinder/blob/master/gifs/card%20scan.gif)
 
-And they can add those cards to their collections.
+In order to create and expand their collection.
 
 ![](https://github.com/dutaci28/CardBinder/blob/master/gifs/collection%20pager.gif)
 
