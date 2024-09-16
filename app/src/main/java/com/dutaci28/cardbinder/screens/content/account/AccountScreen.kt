@@ -21,7 +21,9 @@ import android.content.Context
 import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
@@ -33,6 +35,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
@@ -59,6 +62,7 @@ fun AccountScreen(
     ) {
         Text(text = "Logged in as:")
         Text(text = "${auth.currentUser?.email}")
+        Spacer(modifier = Modifier.padding(10.dp))
         Button(onClick = {
             sendForgotPasswordEmail(
                 auth = auth,
@@ -67,6 +71,8 @@ fun AccountScreen(
             )
         }) { Text(text = "Reset password") }
         Button(onClick = { isShowDialog.value = true }) { Text(text = "Sign Out") }
+        Spacer(modifier = Modifier.padding(10.dp))
+        Text(text = "Version ${context.packageManager.getPackageInfo(context.packageName,0).versionName}")
         if (isShowDialog.value) ShowAccountDialog(
             isShowDialog = isShowDialog,
             viewModel = viewModel,
