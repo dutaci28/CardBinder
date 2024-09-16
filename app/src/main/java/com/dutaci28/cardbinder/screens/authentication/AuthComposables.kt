@@ -20,7 +20,9 @@ package com.dutaci28.cardbinder.screens.authentication
 import android.content.Context
 import android.util.Log
 import android.util.Patterns
+import android.widget.Toast
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -58,7 +60,9 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.dutaci28.cardbinder.R
 import com.dutaci28.cardbinder.screens.navigation.Routes
+import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.auth
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
@@ -282,6 +286,29 @@ fun AuthTextField(
     }
 }
 
+@Composable
+fun ForgotPasswordText(context: Context, email: MutableState<String>){
+    Text(text = "Forgot password?", modifier = Modifier.clickable {
+        sendForgotPasswordEmail(context, email)
+    })
+}
+
+fun sendForgotPasswordEmail(context: Context, email: MutableState<String>) {
+    if (checkEmailValidity(email.value)) {
+        Firebase.auth.sendPasswordResetEmail(email.value).addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                Toast.makeText(context, "Password reset email sent!", Toast.LENGTH_SHORT).show()
+            } else {
+                Toast.makeText(context, "Error: ${task.exception?.message}", Toast.LENGTH_SHORT)
+                    .show()
+            }
+        }
+    } else {
+        Toast.makeText(context, "Please fill in the email field.", Toast.LENGTH_SHORT).show()
+    }
+    Firebase.auth.signOut()
+}
+
 fun checkLoginInputsAndNavigateToMain(
     navController: NavController,
     email: String,
@@ -292,7 +319,7 @@ fun checkLoginInputsAndNavigateToMain(
     isAuthenticationFailed: MutableState<Boolean>
 ) {
     isProcessingCredentials.value = true
-    if (checkEmailValidity(email) && checkPasswordValidity(password))
+    if (checkEmailValidity(email))
         coroutineScope.launch {
             auth.signInWithEmailAndPassword(email, password).addOnCompleteListener { task ->
                 if (task.isSuccessful) {

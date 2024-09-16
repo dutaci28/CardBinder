@@ -18,6 +18,7 @@
 package com.dutaci28.cardbinder.screens.content.account
 
 import android.content.Context
+import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -36,7 +37,11 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.window.DialogProperties
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.dutaci28.cardbinder.screens.authentication.checkEmailValidity
+import com.google.firebase.Firebase
+import com.google.firebase.auth.EmailAuthProvider
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.auth
 
 
 @Composable
@@ -54,7 +59,8 @@ fun AccountScreen(
         verticalArrangement = Arrangement.Center
     ) {
         Text(text = "Work in Progress", color = Color.Red)
-        Button(onClick = { isShowDialog.value = true }) { Text(text = "Account") }
+        Button(onClick = { sendForgotPasswordEmail(context = context,email = Firebase.auth.currentUser?.email.toString()) }) { Text(text = "Reset password") }
+        Button(onClick = { isShowDialog.value = true }) { Text(text = "Sign Out") }
         if (isShowDialog.value) ShowAccountDialog(
             isShowDialog = isShowDialog,
             viewModel = viewModel,
@@ -108,4 +114,30 @@ fun ShowAccountDialog(
         },
         properties = DialogProperties(dismissOnBackPress = true, dismissOnClickOutside = true)
     )
+}
+
+fun sendForgotPasswordEmail(context: Context, email: String) {
+    if(Firebase.auth.currentUser!=null){
+        var isUsingEmail = false
+        Firebase.auth.currentUser!!.providerData.forEach { userInfo-> if(userInfo.providerId == EmailAuthProvider.PROVIDER_ID){
+            isUsingEmail = true
+        } }
+        if(!isUsingEmail){
+            Toast.makeText(context, "You are not using an email/password combination.", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        if (checkEmailValidity(email)) {
+                Firebase.auth.sendPasswordResetEmail(email).addOnCompleteListener { task ->
+                    if (task.isSuccessful) {
+                        Toast.makeText(context, "Password reset email sent!", Toast.LENGTH_SHORT).show()
+                    } else {
+                        Toast.makeText(context, "Error: ${task.exception?.message}", Toast.LENGTH_SHORT)
+                            .show()
+                    }
+                }
+        } else {
+            Toast.makeText(context, "Please fill in the email field.", Toast.LENGTH_SHORT).show()
+        }
+    }
 }
