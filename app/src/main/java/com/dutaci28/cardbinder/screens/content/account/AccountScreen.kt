@@ -32,7 +32,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.window.DialogProperties
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -58,8 +57,15 @@ fun AccountScreen(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        Text(text = "Work in Progress", color = Color.Red)
-        Button(onClick = { sendForgotPasswordEmail(context = context,email = Firebase.auth.currentUser?.email.toString()) }) { Text(text = "Reset password") }
+        Text(text = "Logged in as:")
+        Text(text = "${auth.currentUser?.email}")
+        Button(onClick = {
+            sendForgotPasswordEmail(
+                auth = auth,
+                context = context,
+                email = Firebase.auth.currentUser?.email.toString()
+            )
+        }) { Text(text = "Reset password") }
         Button(onClick = { isShowDialog.value = true }) { Text(text = "Sign Out") }
         if (isShowDialog.value) ShowAccountDialog(
             isShowDialog = isShowDialog,
@@ -116,26 +122,32 @@ fun ShowAccountDialog(
     )
 }
 
-fun sendForgotPasswordEmail(context: Context, email: String) {
-    if(Firebase.auth.currentUser!=null){
+fun sendForgotPasswordEmail(auth: FirebaseAuth, context: Context, email: String) {
+    if (auth.currentUser != null) {
         var isUsingEmail = false
-        Firebase.auth.currentUser!!.providerData.forEach { userInfo-> if(userInfo.providerId == EmailAuthProvider.PROVIDER_ID){
-            isUsingEmail = true
-        } }
-        if(!isUsingEmail){
-            Toast.makeText(context, "You are not using an email/password combination.", Toast.LENGTH_SHORT).show()
+        auth.currentUser!!.providerData.forEach { userInfo ->
+            if (userInfo.providerId == EmailAuthProvider.PROVIDER_ID) {
+                isUsingEmail = true
+            }
+        }
+        if (!isUsingEmail) {
+            Toast.makeText(
+                context,
+                "You are not using an email/password combination.",
+                Toast.LENGTH_SHORT
+            ).show()
             return
         }
 
         if (checkEmailValidity(email)) {
-                Firebase.auth.sendPasswordResetEmail(email).addOnCompleteListener { task ->
-                    if (task.isSuccessful) {
-                        Toast.makeText(context, "Password reset email sent!", Toast.LENGTH_SHORT).show()
-                    } else {
-                        Toast.makeText(context, "Error: ${task.exception?.message}", Toast.LENGTH_SHORT)
-                            .show()
-                    }
+            auth.sendPasswordResetEmail(email).addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    Toast.makeText(context, "Password reset email sent!", Toast.LENGTH_SHORT).show()
+                } else {
+                    Toast.makeText(context, "Error: ${task.exception?.message}", Toast.LENGTH_SHORT)
+                        .show()
                 }
+            }
         } else {
             Toast.makeText(context, "Please fill in the email field.", Toast.LENGTH_SHORT).show()
         }
