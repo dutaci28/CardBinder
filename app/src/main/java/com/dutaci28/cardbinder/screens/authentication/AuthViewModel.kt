@@ -64,7 +64,7 @@ class AuthViewModel @Inject constructor() : ViewModel() {
         val googleIdOption: GetGoogleIdOption =
             GetGoogleIdOption.Builder()
                 .setFilterByAuthorizedAccounts(false)
-                .setServerClientId(context.getString(R.string.FIREBASE_AUTH_WEB_CLIENT_ID))
+                .setServerClientId(context.getString(R.string.FIREBASE_GOOGLE_AUTH_WEB_CLIENT_ID))
                 .build()
         val request = GetCredentialRequest.Builder().addCredentialOption(googleIdOption).build()
         viewModelScope.launch {
