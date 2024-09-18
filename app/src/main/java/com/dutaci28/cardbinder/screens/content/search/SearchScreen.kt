@@ -134,7 +134,10 @@ fun SharedTransitionScope.SearchScreen(
                 SearchScreenTopBar(
                     text = searchQuery,
                     context = context,
-                    onTextChange = { viewModel.updateSearchQuery(query = it) },
+                    onTextChange = {
+                        viewModel.updateSearchQuery(query = it)
+                        viewModel.searchCardsByName(name = it)
+                    },
                     onSearchClicked = { viewModel.searchCardsByName(name = it) },
                     onClearClicked = { viewModel.clearSearchedCards() },
                     shouldFocus = shouldFocus,

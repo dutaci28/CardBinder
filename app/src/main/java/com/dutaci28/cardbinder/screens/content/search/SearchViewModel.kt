@@ -22,7 +22,6 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
-import androidx.paging.cachedIn
 import com.dutaci28.cardbinder.data.repository.Repository
 import com.dutaci28.cardbinder.model.MTGCard
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -48,7 +47,7 @@ class SearchViewModel @Inject constructor(
 
     fun searchCardsByName(name: String) {
         viewModelScope.launch {
-            repo.searchCardsByName(name = name).cachedIn(viewModelScope).collect {
+            repo.searchCardsByName(name = name).collect {
                 _searchedCards.value = it
             }
         }
